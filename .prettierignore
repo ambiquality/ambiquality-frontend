@@ -1,0 +1,5 @@
+dist
+node_modules
+openapi
+src/api/**/*.generated.ts
+*.md
