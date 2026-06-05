@@ -16,6 +16,9 @@ dist
 dist-ssr
 *.local
 
+# Vite dependency cache
+.vite/
+
 # Environment (never commit real secrets / URLs)
 .env
 .env.*

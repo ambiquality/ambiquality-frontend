@@ -49,13 +49,30 @@ const customConfig = defineConfig({
     semanticTokens: {
       colors: {
         brand: {
-          solid: { value: '{colors.brand.600}' },
+          // Light/dark-aware so brand text + surfaces clear WCAG 2.1 AA contrast in BOTH
+          // modes (POU). In dark mode the brand fg/emphasized shift to lighter ramp steps
+          // (300/400) against the dark surface; `solid` (the button fill) lightens to 500
+          // so white contrast stays ≥ 4.5:1.
+          solid: { value: { base: '{colors.brand.600}', _dark: '{colors.brand.500}' } },
           contrast: { value: 'white' },
-          fg: { value: '{colors.brand.700}' },
-          muted: { value: '{colors.brand.100}' },
-          subtle: { value: '{colors.brand.50}' },
-          emphasized: { value: '{colors.brand.700}' },
-          focusRing: { value: '{colors.brand.500}' },
+          fg: { value: { base: '{colors.brand.700}', _dark: '{colors.brand.300}' } },
+          muted: { value: { base: '{colors.brand.100}', _dark: '{colors.brand.800}' } },
+          subtle: { value: { base: '{colors.brand.50}', _dark: '{colors.brand.900}' } },
+          emphasized: { value: { base: '{colors.brand.700}', _dark: '{colors.brand.400}' } },
+          focusRing: { value: { base: '{colors.brand.500}', _dark: '{colors.brand.300}' } },
+        },
+        // Shared form / status semantic tokens used by FormField + ProblemError so error,
+        // required, and muted text are consistent everywhere (KON) and AA-contrast in both
+        // modes. Built on Chakra's `red`/`gray` ramps to avoid a second palette (VZH).
+        fieldError: {
+          fg: { value: { base: '{colors.red.700}', _dark: '{colors.red.300}' } },
+          border: { value: { base: '{colors.red.500}', _dark: '{colors.red.400}' } },
+        },
+        required: {
+          fg: { value: { base: '{colors.red.600}', _dark: '{colors.red.300}' } },
+        },
+        muted: {
+          fg: { value: { base: '{colors.gray.600}', _dark: '{colors.gray.400}' } },
         },
       },
     },
