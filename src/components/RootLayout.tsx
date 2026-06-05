@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Container,
   Flex,
   HStack,
@@ -7,10 +8,11 @@ import {
   Link as ChakraLink,
   Spacer,
 } from '@chakra-ui/react';
-import { Link as RouterLink, Outlet } from 'react-router-dom';
+import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ColorModeButton } from '@/theme';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
+import { useAuth } from '@/auth/useAuth';
 
 /**
  * Top-level shell shared by every route: skip link, header with primary nav, and an
@@ -57,6 +59,7 @@ export function RootLayout() {
               </ChakraLink>
             </HStack>
             <Spacer />
+            <AccountNav />
             <LanguageSwitch />
             <ColorModeButton />
           </HStack>
@@ -69,5 +72,42 @@ export function RootLayout() {
         </Container>
       </Box>
     </Flex>
+  );
+}
+
+/**
+ * Auth-aware account affordance in the header (Phase 4): a "sign in" link when anonymous; an
+ * account link + "sign out" button when authenticated. Hidden entirely while the boot session
+ * restore is still resolving so the header doesn't flicker login→account.
+ */
+function AccountNav() {
+  const { t } = useTranslation('account');
+  const { isAuthenticated, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
+
+  if (isLoading) return null;
+
+  if (!isAuthenticated) {
+    return (
+      <ChakraLink asChild>
+        <RouterLink to="/login">{t('nav.login')}</RouterLink>
+      </ChakraLink>
+    );
+  }
+
+  async function handleLogout() {
+    await logout();
+    navigate('/login', { replace: true });
+  }
+
+  return (
+    <HStack gap="3">
+      <ChakraLink asChild>
+        <RouterLink to="/admin/account">{t('nav.account')}</RouterLink>
+      </ChakraLink>
+      <Button size="sm" variant="ghost" onClick={handleLogout}>
+        {t('nav.logout')}
+      </Button>
+    </HStack>
   );
 }

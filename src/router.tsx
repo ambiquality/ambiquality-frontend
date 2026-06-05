@@ -4,6 +4,9 @@ import { ErrorPage } from '@/components/ErrorPage';
 import { RootLayout } from '@/components/RootLayout';
 import { AboutPage } from '@/features/about/AboutPage';
 import { LoginPage } from '@/features/account/LoginPage';
+import { RegisterPage } from '@/features/account/RegisterPage';
+import { AccountSettingsPage } from '@/features/account/AccountSettingsPage';
+import { ConfirmEmailPage } from '@/features/account/ConfirmEmailPage';
 import { EntityDetailPage } from '@/features/entity-detail/EntityDetailPage';
 import { AdminHomePage } from '@/features/evidence-admin/AdminHomePage';
 import { MapPage } from '@/features/public-map/MapPage';
@@ -13,7 +16,7 @@ import { MapPage } from '@/features/public-map/MapPage';
  *
  * Public routes use backend-issued slugs (`bld-…` / `rm-…` / `sns-…`) so visitor
  * detail URLs are stable and shareable. Operator routes live under `/admin/*` behind
- * `ProtectedRoute` — the auth boundary is scaffolded now; real auth wiring is Phase 4.
+ * `ProtectedRoute` — Phase 4 wires the real auth boundary and the account screens.
  */
 export const router = createBrowserRouter([
   {
@@ -29,17 +32,21 @@ export const router = createBrowserRouter([
       // --- Informational ---
       { path: 'about', element: <AboutPage /> },
 
-      // --- Account (Auth.Api) ---
+      // --- Account (Auth.Api), anonymous ---
       { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
+      // Email-confirmation landings (links arrive from emails with token query params).
+      { path: 'confirm-email', element: <ConfirmEmailPage kind="confirm-email" /> },
+      { path: 'confirm-email-change', element: <ConfirmEmailPage kind="confirm-email-change" /> },
 
-      // --- Operator (Evidence.Api), guarded ---
+      // --- Operator (Evidence.Api + account settings), guarded ---
       {
         path: 'admin',
-        element: (
-          <ProtectedRoute>
-            <AdminHomePage />
-          </ProtectedRoute>
-        ),
+        element: <ProtectedRoute />,
+        children: [
+          { index: true, element: <AdminHomePage /> },
+          { path: 'account', element: <AccountSettingsPage /> },
+        ],
       },
     ],
   },
