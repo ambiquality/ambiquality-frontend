@@ -4,6 +4,7 @@ import { App } from './App';
 import { UiProvider } from './theme';
 import { QueryProvider } from './lib/query-provider';
 import { I18nProvider } from './i18n';
+import { AuthProvider } from './auth/AuthProvider';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -15,7 +16,12 @@ createRoot(rootElement).render(
     <I18nProvider>
       <UiProvider>
         <QueryProvider>
-          <App />
+          {/* AuthProvider wraps the router (App) so every route can `useAuth`, while the provider
+              itself stays outside the router — it never needs navigation, and a hard auth failure
+              simply clears state so ProtectedRoute redirects to /login. */}
+          <AuthProvider>
+            <App />
+          </AuthProvider>
         </QueryProvider>
       </UiProvider>
     </I18nProvider>

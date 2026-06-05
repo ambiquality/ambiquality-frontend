@@ -1,17 +1,7 @@
 /**
- * Auth stub for Phase 1.
- *
- * Real auth (AuthProvider, in-memory access token, localStorage refresh token with
- * single-flight silent refresh, 429/Retry-After handling) lands in Phase 4. For now
- * this is a hard-coded "not authenticated" hook so `ProtectedRoute` can scaffold the
- * operator boundary without pulling in token logic yet.
+ * Phase 4: real, context-backed auth. The hook and context contract live in `auth-context.ts`
+ * (kept JSX-free for React-Refresh); `AuthProvider.tsx` supplies the value. This module re-exports
+ * the public surface so existing imports of `@/auth/useAuth` keep working.
  */
-export interface AuthState {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-}
-
-export function useAuth(): AuthState {
-  // Phase 4 will replace this with real context-backed state.
-  return { isAuthenticated: false, isLoading: false };
-}
+export { useAuth, AuthContext } from './auth-context';
+export type { AuthContextValue, AuthUser, LoginOutcome, RegisterOutcome } from './auth-context';
