@@ -1,0 +1,699 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Ambiquality Public API",
+    "description": "Read-only open-data API for the Ambiquality IEQ (Indoor Environmental Quality) monitoring platform: time-series observations (JSON, JSON-LD, CSV), the building/room/sensor evidence catalog, and a DCAT-AP 3.0 dataset description. All responses are published under CC BY 4.0.",
+    "contact": {
+      "name": "Vilém Charwot, VŠE Prague"
+    },
+    "license": {
+      "name": "CC BY 4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/",
+      "identifier": "CC-BY-4.0"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/"
+    }
+  ],
+  "paths": {
+    "/v1/observations.csv": {
+      "get": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "Export observations as CSV",
+        "description": "Streams the filtered observation set as a downloadable CSV archive (CC BY 4.0).",
+        "operationId": "ExportObservationsCsv",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "Export observations as CSV",
+        "description": "Streams the filtered observation set as a downloadable CSV archive (CC BY 4.0).",
+        "operationId": "ExportObservationsCsv",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/context/measurements.jsonld": {
+      "get": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "JSON-LD context for observations",
+        "description": "The @context document that observation JSON-LD responses link to.",
+        "operationId": "GetMeasurementsContext",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Context"
+        ],
+        "summary": "JSON-LD context for observations",
+        "description": "The @context document that observation JSON-LD responses link to.",
+        "operationId": "GetMeasurementsContext",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/catalog": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "DCAT-AP 3.0 catalog metadata",
+        "description": "Open-data catalog record describing the IEQ dataset (JSON-LD / JSON).",
+        "operationId": "GetDcatCatalog",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "DCAT-AP 3.0 catalog metadata",
+        "description": "Open-data catalog record describing the IEQ dataset (JSON-LD / JSON).",
+        "operationId": "GetDcatCatalog",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/observations": {
+      "get": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "List observations",
+        "description": "Keyset-paginated measurements as SSN/SOSA observations. Filters: from, to, sensorId, parameterCode, buildingId, roomId, bbox, includeInvalid, limit, cursor. Negotiates application/json (default), application/ld+json, and text/csv. Paging is keyset (opaque cursor), not offset: the observations hypertable is append-only and unbounded, so a cursor gives stable, gap-free pages and constant latency at any depth — unlike the catalog endpoints, which use small, bounded offset/page collections.",
+        "operationId": "ListObservations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "List observations",
+        "description": "Keyset-paginated measurements as SSN/SOSA observations. Filters: from, to, sensorId, parameterCode, buildingId, roomId, bbox, includeInvalid, limit, cursor. Negotiates application/json (default), application/ld+json, and text/csv. Paging is keyset (opaque cursor), not offset: the observations hypertable is append-only and unbounded, so a cursor gives stable, gap-free pages and constant latency at any depth — unlike the catalog endpoints, which use small, bounded offset/page collections.",
+        "operationId": "ListObservations",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/observations/{id}": {
+      "get": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "Get an observation by id",
+        "description": "The stable IRI target for a single observation (JSON or JSON-LD).",
+        "operationId": "GetObservationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Observations"
+        ],
+        "summary": "Get an observation by id",
+        "description": "The stable IRI target for a single observation (JSON or JSON-LD).",
+        "operationId": "GetObservationById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/properties": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "List observable properties",
+        "description": "The platform's IEQ observable-property vocabulary. Each entry is the sosa:observedProperty target for its parameter, with its QUDT quantity kind + applicable unit and any authoritative external match. JSON or JSON-LD.",
+        "operationId": "ListProperties",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "List observable properties",
+        "description": "The platform's IEQ observable-property vocabulary. Each entry is the sosa:observedProperty target for its parameter, with its QUDT quantity kind + applicable unit and any authoritative external match. JSON or JSON-LD.",
+        "operationId": "ListProperties",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/properties/{code}": {
+      "get": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Get an observable property by code",
+        "description": "The dereferenceable IRI target for a single observed property (JSON or JSON-LD).",
+        "operationId": "GetPropertyByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Properties"
+        ],
+        "summary": "Get an observable property by code",
+        "description": "The dereferenceable IRI target for a single observed property (JSON or JSON-LD).",
+        "operationId": "GetPropertyByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/codelists": {
+      "get": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "List codelists",
+        "description": "The catalog's controlled vocabularies as SKOS concept schemes (JSON or JSON-LD).",
+        "operationId": "ListCodelists",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "List codelists",
+        "description": "The catalog's controlled vocabularies as SKOS concept schemes (JSON or JSON-LD).",
+        "operationId": "ListCodelists",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/codelists/{scheme}": {
+      "get": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "Get a codelist (concept scheme)",
+        "description": "A single codelist with its bilingual concepts (JSON or JSON-LD).",
+        "operationId": "GetCodelistScheme",
+        "parameters": [
+          {
+            "name": "scheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "Get a codelist (concept scheme)",
+        "description": "A single codelist with its bilingual concepts (JSON or JSON-LD).",
+        "operationId": "GetCodelistScheme",
+        "parameters": [
+          {
+            "name": "scheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/codelists/{scheme}/{code}": {
+      "get": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "Get a codelist concept",
+        "description": "The dereferenceable IRI target for a single codelist concept (JSON or JSON-LD).",
+        "operationId": "GetCodelistConcept",
+        "parameters": [
+          {
+            "name": "scheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Codelists"
+        ],
+        "summary": "Get a codelist concept",
+        "description": "The dereferenceable IRI target for a single codelist concept (JSON or JSON-LD).",
+        "operationId": "GetCodelistConcept",
+        "parameters": [
+          {
+            "name": "scheme",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/buildings": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "List buildings",
+        "description": "Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed.",
+        "operationId": "ListBuildings",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "List buildings",
+        "description": "Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed.",
+        "operationId": "ListBuildings",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/buildings/{id}": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "Get a building by id",
+        "operationId": "GetBuildingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "Get a building by id",
+        "operationId": "GetBuildingById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "List rooms of a building",
+        "description": "Filters: roomFunction, minExposure (minutes), page, pageSize.",
+        "operationId": "ListBuildingRooms",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "summary": "List rooms of a building",
+        "description": "Filters: roomFunction, minExposure (minutes), page, pageSize.",
+        "operationId": "ListBuildingRooms",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/rooms/{id}": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Get a room by id",
+        "operationId": "GetRoomById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "Get a room by id",
+        "operationId": "GetRoomById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/rooms/{roomId}/sensors": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "List sensors in a room",
+        "description": "Filters: parameterCode, status, page, pageSize.",
+        "operationId": "ListRoomSensors",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Rooms"
+        ],
+        "summary": "List sensors in a room",
+        "description": "Filters: parameterCode, status, page, pageSize.",
+        "operationId": "ListRoomSensors",
+        "parameters": [
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/v1/sensors/{id}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Get a sensor by id",
+        "operationId": "GetSensorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "head": {
+        "tags": [
+          "Sensors"
+        ],
+        "summary": "Get a sensor by id",
+        "operationId": "GetSensorById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Observations"
+    },
+    {
+      "name": "Context"
+    },
+    {
+      "name": "Catalog"
+    },
+    {
+      "name": "Properties"
+    },
+    {
+      "name": "Codelists"
+    },
+    {
+      "name": "Buildings"
+    },
+    {
+      "name": "Rooms"
+    },
+    {
+      "name": "Sensors"
+    }
+  ]
+}
