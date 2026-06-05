@@ -7,7 +7,8 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'node_modules', 'src/api/**/*.generated.ts'],
+    // Generated OpenAPI types — auto-emitted by `npm run gen:api`, not hand-edited.
+    ignores: ['dist', 'node_modules', 'src/api/**/*.generated.ts', 'src/api/**/schema.d.ts'],
   },
   {
     files: ['**/*.{ts,tsx}'],

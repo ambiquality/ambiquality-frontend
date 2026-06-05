@@ -1,0 +1,2607 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Ambiquality.Evidence.Api | v1",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/"
+    }
+  ],
+  "paths": {
+    "/v1/buildings": {
+      "post": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Register a new building",
+        "operationId": "RegisterBuilding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterBuildingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterBuildingResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "List the authenticated owner's buildings (unmasked coordinates)",
+        "operationId": "ListBuildings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "List the authenticated owner's buildings (unmasked coordinates)",
+        "operationId": "ListBuildings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get a building by ID",
+        "operationId": "GetBuildingById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get a building by ID",
+        "operationId": "GetBuildingById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{slug}": {
+      "get": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get a building by slug",
+        "operationId": "GetBuildingBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Get a building by slug",
+        "operationId": "GetBuildingBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/name": {
+      "put": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Record a new building name effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeBuildingName",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBuildingNameRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/address": {
+      "put": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Record a new building address effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeBuildingAddress",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBuildingAddressRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/type": {
+      "put": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Record a new building type effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeBuildingType",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBuildingTypeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/location": {
+      "put": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Record a new building location effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeBuildingLocation",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBuildingLocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/years": {
+      "put": {
+        "tags": [
+          "Buildings"
+        ],
+        "description": "Record new construction/renovation years effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeBuildingYears",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBuildingYearsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms": {
+      "post": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Register a new room in a building",
+        "operationId": "RegisterRoom",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRoomRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomSnapshotResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "List the rooms of a building the caller owns",
+        "operationId": "ListRooms",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "List the rooms of a building the caller owns",
+        "operationId": "ListRooms",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RoomSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Get a room by ID",
+        "operationId": "GetRoomById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Get a room by ID",
+        "operationId": "GetRoomById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{slug}": {
+      "get": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Get a room by slug",
+        "operationId": "GetRoomBySlug",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Get a room by slug",
+        "operationId": "GetRoomBySlug",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/name": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a new room name effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeRoomName",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomAttributeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/floor": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a new room floor effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeRoomFloor",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomFloorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/function": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a new room function effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeRoomFunction",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomAttributeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/exposure": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a new room exposure effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeRoomExposure",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomAttributeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/geometry": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record new room geometry (area, ceiling height) effective from validFrom (appends history)",
+        "operationId": "ChangeRoomGeometry",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomGeometryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/ventilation": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a new room ventilation type effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeRoomVentilation",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeRoomAttributeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/pollution-sources": {
+      "post": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Record a pollution source effective from validFrom (appends history)",
+        "operationId": "AddPollutionSource",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPollutionSourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/pollution-sources/{sourceCode}": {
+      "put": {
+        "tags": [
+          "Rooms"
+        ],
+        "description": "Close a pollution source's validity as of validTo (soft history)",
+        "operationId": "RemovePollutionSource",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sourceCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePollutionSourceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors": {
+      "post": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Register a new sensor in a room",
+        "operationId": "RegisterSensor",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterSensorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorRegisteredResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "List the sensors of a room in a building the caller owns",
+        "operationId": "ListSensors",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SensorSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "List the sensors of a room in a building the caller owns",
+        "operationId": "ListSensors",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SensorSnapshotResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Get a sensor by ID",
+        "operationId": "GetSensorById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Get a sensor by ID",
+        "operationId": "GetSensorById",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{slug}": {
+      "get": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Get a sensor by slug",
+        "operationId": "GetSensorBySlug",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      },
+      "head": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Get a sensor by slug",
+        "operationId": "GetSensorBySlug",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensorSnapshotResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/identity": {
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Record new sensor identity (manufacturer, model, serial) effective from validFrom (appends history)",
+        "operationId": "ChangeSensorIdentity",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeSensorIdentityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/placement": {
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Record a new sensor placement (room) effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeSensorPlacement",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeSensorPlacementRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/status": {
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Record a new sensor lifecycle status effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeSensorStatus",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeSensorStatusRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/measured-parameters": {
+      "post": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Record a measured-parameter capability effective from validFrom (appends history)",
+        "operationId": "AddMeasuredParameter",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMeasuredParameterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/measured-parameters/{parameterCode}": {
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Close a measured-parameter capability's validity as of validTo (soft history)",
+        "operationId": "RemoveMeasuredParameter",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "parameterCode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveMeasuredParameterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddMeasuredParameterRequest": {
+        "required": [
+          "parameterCode",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "parameterCode": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AddPollutionSourceRequest": {
+        "required": [
+          "sourceCode",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceCode": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BuildingSnapshotResponse": {
+        "required": [
+          "id",
+          "uriSlug",
+          "ownerId",
+          "name",
+          "street",
+          "city",
+          "postcode",
+          "country",
+          "buildingTypeCode",
+          "latitude",
+          "longitude",
+          "anonymizationLevel",
+          "yearBuilt",
+          "yearRenovated",
+          "asOf"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uriSlug": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "buildingTypeCode": {
+            "type": "string"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "anonymizationLevel": {
+            "type": "string"
+          },
+          "yearBuilt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          },
+          "yearRenovated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeBuildingAddressRequest": {
+        "required": [
+          "street",
+          "city",
+          "postcode",
+          "country",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeBuildingLocationRequest": {
+        "required": [
+          "latitude",
+          "longitude",
+          "anonymizationLevel",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "anonymizationLevel": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeBuildingNameRequest": {
+        "required": [
+          "newName",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "newName": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeBuildingTypeRequest": {
+        "required": [
+          "newTypeCode",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "newTypeCode": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeBuildingYearsRequest": {
+        "required": [
+          "yearBuilt",
+          "yearRenovated",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "yearBuilt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          },
+          "yearRenovated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeRoomAttributeRequest": {
+        "required": [
+          "newValue",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "newValue": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeRoomFloorRequest": {
+        "required": [
+          "floor",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "floor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint8"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeRoomGeometryRequest": {
+        "required": [
+          "areaM2",
+          "ceilingHeightM",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "areaM2": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "ceilingHeightM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeSensorIdentityRequest": {
+        "required": [
+          "manufacturer",
+          "model",
+          "serialNumber",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "manufacturer": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeSensorPlacementRequest": {
+        "required": [
+          "newRoomId",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "newRoomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ChangeSensorStatusRequest": {
+        "required": [
+          "newStatusCode",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "newStatusCode": {
+            "type": "string"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MeasuredParameterResponse": {
+        "required": [
+          "code",
+          "quantityKindUri",
+          "unitUri"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "quantityKindUri": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "unitUri": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "RegisterBuildingRequest": {
+        "required": [
+          "name",
+          "street",
+          "city",
+          "postcode",
+          "country",
+          "buildingTypeCode",
+          "latitude",
+          "longitude",
+          "anonymizationLevel",
+          "yearBuilt",
+          "yearRenovated"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "buildingTypeCode": {
+            "type": "string"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "anonymizationLevel": {
+            "type": "string"
+          },
+          "yearBuilt": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          },
+          "yearRenovated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int16"
+          }
+        }
+      },
+      "RegisterBuildingResult": {
+        "required": [
+          "id",
+          "uriSlug"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uriSlug": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRoomRequest": {
+        "required": [
+          "name",
+          "floor",
+          "functionCode",
+          "exposureCode",
+          "areaM2",
+          "ceilingHeightM",
+          "ventilationType",
+          "pollutionSources"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "floor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint8"
+          },
+          "functionCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "exposureCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "areaM2": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "ceilingHeightM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "ventilationType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pollutionSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RegisterSensorRequest": {
+        "required": [
+          "manufacturer",
+          "model",
+          "serialNumber",
+          "statusCode",
+          "measuredParameters"
+        ],
+        "type": "object",
+        "properties": {
+          "manufacturer": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "measuredParameters": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RemoveMeasuredParameterRequest": {
+        "required": [
+          "validTo"
+        ],
+        "type": "object",
+        "properties": {
+          "validTo": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RemovePollutionSourceRequest": {
+        "required": [
+          "validTo"
+        ],
+        "type": "object",
+        "properties": {
+          "validTo": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RoomSnapshotResponse": {
+        "required": [
+          "id",
+          "uriSlug",
+          "buildingId",
+          "name",
+          "floor",
+          "functionCode",
+          "exposureCode",
+          "areaM2",
+          "ceilingHeightM",
+          "ventilationType",
+          "pollutionSources",
+          "asOf"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uriSlug": {
+            "type": "string"
+          },
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "floor": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint8"
+          },
+          "functionCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "exposureCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "areaM2": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "ceilingHeightM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "ventilationType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pollutionSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SensorRegisteredResponse": {
+        "required": [
+          "id",
+          "uriSlug",
+          "buildingId",
+          "roomId",
+          "manufacturer",
+          "model",
+          "serialNumber",
+          "statusCode",
+          "measuredParameters",
+          "asOf",
+          "apiKey"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uriSlug": {
+            "type": "string"
+          },
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "measuredParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeasuredParameterResponse"
+            }
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "apiKey": {
+            "type": "string"
+          }
+        }
+      },
+      "SensorSnapshotResponse": {
+        "required": [
+          "id",
+          "uriSlug",
+          "buildingId",
+          "roomId",
+          "manufacturer",
+          "model",
+          "serialNumber",
+          "statusCode",
+          "measuredParameters",
+          "asOf"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uriSlug": {
+            "type": "string"
+          },
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "roomId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "serialNumber": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "string"
+          },
+          "measuredParameters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MeasuredParameterResponse"
+            }
+          },
+          "asOf": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "JWT access token issued by the Ambiquality Auth API.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Buildings"
+    },
+    {
+      "name": "Rooms"
+    },
+    {
+      "name": "Sensors"
+    }
+  ]
+}
