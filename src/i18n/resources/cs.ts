@@ -30,9 +30,6 @@ export const cs: Resources = {
       cs: 'Čeština',
       en: 'English',
     },
-    colorMode: {
-      toggle: 'Přepnout barevný režim',
-    },
     actions: {
       save: 'Uložit',
       cancel: 'Zrušit',

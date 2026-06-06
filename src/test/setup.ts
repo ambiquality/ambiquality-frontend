@@ -25,7 +25,7 @@ if (typeof window !== 'undefined' && !window.localStorage) {
   });
 }
 
-// jsdom doesn't implement matchMedia; next-themes (color mode) reads it on mount.
+// jsdom doesn't implement matchMedia; some Chakra components read it on mount.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) => ({
     matches: false,

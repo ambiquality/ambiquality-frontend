@@ -27,9 +27,6 @@ export const en = {
       cs: 'Čeština',
       en: 'English',
     },
-    colorMode: {
-      toggle: 'Toggle color mode',
-    },
     actions: {
       save: 'Save',
       cancel: 'Cancel',
