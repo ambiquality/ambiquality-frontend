@@ -37,6 +37,26 @@ export function optionalNumber(message: string): FieldValidator {
   };
 }
 
+/**
+ * Optional finite **decimal** within an inclusive `[min, max]` range; blank is allowed. Used for
+ * latitude (−90…90) and longitude (−180…180), where the value is a decimal degree, not an integer
+ * (cf. {@link optionalIntInRange}). Lenient client check — Evidence.Api stays authoritative.
+ */
+export function optionalNumberInRange(
+  min: number,
+  max: number,
+  messages: { invalid: string; range: string },
+): FieldValidator {
+  return (value) => {
+    const v = value.trim();
+    if (v === '') return null;
+    const n = Number(v);
+    if (!Number.isFinite(n)) return messages.invalid;
+    if (n < min || n > max) return messages.range;
+    return null;
+  };
+}
+
 /** Required finite number. */
 export function requiredNumber(messages: { required: string; invalid: string }): FieldValidator {
   return (value) => {

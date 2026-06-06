@@ -50,9 +50,11 @@ export const en = {
     required: 'required',
     requiredMarker: '*',
     optional: 'optional',
+    moreInfo: 'More information',
     validation: {
       required: 'This field is required.',
       invalid: 'This value is not valid.',
+      range: 'Enter a number between {{min}} and {{max}}.',
       email: 'Enter a valid email address.',
       passwordTooShort: 'Use at least 8 characters.',
     },
@@ -199,6 +201,11 @@ export const en = {
       latitude: 'Latitude',
       longitude: 'Longitude',
       anonymizationLevel: 'Coordinate precision',
+      anonymizationLevelHint:
+        'How precisely this building’s location is shared publicly — anyone who is not the owner ' +
+        'sees the coordinates coarsened to this level. Prefer a coarser level: it protects ' +
+        'privacy (people may not want their home pinpointed on a public map) and security ' +
+        '(some readings reveal occupancy — e.g. unusually low CO₂ can signal that nobody is home).',
       yearBuilt: 'Year built',
       yearRenovated: 'Year renovated',
       floor: 'Floor',

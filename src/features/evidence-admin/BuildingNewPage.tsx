@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Box, Button, Heading, Input, SimpleGrid, VStack } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -8,10 +8,8 @@ import { useRegisterBuilding } from './queries';
 import { SelectField } from './components';
 import { useCodelistOptions } from './codelists';
 import { useCountryOptions } from './countries';
-import { requiredValidator, optionalIntInRange, optionalNumber } from './validation';
-
-/** Coordinate-precision levels — the fixed backend `AnonymizationLevel` enum (not a codelist). */
-const ANONYMIZATION_LEVELS = ['precise', 'street', 'municipality'] as const;
+import { useAnonymizationOptions } from './anonymization';
+import { requiredValidator, optionalIntInRange, optionalNumberInRange } from './validation';
 
 /**
  * F05 register a building (`POST /v1/buildings`). A single registration form (initial state);
@@ -29,10 +27,7 @@ export function BuildingNewPage() {
 
   const countryOptions = useCountryOptions();
   const buildingTypes = useCodelistOptions('building-type');
-  const anonymizationOptions = useMemo(
-    () => ANONYMIZATION_LEVELS.map((value) => ({ value, label: t(`anonymizationLevels.${value}`) })),
-    [t],
-  );
+  const anonymizationOptions = useAnonymizationOptions();
 
   const [name, setName] = useState('');
   const [street, setStreet] = useState('');
@@ -114,16 +109,45 @@ export function BuildingNewPage() {
           </FormField>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.latitude')} validate={optionalNumber(tf('validation.invalid'))}>
-              <Input value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+            <FormField
+              label={t('fields.latitude')}
+              validate={optionalNumberInRange(-90, 90, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '-90', max: '90' }),
+              })}
+            >
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="any"
+                min={-90}
+                max={90}
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+              />
             </FormField>
-            <FormField label={t('fields.longitude')} validate={optionalNumber(tf('validation.invalid'))}>
-              <Input value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+            <FormField
+              label={t('fields.longitude')}
+              validate={optionalNumberInRange(-180, 180, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '-180', max: '180' }),
+              })}
+            >
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="any"
+                min={-180}
+                max={180}
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+              />
             </FormField>
           </SimpleGrid>
 
           <FormField
             label={t('fields.anonymizationLevel')}
+            labelHint={t('fields.anonymizationLevelHint')}
             required
             validate={requiredValidator(tf('validation.required'))}
           >

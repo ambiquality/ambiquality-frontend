@@ -51,9 +51,11 @@ export const cs: Resources = {
     required: 'povinné',
     requiredMarker: '*',
     optional: 'nepovinné',
+    moreInfo: 'Více informací',
     validation: {
       required: 'Toto pole je povinné.',
       invalid: 'Tato hodnota není platná.',
+      range: 'Zadejte číslo mezi {{min}} a {{max}}.',
       email: 'Zadejte platnou e-mailovou adresu.',
       passwordTooShort: 'Použijte alespoň 8 znaků.',
     },
@@ -195,6 +197,12 @@ export const cs: Resources = {
       latitude: 'Zeměpisná šířka',
       longitude: 'Zeměpisná délka',
       anonymizationLevel: 'Přesnost souřadnic',
+      anonymizationLevelHint:
+        'Jak přesně se poloha této budovy sdílí s veřejností — kdokoli, kdo není vlastníkem, ' +
+        'uvidí souřadnice zhrubené na tuto úroveň. Volte raději hrubší úroveň: chrání soukromí ' +
+        '(ne každý chce mít svůj domov přesně zaměřený na veřejné mapě) i bezpečnost ' +
+        '(některé hodnoty prozrazují přítomnost osob — např. neobvykle nízké CO₂ může ' +
+        'signalizovat, že nikdo není doma).',
       yearBuilt: 'Rok výstavby',
       yearRenovated: 'Rok rekonstrukce',
       floor: 'Podlaží',
