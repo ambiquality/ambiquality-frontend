@@ -9,6 +9,12 @@ import { AccountSettingsPage } from '@/features/account/AccountSettingsPage';
 import { ConfirmEmailPage } from '@/features/account/ConfirmEmailPage';
 import { EntityDetailPage } from '@/features/entity-detail/EntityDetailPage';
 import { AdminHomePage } from '@/features/evidence-admin/AdminHomePage';
+import { BuildingNewPage } from '@/features/evidence-admin/BuildingNewPage';
+import { BuildingDetailPage } from '@/features/evidence-admin/BuildingDetailPage';
+import { RoomNewPage } from '@/features/evidence-admin/RoomNewPage';
+import { RoomDetailPage } from '@/features/evidence-admin/RoomDetailPage';
+import { SensorNewPage } from '@/features/evidence-admin/SensorNewPage';
+import { SensorDetailPage } from '@/features/evidence-admin/SensorDetailPage';
 import { MapPage } from '@/features/public-map/MapPage';
 
 /**
@@ -46,6 +52,21 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <AdminHomePage /> },
           { path: 'account', element: <AccountSettingsPage /> },
+
+          // Evidence admin (F05–F09). IDs (server UUIDs) drive the nested operator URLs; the
+          // public slug-based detail routes live on the visitor side (Public.Api).
+          { path: 'buildings/new', element: <BuildingNewPage /> },
+          { path: 'buildings/:buildingId', element: <BuildingDetailPage /> },
+          { path: 'buildings/:buildingId/rooms/new', element: <RoomNewPage /> },
+          { path: 'buildings/:buildingId/rooms/:roomId', element: <RoomDetailPage /> },
+          {
+            path: 'buildings/:buildingId/rooms/:roomId/sensors/new',
+            element: <SensorNewPage />,
+          },
+          {
+            path: 'buildings/:buildingId/rooms/:roomId/sensors/:sensorId',
+            element: <SensorDetailPage />,
+          },
         ],
       },
     ],
