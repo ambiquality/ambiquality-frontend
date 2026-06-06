@@ -49,7 +49,7 @@ export function RoomNewPage() {
         ventilationType: ventilationType.trim() === '' ? null : ventilationType,
         pollutionSources: [],
       });
-      navigate(`/admin/buildings/${buildingId}/rooms/${room.id}`);
+      navigate(`/operator/buildings/${buildingId}/rooms/${room.id}`);
     } catch (error) {
       if (error instanceof ProblemErrorObject) setProblem(error);
     }
@@ -59,8 +59,8 @@ export function RoomNewPage() {
     <Box maxW="2xl" mx="auto">
       <Breadcrumb
         items={[
-          { label: t('building.listTitle'), to: '/admin' },
-          { label: t('building.detailTitle'), to: `/admin/buildings/${buildingId}` },
+          { label: t('building.listTitle'), to: '/operator' },
+          { label: t('building.detailTitle'), to: `/operator/buildings/${buildingId}` },
           { label: t('room.registerTitle') },
         ]}
       />

@@ -23,10 +23,10 @@ vi.mock('@/api/auth/client', () => ({
 function renderSettings() {
   return renderWithProviders(
     <Routes>
-      <Route path="/admin/account" element={<AccountSettingsPage />} />
+      <Route path="/operator/account" element={<AccountSettingsPage />} />
       <Route path="/login" element={<div>login-screen</div>} />
     </Routes>,
-    { routerProps: { initialEntries: ['/admin/account'] } },
+    { routerProps: { initialEntries: ['/operator/account'] } },
   );
 }
 

@@ -18,7 +18,7 @@ interface FromState {
  *    whether the email exists),
  *  - **429** → a rate-limit notice that reads `Retry-After` and tells the user when to retry,
  *  - on success → redirect to the location the user was sent here from (`ProtectedRoute` puts it
- *    in router state as `from`), defaulting to `/admin`.
+ *    in router state as `from`), defaulting to `/operator`.
  */
 export function LoginPage() {
   const { t } = useTranslation('account');
@@ -32,7 +32,7 @@ export function LoginPage() {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const returnTo = (location.state as FromState | null)?.from?.pathname ?? '/admin';
+  const returnTo = (location.state as FromState | null)?.from?.pathname ?? '/operator';
 
   // Already signed in (e.g. navigated here directly): bounce to the operator area.
   if (isAuthenticated) {
