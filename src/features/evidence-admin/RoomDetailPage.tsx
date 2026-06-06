@@ -2,58 +2,41 @@ import { useState } from 'react';
 import {
   Box,
   Button,
-  Heading,
   HStack,
-  Input,
   Link as ChakraLink,
-  SimpleGrid,
   Spinner,
   Stack,
   Text,
-  VStack,
 } from '@chakra-ui/react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FormField, ProblemError, Breadcrumb } from '@/components';
+import { ProblemError, Breadcrumb } from '@/components';
 import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-details';
 import { useRoom, useSensors, type RoomSnapshot } from './queries';
-import {
-  useChangeRoomTextAttribute,
-  useChangeRoomFloor,
-  useChangeRoomGeometry,
-  useAddPollutionSource,
-  useRemovePollutionSource,
-} from './attribute-mutations';
-import { AttributeEditForm, AsOfViewer, CollectionEditor, SelectField } from './components';
-import { useCodelistOptions } from './codelists';
+import { SummaryCard, Pager, paginate, pageCountOf } from './components';
+import { useRoomSummaryRows } from './summaries';
+import { publicEntityUri } from './entity-uri';
 
 /**
- * F06 room detail + F07 temporal edits + the pollution-sources collection. Reads the room at
- * the chosen `asOf`; renders one {@link AttributeEditForm} per attribute (name / floor /
- * function / exposure / geometry / ventilation) and a {@link CollectionEditor} for pollution
- * sources (add = POST validFrom, remove = soft-close PUT validTo). A sensors list links into
- * F08/F09.
+ * F06 room detail — the read-only screen. Reads the latest room snapshot and renders it as a
+ * {@link SummaryCard} (with Edit and History actions on their own sub-routes; pollution sources
+ * shown read-only). Below the card, the sensors (F08/F09) are listed with client-side pagination
+ * and a Details button per row.
  */
 export function RoomDetailPage() {
   const { t } = useTranslation('evidence');
   const { buildingId = '', roomId = '' } = useParams();
-  const [asOf, setAsOf] = useState<string | null>(null);
-  const room = useRoom(buildingId, roomId, asOf);
+  const room = useRoom(buildingId, roomId);
 
   return (
     <Box maxW="3xl" mx="auto">
       <Breadcrumb
         items={[
-          { label: t('building.listTitle'), to: '/admin' },
-          { label: t('building.detailTitle'), to: `/admin/buildings/${buildingId}` },
+          { label: t('building.listTitle'), to: '/operator' },
+          { label: t('building.detailTitle'), to: `/operator/buildings/${buildingId}` },
           { label: room.data?.name ?? t('room.detailTitle') },
         ]}
       />
-      <Heading size="2xl" mb="6">
-        {room.data?.name ?? t('room.detailTitle')}
-      </Heading>
-
-      <AsOfViewer value={asOf} onChange={setAsOf} />
 
       {room.isLoading && <Spinner aria-label={t('common.loading')} mt="6" />}
       {room.error instanceof ProblemErrorObject && (
@@ -63,21 +46,16 @@ export function RoomDetailPage() {
       )}
 
       {room.data && (
-        <VStack gap="10" align="stretch" mt="8">
-          <RoomAttributeForms buildingId={buildingId} roomId={roomId} snapshot={room.data} />
-          <PollutionSourcesSection
-            buildingId={buildingId}
-            roomId={roomId}
-            codes={room.data.pollutionSources}
-          />
+        <Stack gap="10" align="stretch" mt="2">
+          <RoomSummary buildingId={buildingId} roomId={roomId} snapshot={room.data} />
           <SensorsSection buildingId={buildingId} roomId={roomId} />
-        </VStack>
+        </Stack>
       )}
     </Box>
   );
 }
 
-function RoomAttributeForms({
+function RoomSummary({
   buildingId,
   roomId,
   snapshot,
@@ -87,149 +65,31 @@ function RoomAttributeForms({
   snapshot: RoomSnapshot;
 }) {
   const { t } = useTranslation('evidence');
-
-  const functionCodes = useCodelistOptions('room-function');
-  const exposureCodes = useCodelistOptions('exposure');
-  const ventilationTypes = useCodelistOptions('ventilation-type');
-
-  const changeName = useChangeRoomTextAttribute(buildingId, roomId, 'name');
-  const changeFunction = useChangeRoomTextAttribute(buildingId, roomId, 'function');
-  const changeExposure = useChangeRoomTextAttribute(buildingId, roomId, 'exposure');
-  const changeVentilation = useChangeRoomTextAttribute(buildingId, roomId, 'ventilation');
-  const changeFloor = useChangeRoomFloor(buildingId, roomId);
-  const changeGeometry = useChangeRoomGeometry(buildingId, roomId);
-
-  const [name, setName] = useState(snapshot.name);
-  const [floor, setFloor] = useState(String(snapshot.floor));
-  const [functionCode, setFunctionCode] = useState(snapshot.functionCode ?? '');
-  const [exposureCode, setExposureCode] = useState(snapshot.exposureCode ?? '');
-  const [ventilation, setVentilation] = useState(snapshot.ventilationType ?? '');
-  const [areaM2, setAreaM2] = useState(String(snapshot.areaM2 ?? ''));
-  const [ceilingHeightM, setCeilingHeightM] = useState(String(snapshot.ceilingHeightM ?? ''));
-
-  const toNum = (v: string) => (v.trim() === '' ? null : Number(v));
+  const rows = useRoomSummaryRows(snapshot);
 
   return (
-    <Box>
-      <Heading size="lg" mb="6">
-        {t('room.editTitle')}
-      </Heading>
-      <VStack gap="10" align="stretch">
-        <AttributeEditForm
-          title={t('fields.name')}
-          buildBody={(validFrom) => ({ newValue: name, validFrom })}
-          mutateAsync={changeName.mutateAsync}
-        >
-          <FormField label={t('fields.name')} required>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
-          </FormField>
-        </AttributeEditForm>
-
-        <AttributeEditForm
-          title={t('fields.floor')}
-          buildBody={(validFrom) => ({ floor: Number(floor), validFrom })}
-          mutateAsync={changeFloor.mutateAsync}
-        >
-          <FormField label={t('fields.floor')} required>
-            <Input value={floor} onChange={(e) => setFloor(e.target.value)} />
-          </FormField>
-        </AttributeEditForm>
-
-        <AttributeEditForm
-          title={t('fields.function')}
-          buildBody={(validFrom) => ({ newValue: functionCode, validFrom })}
-          mutateAsync={changeFunction.mutateAsync}
-        >
-          <FormField label={t('fields.function')}>
-            <SelectField
-              value={functionCode}
-              onChange={setFunctionCode}
-              options={functionCodes.options}
-              disabled={functionCodes.isLoading}
-              placeholder={functionCodes.isLoading ? t('select.loading') : t('select.placeholder')}
-            />
-          </FormField>
-        </AttributeEditForm>
-
-        <AttributeEditForm
-          title={t('fields.exposure')}
-          buildBody={(validFrom) => ({ newValue: exposureCode, validFrom })}
-          mutateAsync={changeExposure.mutateAsync}
-        >
-          <FormField label={t('fields.exposure')}>
-            <SelectField
-              value={exposureCode}
-              onChange={setExposureCode}
-              options={exposureCodes.options}
-              disabled={exposureCodes.isLoading}
-              placeholder={exposureCodes.isLoading ? t('select.loading') : t('select.placeholder')}
-            />
-          </FormField>
-        </AttributeEditForm>
-
-        <AttributeEditForm
-          title={t('room.geometryTitle')}
-          buildBody={(validFrom) => ({
-            areaM2: toNum(areaM2),
-            ceilingHeightM: toNum(ceilingHeightM),
-            validFrom,
-          })}
-          mutateAsync={changeGeometry.mutateAsync}
-        >
-          <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.areaM2')}>
-              <Input value={areaM2} onChange={(e) => setAreaM2(e.target.value)} />
-            </FormField>
-            <FormField label={t('fields.ceilingHeightM')}>
-              <Input value={ceilingHeightM} onChange={(e) => setCeilingHeightM(e.target.value)} />
-            </FormField>
-          </SimpleGrid>
-        </AttributeEditForm>
-
-        <AttributeEditForm
-          title={t('fields.ventilation')}
-          buildBody={(validFrom) => ({ newValue: ventilation, validFrom })}
-          mutateAsync={changeVentilation.mutateAsync}
-        >
-          <FormField label={t('fields.ventilation')}>
-            <SelectField
-              value={ventilation}
-              onChange={setVentilation}
-              options={ventilationTypes.options}
-              disabled={ventilationTypes.isLoading}
-              placeholder={
-                ventilationTypes.isLoading ? t('select.loading') : t('select.placeholder')
-              }
-            />
-          </FormField>
-        </AttributeEditForm>
-      </VStack>
-    </Box>
-  );
-}
-
-function PollutionSourcesSection({
-  buildingId,
-  roomId,
-  codes,
-}: {
-  buildingId: string;
-  roomId: string;
-  codes: string[];
-}) {
-  const { t } = useTranslation('evidence');
-  const sources = useCodelistOptions('pollution-source');
-  const add = useAddPollutionSource(buildingId, roomId);
-  const remove = useRemovePollutionSource(buildingId, roomId);
-
-  return (
-    <CollectionEditor
-      title={t('room.pollutionSourcesTitle')}
-      codes={codes}
-      options={sources.options}
-      renderLabel={sources.label}
-      onAdd={(sourceCode, validFrom) => add.mutateAsync({ sourceCode, validFrom })}
-      onRemove={(sourceCode, validTo) => remove.mutateAsync({ sourceCode, body: { validTo } })}
+    <SummaryCard
+      title={snapshot.name}
+      uri={publicEntityUri('rooms', snapshot.uriSlug)}
+      rows={rows}
+      actions={
+        <HStack gap="2">
+          <ChakraLink asChild>
+            <RouterLink to={`/operator/buildings/${buildingId}/rooms/${roomId}/history`}>
+              <Button variant="outline" size="sm">
+                {t('nav.history')}
+              </Button>
+            </RouterLink>
+          </ChakraLink>
+          <ChakraLink asChild>
+            <RouterLink to={`/operator/buildings/${buildingId}/rooms/${roomId}/edit`}>
+              <Button colorPalette="brand" size="sm">
+                {t('nav.edit')}
+              </Button>
+            </RouterLink>
+          </ChakraLink>
+        </HStack>
+      }
     />
   );
 }
@@ -237,41 +97,70 @@ function PollutionSourcesSection({
 function SensorsSection({ buildingId, roomId }: { buildingId: string; roomId: string }) {
   const { t } = useTranslation('evidence');
   const sensors = useSensors(buildingId, roomId);
+  const [page, setPage] = useState(1);
+
+  const all = sensors.data ?? [];
+  const pageCount = pageCountOf(all.length);
+  const visible = paginate(all, page);
 
   return (
     <Box as="section" aria-labelledby="sensors-heading">
       <HStack justify="space-between" mb="4" align="center">
-        <Heading id="sensors-heading" size="lg">
+        <Text as="h2" id="sensors-heading" fontSize="xl" fontWeight="semibold">
           {t('sensor.listTitle')}
-        </Heading>
+        </Text>
         <ChakraLink asChild>
-          <RouterLink to={`/admin/buildings/${buildingId}/rooms/${roomId}/sensors/new`}>
-            <Button variant="outline">{t('nav.newSensor')}</Button>
+          <RouterLink to={`/operator/buildings/${buildingId}/rooms/${roomId}/sensors/new`}>
+            <Button colorPalette="brand">{t('nav.newSensor')}</Button>
           </RouterLink>
         </ChakraLink>
       </HStack>
 
       {sensors.isLoading && <Spinner aria-label={t('common.loading')} />}
-      {sensors.data && sensors.data.length === 0 && (
+      {all.length === 0 && !sensors.isLoading && (
         <Text color="fg.muted">{t('common.empty')}</Text>
       )}
-      {sensors.data && sensors.data.length > 0 && (
-        <Stack as="ul" gap="2" listStyleType="none">
-          {sensors.data.map((s) => (
-            <Box as="li" key={s.id} borderWidth="1px" rounded="md" p="3">
-              <ChakraLink asChild fontWeight="medium">
-                <RouterLink
-                  to={`/admin/buildings/${buildingId}/rooms/${roomId}/sensors/${s.id}`}
-                >
-                  {s.manufacturer} {s.model}
-                </RouterLink>
-              </ChakraLink>
-              <Text color="fg.muted" fontSize="sm">
-                {s.serialNumber}
-              </Text>
-            </Box>
-          ))}
-        </Stack>
+      {all.length > 0 && (
+        <>
+          <Stack as="ul" gap="2" listStyleType="none">
+            {visible.map((s) => (
+              <HStack
+                as="li"
+                key={s.id}
+                borderWidth="1px"
+                borderColor="border"
+                rounded="md"
+                p="3"
+                justify="space-between"
+                align="center"
+                gap="4"
+              >
+                <Box>
+                  <ChakraLink asChild fontWeight="medium">
+                    <RouterLink
+                      to={`/operator/buildings/${buildingId}/rooms/${roomId}/sensors/${s.id}`}
+                    >
+                      {s.manufacturer} {s.model}
+                    </RouterLink>
+                  </ChakraLink>
+                  <Text color="fg.muted" fontSize="sm">
+                    {s.serialNumber}
+                  </Text>
+                </Box>
+                <ChakraLink asChild>
+                  <RouterLink
+                    to={`/operator/buildings/${buildingId}/rooms/${roomId}/sensors/${s.id}`}
+                  >
+                    <Button variant="outline" size="sm">
+                      {t('nav.details')}
+                    </Button>
+                  </RouterLink>
+                </ChakraLink>
+              </HStack>
+            ))}
+          </Stack>
+          <Pager page={page} pageCount={pageCount} onChange={setPage} />
+        </>
       )}
     </Box>
   );

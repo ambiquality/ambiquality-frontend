@@ -17,10 +17,11 @@ import { useBuildings } from './queries';
 /**
  * F05–F09 operator evidence admin landing: the catalog of buildings the operator owns, plus the
  * entry point to register a new one. Buildings read via Evidence.Api (owner-precise; the visitor
- * map reads Public.Api instead — two read sources). Each row links to the building detail/edit
- * screen, which is where the per-attribute temporal edits, rooms, and sensors live.
+ * map reads Public.Api instead — two read sources). Each row links to the building detail screen
+ * (clickable name + an explicit "Details" button), which leads on to the temporal edits, history,
+ * rooms and sensors.
  */
-export function AdminHomePage() {
+export function BuildingsListPage() {
   const { t } = useTranslation('evidence');
   const buildings = useBuildings();
 
@@ -29,7 +30,7 @@ export function AdminHomePage() {
       <HStack justify="space-between" mb="6" align="center">
         <Heading size="2xl">{t('building.listTitle')}</Heading>
         <ChakraLink asChild>
-          <RouterLink to="/admin/buildings/new">
+          <RouterLink to="/operator/buildings/new">
             <Button colorPalette="brand">{t('nav.newBuilding')}</Button>
           </RouterLink>
         </ChakraLink>
@@ -45,14 +46,33 @@ export function AdminHomePage() {
       {buildings.data && buildings.data.length > 0 && (
         <Stack as="ul" gap="2" listStyleType="none">
           {buildings.data.map((b) => (
-            <Box as="li" key={b.id} borderWidth="1px" rounded="md" p="4">
-              <ChakraLink asChild fontWeight="medium">
-                <RouterLink to={`/admin/buildings/${b.id}`}>{b.name}</RouterLink>
+            <HStack
+              as="li"
+              key={b.id}
+              borderWidth="1px"
+              borderColor="border"
+              rounded="md"
+              p="4"
+              justify="space-between"
+              align="center"
+              gap="4"
+            >
+              <Box>
+                <ChakraLink asChild fontWeight="medium">
+                  <RouterLink to={`/operator/buildings/${b.id}`}>{b.name}</RouterLink>
+                </ChakraLink>
+                <Text color="fg.muted" fontSize="sm">
+                  {b.street}, {b.city}
+                </Text>
+              </Box>
+              <ChakraLink asChild>
+                <RouterLink to={`/operator/buildings/${b.id}`}>
+                  <Button variant="outline" size="sm">
+                    {t('nav.details')}
+                  </Button>
+                </RouterLink>
               </ChakraLink>
-              <Text color="fg.muted" fontSize="sm">
-                {b.street}, {b.city}
-              </Text>
-            </Box>
+            </HStack>
           ))}
         </Stack>
       )}

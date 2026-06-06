@@ -17,24 +17,8 @@ const sensorSnapshot = {
   asOf: '2026-06-06T00:00:00Z',
 };
 
-const rooms = [
-  { id: 'r1', name: 'Room One' },
-  { id: 'r2', name: 'Room Two' },
-  { id: 'r3', name: 'Room Three' },
-];
-
 vi.mock('./queries', () => ({
   useSensor: () => ({ data: sensorSnapshot, isLoading: false, error: null }),
-  useRooms: () => ({ data: rooms, isLoading: false }),
-}));
-
-const noopMutation = { mutateAsync: vi.fn().mockResolvedValue(undefined) };
-vi.mock('./attribute-mutations', () => ({
-  useChangeSensorIdentity: () => noopMutation,
-  useChangeSensorStatus: () => noopMutation,
-  useChangeSensorPlacement: () => noopMutation,
-  useAddMeasuredParameter: () => noopMutation,
-  useRemoveMeasuredParameter: () => noopMutation,
 }));
 
 vi.mock('@/api/public/hooks', () => ({
@@ -52,33 +36,38 @@ vi.mock('@/api/public/hooks', () => ({
 }));
 
 function renderPage() {
+  const base = '/operator/buildings/:buildingId/rooms/:roomId/sensors/:sensorId';
   return renderWithProviders(
     <Routes>
-      <Route
-        path="/admin/buildings/:buildingId/rooms/:roomId/sensors/:sensorId"
-        element={<SensorDetailPage />}
-      />
+      <Route path={base} element={<SensorDetailPage />} />
+      <Route path={`${base}/edit`} element={<div>sensor-edit</div>} />
+      <Route path={`${base}/history`} element={<div>sensor-history</div>} />
     </Routes>,
-    { routerProps: { initialEntries: ['/admin/buildings/b1/rooms/r1/sensors/sns-1'] } },
+    { routerProps: { initialEntries: ['/operator/buildings/b1/rooms/r1/sensors/sns-1'] } },
   );
 }
 
-describe('SensorDetailPage (F09 relocate + collections)', () => {
-  it('offers sibling rooms in the relocate picker but excludes the current room', () => {
+describe('SensorDetailPage (read-only card)', () => {
+  it('shows identity, status label, and measured quantities on the card', () => {
     renderPage();
-    const select = screen.getByLabelText(/Move to room/) as HTMLSelectElement;
-    expect(select.tagName).toBe('SELECT');
-    // Current room (r1 / "Room One") is not a relocation target.
-    expect(screen.queryByRole('option', { name: 'Room One' })).toBeNull();
-    expect(screen.getByRole('option', { name: 'Room Two' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Room Three' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Acme X100' })).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+    // Measured quantities are listed on the card (resolved to their property label).
+    expect(screen.getByText('Carbon dioxide')).toBeInTheDocument();
+    // No inline edit/collection controls on the read-only screen.
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Move to room/)).toBeNull();
   });
 
-  it('drives measured parameters from the property catalogue, excluding present codes', () => {
+  it('links to the Edit and History sub-routes', () => {
     renderPage();
-    // Already-present 'co2' renders as a labeled tag, and is excluded from the add picker.
-    expect(screen.getByText('Carbon dioxide')).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Carbon dioxide' })).toBeNull();
-    expect(screen.getByRole('option', { name: 'PM2.5' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/operator/buildings/b1/rooms/r1/sensors/sns-1/edit',
+    );
+    expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute(
+      'href',
+      '/operator/buildings/b1/rooms/r1/sensors/sns-1/history',
+    );
   });
 });
