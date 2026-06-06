@@ -8,20 +8,26 @@ import { RegisterPage } from '@/features/account/RegisterPage';
 import { AccountSettingsPage } from '@/features/account/AccountSettingsPage';
 import { ConfirmEmailPage } from '@/features/account/ConfirmEmailPage';
 import { EntityDetailPage } from '@/features/entity-detail/EntityDetailPage';
-import { AdminHomePage } from '@/features/evidence-admin/AdminHomePage';
+import { BuildingsListPage } from '@/features/evidence-admin/BuildingsListPage';
 import { BuildingNewPage } from '@/features/evidence-admin/BuildingNewPage';
 import { BuildingDetailPage } from '@/features/evidence-admin/BuildingDetailPage';
+import { BuildingEditPage } from '@/features/evidence-admin/BuildingEditPage';
+import { BuildingHistoryPage } from '@/features/evidence-admin/BuildingHistoryPage';
 import { RoomNewPage } from '@/features/evidence-admin/RoomNewPage';
 import { RoomDetailPage } from '@/features/evidence-admin/RoomDetailPage';
+import { RoomEditPage } from '@/features/evidence-admin/RoomEditPage';
+import { RoomHistoryPage } from '@/features/evidence-admin/RoomHistoryPage';
 import { SensorNewPage } from '@/features/evidence-admin/SensorNewPage';
 import { SensorDetailPage } from '@/features/evidence-admin/SensorDetailPage';
+import { SensorEditPage } from '@/features/evidence-admin/SensorEditPage';
+import { SensorHistoryPage } from '@/features/evidence-admin/SensorHistoryPage';
 import { MapPage } from '@/features/public-map/MapPage';
 
 /**
  * React Router v7 data router.
  *
  * Public routes use backend-issued slugs (`bld-…` / `rm-…` / `sns-…`) so visitor
- * detail URLs are stable and shareable. Operator routes live under `/admin/*` behind
+ * detail URLs are stable and shareable. Operator routes live under `/operator/*` behind
  * `ProtectedRoute` — Phase 4 wires the real auth boundary and the account screens.
  */
 export const router = createBrowserRouter([
@@ -47,18 +53,24 @@ export const router = createBrowserRouter([
 
       // --- Operator (Evidence.Api + account settings), guarded ---
       {
-        path: 'admin',
+        path: 'operator',
         element: <ProtectedRoute />,
         children: [
-          { index: true, element: <AdminHomePage /> },
+          { index: true, element: <BuildingsListPage /> },
           { path: 'account', element: <AccountSettingsPage /> },
 
           // Evidence admin (F05–F09). IDs (server UUIDs) drive the nested operator URLs; the
-          // public slug-based detail routes live on the visitor side (Public.Api).
+          // public slug-based detail routes live on the visitor side (Public.Api). Each entity
+          // splits into a read-only detail (card + nested list), an `edit` sub-route (temporal
+          // attribute forms), and a `history` sub-route (asOf projection).
           { path: 'buildings/new', element: <BuildingNewPage /> },
           { path: 'buildings/:buildingId', element: <BuildingDetailPage /> },
+          { path: 'buildings/:buildingId/edit', element: <BuildingEditPage /> },
+          { path: 'buildings/:buildingId/history', element: <BuildingHistoryPage /> },
           { path: 'buildings/:buildingId/rooms/new', element: <RoomNewPage /> },
           { path: 'buildings/:buildingId/rooms/:roomId', element: <RoomDetailPage /> },
+          { path: 'buildings/:buildingId/rooms/:roomId/edit', element: <RoomEditPage /> },
+          { path: 'buildings/:buildingId/rooms/:roomId/history', element: <RoomHistoryPage /> },
           {
             path: 'buildings/:buildingId/rooms/:roomId/sensors/new',
             element: <SensorNewPage />,
@@ -66,6 +78,14 @@ export const router = createBrowserRouter([
           {
             path: 'buildings/:buildingId/rooms/:roomId/sensors/:sensorId',
             element: <SensorDetailPage />,
+          },
+          {
+            path: 'buildings/:buildingId/rooms/:roomId/sensors/:sensorId/edit',
+            element: <SensorEditPage />,
+          },
+          {
+            path: 'buildings/:buildingId/rooms/:roomId/sensors/:sensorId/history',
+            element: <SensorHistoryPage />,
           },
         ],
       },

@@ -60,7 +60,7 @@ export function SensorNewPage() {
         <ApiKeyReveal
           apiKey={registered.apiKey}
           onAcknowledge={() =>
-            navigate(`/admin/buildings/${buildingId}/rooms/${roomId}/sensors/${registered.id}`)
+            navigate(`/operator/buildings/${buildingId}/rooms/${roomId}/sensors/${registered.id}`)
           }
         />
       </Box>
@@ -71,9 +71,9 @@ export function SensorNewPage() {
     <Box maxW="2xl" mx="auto">
       <Breadcrumb
         items={[
-          { label: t('building.listTitle'), to: '/admin' },
-          { label: t('building.detailTitle'), to: `/admin/buildings/${buildingId}` },
-          { label: t('room.detailTitle'), to: `/admin/buildings/${buildingId}/rooms/${roomId}` },
+          { label: t('building.listTitle'), to: '/operator' },
+          { label: t('building.detailTitle'), to: `/operator/buildings/${buildingId}` },
+          { label: t('room.detailTitle'), to: `/operator/buildings/${buildingId}/rooms/${roomId}` },
           { label: t('sensor.registerTitle') },
         ]}
       />

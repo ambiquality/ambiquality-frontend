@@ -54,7 +54,7 @@ export function RootLayout() {
                 <RouterLink to="/">{t('nav.map')}</RouterLink>
               </ChakraLink>
               <ChakraLink asChild>
-                <RouterLink to="/admin">{t('nav.operator')}</RouterLink>
+                <RouterLink to="/operator">{t('nav.operator')}</RouterLink>
               </ChakraLink>
               <ChakraLink asChild>
                 <RouterLink to="/about">{t('nav.about')}</RouterLink>
@@ -104,7 +104,7 @@ function AccountNav() {
   return (
     <HStack gap="3">
       <ChakraLink asChild>
-        <RouterLink to="/admin/account">{t('nav.account')}</RouterLink>
+        <RouterLink to="/operator/account">{t('nav.account')}</RouterLink>
       </ChakraLink>
       <Button size="sm" variant="ghost" onClick={handleLogout}>
         {t('nav.logout')}

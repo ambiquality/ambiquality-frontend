@@ -23,10 +23,10 @@ vi.mock('@/api/public/hooks', () => ({
 function renderPage() {
   return renderWithProviders(
     <Routes>
-      <Route path="/admin/buildings/new" element={<BuildingNewPage />} />
-      <Route path="/admin/buildings/:buildingId" element={<div>building-detail</div>} />
+      <Route path="/operator/buildings/new" element={<BuildingNewPage />} />
+      <Route path="/operator/buildings/:buildingId" element={<div>building-detail</div>} />
     </Routes>,
-    { routerProps: { initialEntries: ['/admin/buildings/new'] } },
+    { routerProps: { initialEntries: ['/operator/buildings/new'] } },
   );
 }
 

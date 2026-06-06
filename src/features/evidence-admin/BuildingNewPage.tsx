@@ -64,7 +64,7 @@ export function BuildingNewPage() {
         yearBuilt: yearBuilt.trim() === '' ? null : Number(yearBuilt),
         yearRenovated: yearRenovated.trim() === '' ? null : Number(yearRenovated),
       });
-      navigate(`/admin/buildings/${result.id}`);
+      navigate(`/operator/buildings/${result.id}`);
     } catch (error) {
       if (error instanceof ProblemErrorObject) setProblem(error);
     }

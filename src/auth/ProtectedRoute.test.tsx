@@ -22,7 +22,7 @@ function renderGuarded(initialPath: string) {
   return renderWithProviders(
     <Routes>
       <Route path="/login" element={<LoginProbe />} />
-      <Route path="/admin" element={<ProtectedRoute />}>
+      <Route path="/operator" element={<ProtectedRoute />}>
         <Route index element={<div>admin-home</div>} />
       </Route>
     </Routes>,
@@ -37,19 +37,19 @@ afterEach(() => {
 describe('ProtectedRoute', () => {
   it('renders the guarded outlet when authenticated', () => {
     useAuthMock.mockReturnValue({ isAuthenticated: true, isLoading: false });
-    renderGuarded('/admin');
+    renderGuarded('/operator');
     expect(screen.getByText('admin-home')).toBeInTheDocument();
   });
 
   it('redirects to /login and preserves the attempted location when unauthenticated', () => {
     useAuthMock.mockReturnValue({ isAuthenticated: false, isLoading: false });
-    renderGuarded('/admin');
-    expect(screen.getByText('login-screen:/admin')).toBeInTheDocument();
+    renderGuarded('/operator');
+    expect(screen.getByText('login-screen:/operator')).toBeInTheDocument();
   });
 
   it('shows a spinner (no redirect) while the boot session restore is loading', () => {
     useAuthMock.mockReturnValue({ isAuthenticated: false, isLoading: true });
-    renderGuarded('/admin');
+    renderGuarded('/operator');
     expect(screen.queryByText(/login-screen/)).not.toBeInTheDocument();
     expect(screen.queryByText('admin-home')).not.toBeInTheDocument();
     // The spinner carries the localized loading label.

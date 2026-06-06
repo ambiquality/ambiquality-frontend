@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { Routes, Route } from 'react-router-dom';
 import { renderWithProviders } from '@/test/render';
 import { BuildingDetailPage } from './BuildingDetailPage';
@@ -16,81 +16,82 @@ const SNAPSHOT = {
   buildingTypeCode: 'office',
   latitude: 50,
   longitude: 14,
-  anonymizationLevel: 'exact',
+  anonymizationLevel: 'precise',
   yearBuilt: 1990,
   yearRenovated: null,
   asOf: '2026-06-06T00:00:00Z',
 };
 
 const useBuilding = vi.fn();
-const changeName = vi.fn().mockResolvedValue(undefined);
+const useRooms = vi.fn();
 
 vi.mock('./queries', () => ({
   useBuilding: (...args: unknown[]) => useBuilding(...args),
-  useRooms: () => ({ isLoading: false, data: [] }),
+  useRooms: (...args: unknown[]) => useRooms(...args),
 }));
 
-vi.mock('./attribute-mutations', () => ({
-  useChangeBuildingName: () => ({ mutateAsync: changeName }),
-  useChangeBuildingAddress: () => ({ mutateAsync: vi.fn() }),
-  useChangeBuildingType: () => ({ mutateAsync: vi.fn() }),
-  useChangeBuildingLocation: () => ({ mutateAsync: vi.fn() }),
-  useChangeBuildingYears: () => ({ mutateAsync: vi.fn() }),
+// Building type is resolved to its codelist label on the summary card.
+vi.mock('@/api/public/hooks', () => ({
+  useCodelistScheme: () => ({
+    data: { office: { code: 'office', prefLabel: { en: 'Office building', cs: 'Administrativní budova' } } },
+    isLoading: false,
+  }),
 }));
 
 function renderPage() {
   return renderWithProviders(
     <Routes>
-      <Route path="/admin/buildings/:buildingId" element={<BuildingDetailPage />} />
+      <Route path="/operator/buildings/:buildingId" element={<BuildingDetailPage />} />
+      <Route path="/operator/buildings/:buildingId/edit" element={<div>building-edit</div>} />
+      <Route path="/operator/buildings/:buildingId/history" element={<div>building-history</div>} />
+      <Route path="/operator/buildings/:buildingId/rooms/:roomId" element={<div>room-detail</div>} />
     </Routes>,
-    { routerProps: { initialEntries: ['/admin/buildings/b1'] } },
+    { routerProps: { initialEntries: ['/operator/buildings/b1'] } },
   );
 }
 
 beforeEach(() => {
   useBuilding.mockReset();
   useBuilding.mockReturnValue({ isLoading: false, data: SNAPSHOT });
-  changeName.mockClear();
+  useRooms.mockReset();
+  useRooms.mockReturnValue({ isLoading: false, data: [] });
 });
 
-describe('BuildingDetailPage (F07 temporal edit + asOf viewer)', () => {
-  it('renders one attribute edit form per attribute (no single save-object form)', () => {
+describe('BuildingDetailPage (read-only card + nested rooms)', () => {
+  it('reads the latest snapshot and shows it as a read-only summary card', () => {
     renderPage();
-    // Distinct attribute sections each have their own Save button.
-    expect(screen.getByRole('heading', { name: 'Address' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Construction years' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Location' })).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: 'Save' }).length).toBeGreaterThanOrEqual(5);
+    expect(useBuilding).toHaveBeenCalledWith('b1');
+    expect(screen.getByRole('heading', { name: 'Main hall' })).toBeInTheDocument();
+    expect(screen.getByText('Office building')).toBeInTheDocument();
+    expect(screen.getByText('Náměstí 1, 11000 Praha, CZ')).toBeInTheDocument();
+    // The stable slug is surfaced as a copyable full public URI.
+    expect(screen.getByText(/\/buildings\/bld-x$/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
+    // No inline edit forms on the detail screen.
+    expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
   });
 
-  it('re-reads the building at the chosen asOf when the history viewer is applied', async () => {
+  it('links to the Edit and History sub-routes', () => {
     renderPage();
-
-    // Initially latest (asOf null).
-    expect(useBuilding).toHaveBeenCalledWith('b1', null);
-
-    fireEvent.change(screen.getByLabelText('Show state as of'), {
-      target: { value: '2025-03-01T09:00' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'View' }));
-
-    await waitFor(() => {
-      const lastCall = useBuilding.mock.calls.at(-1);
-      expect(lastCall?.[0]).toBe('b1');
-      expect(String(lastCall?.[1])).toMatch(/^2025-03-01T/);
-    });
+    expect(screen.getByRole('link', { name: 'Edit' })).toHaveAttribute(
+      'href',
+      '/operator/buildings/b1/edit',
+    );
+    expect(screen.getByRole('link', { name: 'History' })).toHaveAttribute(
+      'href',
+      '/operator/buildings/b1/history',
+    );
   });
 
-  it('fires the per-attribute name PUT carrying validFrom', async () => {
+  it('paginates rooms and gives each a Details link', () => {
+    const rooms = Array.from({ length: 12 }, (_, i) => ({ id: `r${i}`, name: `Room ${i}` }));
+    useRooms.mockReturnValue({ isLoading: false, data: rooms });
     renderPage();
 
-    // The first Save button belongs to the Name attribute form.
-    const saveButtons = screen.getAllByRole('button', { name: 'Save' });
-    fireEvent.click(saveButtons[0]);
-
-    await waitFor(() => expect(changeName).toHaveBeenCalledTimes(1));
-    const body = changeName.mock.calls[0][0] as { newName: string; validFrom: string };
-    expect(body.newName).toBe('Main hall');
-    expect(body.validFrom).toMatch(/Z$/);
+    // 10 per page → first page shows Room 0..9, not Room 10/11; pager status visible.
+    expect(screen.getByText('Room 0')).toBeInTheDocument();
+    expect(screen.queryByText('Room 10')).not.toBeInTheDocument();
+    expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Details' }).length).toBe(10);
   });
 });

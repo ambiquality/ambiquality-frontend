@@ -15,8 +15,8 @@ function renderLogin(initialEntry: { pathname: string; state?: unknown } | strin
   return renderWithProviders(
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/admin" element={<div>admin-home</div>} />
-      <Route path="/admin/buildings" element={<div>buildings-screen</div>} />
+      <Route path="/operator" element={<div>admin-home</div>} />
+      <Route path="/operator/buildings" element={<div>buildings-screen</div>} />
     </Routes>,
     { routerProps: { initialEntries: [initialEntry] } },
   );
@@ -60,7 +60,7 @@ describe('LoginPage', () => {
   it('redirects to the intended location on success', async () => {
     const user = userEvent.setup();
     login.mockResolvedValue({ ok: true });
-    renderLogin({ pathname: '/login', state: { from: { pathname: '/admin/buildings' } } });
+    renderLogin({ pathname: '/login', state: { from: { pathname: '/operator/buildings' } } });
 
     await fillCredentials(user);
     await user.click(screen.getByRole('button', { name: 'Sign in' }));

@@ -25,15 +25,15 @@ function renderPage() {
   return renderWithProviders(
     <Routes>
       <Route
-        path="/admin/buildings/:buildingId/rooms/:roomId/sensors/new"
+        path="/operator/buildings/:buildingId/rooms/:roomId/sensors/new"
         element={<SensorNewPage />}
       />
       <Route
-        path="/admin/buildings/:buildingId/rooms/:roomId/sensors/:sensorId"
+        path="/operator/buildings/:buildingId/rooms/:roomId/sensors/:sensorId"
         element={<div>sensor-detail</div>}
       />
     </Routes>,
-    { routerProps: { initialEntries: ['/admin/buildings/b1/rooms/r1/sensors/new'] } },
+    { routerProps: { initialEntries: ['/operator/buildings/b1/rooms/r1/sensors/new'] } },
   );
 }
 
