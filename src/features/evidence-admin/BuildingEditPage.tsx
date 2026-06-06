@@ -23,6 +23,8 @@ import {
 } from './attribute-mutations';
 import { AttributeEditForm, SelectField } from './components';
 import { useCodelistOptions } from './codelists';
+import { useAnonymizationOptions } from './anonymization';
+import { optionalNumberInRange } from './validation';
 
 /**
  * F07 building temporal edits. Each attribute (name / address / type / location / years) is its
@@ -76,8 +78,10 @@ function BuildingAttributeForms({
   snapshot: BuildingSnapshot;
 }) {
   const { t } = useTranslation('evidence');
+  const { t: tf } = useTranslation('forms');
 
   const buildingTypes = useCodelistOptions('building-type');
+  const anonymizationOptions = useAnonymizationOptions();
 
   const changeName = useChangeBuildingName(buildingId);
   const changeAddress = useChangeBuildingAddress(buildingId);
@@ -164,17 +168,51 @@ function BuildingAttributeForms({
           mutateAsync={changeLocation.mutateAsync}
         >
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.latitude')}>
-              <Input value={latitude} onChange={(e) => setLatitude(e.target.value)} />
+            <FormField
+              label={t('fields.latitude')}
+              validate={optionalNumberInRange(-90, 90, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '-90', max: '90' }),
+              })}
+            >
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="any"
+                min={-90}
+                max={90}
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+              />
             </FormField>
-            <FormField label={t('fields.longitude')}>
-              <Input value={longitude} onChange={(e) => setLongitude(e.target.value)} />
+            <FormField
+              label={t('fields.longitude')}
+              validate={optionalNumberInRange(-180, 180, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '-180', max: '180' }),
+              })}
+            >
+              <Input
+                type="number"
+                inputMode="decimal"
+                step="any"
+                min={-180}
+                max={180}
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+              />
             </FormField>
           </SimpleGrid>
-          <FormField label={t('fields.anonymizationLevel')} required>
-            <Input
+          <FormField
+            label={t('fields.anonymizationLevel')}
+            labelHint={t('fields.anonymizationLevelHint')}
+            required
+          >
+            <SelectField
               value={anonymizationLevel}
-              onChange={(e) => setAnonymizationLevel(e.target.value)}
+              onChange={setAnonymizationLevel}
+              options={anonymizationOptions}
+              placeholder={t('select.placeholder')}
             />
           </FormField>
         </AttributeEditForm>

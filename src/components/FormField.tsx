@@ -1,4 +1,4 @@
-import { Field, Input, type InputProps } from '@chakra-ui/react';
+import { Field, HStack, Input, type InputProps } from '@chakra-ui/react';
 import {
   cloneElement,
   isValidElement,
@@ -9,6 +9,7 @@ import {
   type ReactElement,
 } from 'react';
 import { useTranslation } from 'react-i18next';
+import { InfoTip } from './InfoTip';
 
 /**
  * A `validate` returns an error MESSAGE string when invalid, or `null`/`undefined` when valid.
@@ -23,6 +24,11 @@ export interface FormFieldProps {
   required?: boolean;
   /** Optional helper text rendered under the control and wired via `aria-describedby`. */
   helperText?: string;
+  /**
+   * Optional explanatory text revealed by an "ⓘ" tooltip next to the label — for a non-obvious
+   * choice that doesn't warrant permanent helper text. Shown on hover and focus (keyboard-reachable).
+   */
+  labelHint?: string;
   /**
    * Server/controlled error message. When set it takes precedence over local blur-validation
    * (so RFC 9457 field errors from `ProblemError` can be surfaced on the matching field).
@@ -54,6 +60,7 @@ export function FormField({
   label,
   required = false,
   helperText,
+  labelHint,
   error,
   validate,
   children,
@@ -87,14 +94,19 @@ export function FormField({
 
   return (
     <Field.Root id={fieldId} required={required} invalid={isInvalid}>
-      <Field.Label>
-        {label}
-        {required && (
-          <Field.RequiredIndicator fallback={null} color="required.fg" aria-label={t('required')}>
-            {t('requiredMarker')}
-          </Field.RequiredIndicator>
-        )}
-      </Field.Label>
+      {/* Keep the InfoTip a SIBLING of the <label> (not a child) — a button inside <label> is
+          invalid and would proxy clicks to the control. */}
+      <HStack gap="1.5" align="center">
+        <Field.Label mb="0">
+          {label}
+          {required && (
+            <Field.RequiredIndicator fallback={null} color="required.fg" aria-label={t('required')}>
+              {t('requiredMarker')}
+            </Field.RequiredIndicator>
+          )}
+        </Field.Label>
+        {labelHint && <InfoTip content={labelHint} ariaLabel={t('moreInfo')} />}
+      </HStack>
       {control}
       {helperText && <Field.HelperText>{helperText}</Field.HelperText>}
       {isInvalid && <Field.ErrorText color="fieldError.fg">{message}</Field.ErrorText>}
