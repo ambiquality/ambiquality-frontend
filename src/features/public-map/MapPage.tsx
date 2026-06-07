@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Heading, Stack, Text, VStack } from '@chakra-ui/react';
+import { Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
@@ -12,6 +12,7 @@ import { BuildingDialog } from './BuildingDialog';
 import { DegradationBanner } from './DegradationBanner';
 import { MarkerTableFallback } from './MarkerTableFallback';
 import { classify, hasBands, resolveStatusColor } from './color-bands';
+import { DisplayUnitControl } from '@/units';
 
 /**
  * F18 — public interactive map (visitor interface, UC18). Reads from Public.Api only.
@@ -89,12 +90,15 @@ export function MapPage() {
         align={{ base: 'stretch', md: 'flex-end' }}
         justify="space-between"
       >
-        <ParameterFilter
-          properties={properties}
-          value={parameterCode}
-          onChange={setSelectedParam}
-          isLoading={propertiesLoading}
-        />
+        <HStack gap="4" align="flex-end" wrap="wrap">
+          <ParameterFilter
+            properties={properties}
+            value={parameterCode}
+            onChange={setSelectedParam}
+            isLoading={propertiesLoading}
+          />
+          <DisplayUnitControl canonicalUnit={snapshot?.unit ?? null} />
+        </HStack>
         <MapLegend banded={banded} />
       </Stack>
 

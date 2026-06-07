@@ -5,6 +5,7 @@ import { UiProvider } from './theme';
 import { QueryProvider } from './lib/query-provider';
 import { I18nProvider } from './i18n';
 import { AuthProvider } from './auth/AuthProvider';
+import { UnitPreferenceProvider } from './units';
 import { env } from './lib/env';
 
 const rootElement = document.getElementById('root');
@@ -33,7 +34,9 @@ void enableMocks().then(() => {
                 itself stays outside the router — it never needs navigation, and a hard auth failure
                 simply clears state so ProtectedRoute redirects to /login. */}
             <AuthProvider>
-              <App />
+              <UnitPreferenceProvider>
+                <App />
+              </UnitPreferenceProvider>
             </AuthProvider>
           </QueryProvider>
         </UiProvider>
