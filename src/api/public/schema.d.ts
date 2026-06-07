@@ -4,6 +4,30 @@
  */
 
 export interface paths {
+    "/v1/observations/aggregate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Aggregate observations into buckets + distribution
+         * @description Server-side aggregation for the map's click-through chart. Either buildingId (aggregate across the building's sensors) or sensorId (one sensor) is required, plus parameterCode. Filters: from, to (ISO-8601), bucket (auto|5m|1h|6h|1d|1w). bucket=auto picks a granularity from the span and caps the bucket count.
+         */
+        get: operations["AggregateObservations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        /**
+         * Aggregate observations into buckets + distribution
+         * @description Server-side aggregation for the map's click-through chart. Either buildingId (aggregate across the building's sensors) or sensorId (one sensor) is required, plus parameterCode. Filters: from, to (ISO-8601), bucket (auto|5m|1h|6h|1d|1w). bucket=auto picks a granularity from the span and caps the bucket count.
+         */
+        head: operations["AggregateObservations"];
+        patch?: never;
+        trace?: never;
+    };
     "/v1/observations.csv": {
         parameters: {
             query?: never;
@@ -121,6 +145,30 @@ export interface paths {
          * @description The stable IRI target for a single observation (JSON or JSON-LD).
          */
         head: operations["GetObservationById"];
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/map/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Latest-value building markers for a quantity
+         * @description One marker per building with ≥1 active sensor measuring parameterCode. latestValue is the mean of each sensor's most-recent value; stale markers (freshest observation older than the freshness window) carry a null latestValue. Filters: parameterCode (required), bbox (minLon,minLat,maxLon,maxLat). Cached ~60 s.
+         */
+        get: operations["GetMapSnapshot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        /**
+         * Latest-value building markers for a quantity
+         * @description One marker per building with ≥1 active sensor measuring parameterCode. latestValue is the mean of each sensor's most-recent value; stale markers (freshest observation older than the freshness window) carry a null latestValue. Filters: parameterCode (required), bbox (minLon,minLat,maxLon,maxLat). Cached ~60 s.
+         */
+        head: operations["GetMapSnapshot"];
         patch?: never;
         trace?: never;
     };
@@ -373,7 +421,105 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        AggregateBucketDto: {
+            /** Format: date-time */
+            t: string;
+            /** Format: int64 */
+            count: number | string;
+            /** Format: double */
+            min: number | string;
+            /** Format: double */
+            max: number | string;
+            /** Format: double */
+            avg: number | string;
+            /** Format: double */
+            p25: number | string;
+            /** Format: double */
+            p50: number | string;
+            /** Format: double */
+            p75: number | string;
+        };
+        AggregateResponse: {
+            parameterCode: string;
+            unit: null | string;
+            /** Format: date-time */
+            from: string;
+            /** Format: date-time */
+            to: string;
+            bucket: string;
+            buckets: components["schemas"]["AggregateBucketDto"][];
+            stats: null | components["schemas"]["AggregateStatsDto"];
+            license: string;
+        };
+        AggregateStatsDto: {
+            /** Format: int64 */
+            count: number | string;
+            /** Format: double */
+            min: number | string;
+            /** Format: double */
+            max: number | string;
+            /** Format: double */
+            avg: number | string;
+            /** Format: double */
+            p05: number | string;
+            /** Format: double */
+            p25: number | string;
+            /** Format: double */
+            p50: number | string;
+            /** Format: double */
+            p75: number | string;
+            /** Format: double */
+            p95: number | string;
+        };
+        MapSnapshotItem: {
+            /** Format: uuid */
+            buildingId: string;
+            slug: string;
+            name: null | string;
+            /** Format: double */
+            lat: null | number | string;
+            /** Format: double */
+            lon: null | number | string;
+            /** Format: double */
+            latestValue: null | number | string;
+            /** Format: date-time */
+            observedAt: null | string;
+            stale: boolean;
+            /** Format: int32 */
+            sensorCount: number | string;
+        };
+        MapSnapshotResponse: {
+            parameterCode: string;
+            unit: null | string;
+            /** Format: date-time */
+            asOf: string;
+            items: components["schemas"]["MapSnapshotItem"][];
+            license: string;
+        };
+        ProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number | string;
+            detail?: null | string;
+            instance?: null | string;
+        };
+        PropertyCollection: {
+            items: components["schemas"]["PropertyResponse"][];
+            license: string;
+        };
+        PropertyResponse: {
+            code: string;
+            iri: string;
+            label: string;
+            quantityKindUri: null | string;
+            unitUri: null | string;
+            exactMatchIri: null | string;
+            closeMatchIri: null | string;
+            license: string;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -382,6 +528,82 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    AggregateObservations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AggregateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    AggregateObservations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AggregateResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     ExportObservationsCsv: {
         parameters: {
             query?: never;
@@ -566,7 +788,7 @@ export interface operations {
             };
         };
     };
-    ListProperties: {
+    GetMapSnapshot: {
         parameters: {
             query?: never;
             header?: never;
@@ -580,7 +802,65 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["MapSnapshotResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetMapSnapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MapSnapshotResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -598,7 +878,47 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PropertyCollection"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListProperties: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropertyCollection"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -618,7 +938,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PropertyResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -638,7 +978,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["PropertyResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };

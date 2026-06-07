@@ -52,6 +52,8 @@ export function MarkerTableFallback({
         {items.map((item) => {
           const unknown = item.stale || item.latestValue == null;
           const status = unknown ? 'unknown' : classify(parameterCode ?? '', item.latestValue);
+          // `name` is nullable in the snapshot schema; fall back to the (always-present) slug.
+          const name = item.name ?? item.slug;
           return (
             <Table.Row key={item.buildingId}>
               <Table.Cell>
@@ -62,11 +64,9 @@ export function MarkerTableFallback({
                   color="brand.fg"
                   textDecoration="underline"
                   fontWeight="medium"
-                  onClick={() =>
-                    onSelect({ buildingId: item.buildingId, slug: item.slug, name: item.name })
-                  }
+                  onClick={() => onSelect({ buildingId: item.buildingId, slug: item.slug, name })}
                 >
-                  {item.name}
+                  {name}
                 </Button>
               </Table.Cell>
               <Table.Cell>
