@@ -42,6 +42,20 @@ describe('TimeSeriesChart', () => {
     const { container } = renderWithProviders(<TimeSeriesChart buckets={[]} unit="ppm" />);
     expect(container.querySelector('svg')).toBeNull();
   });
+
+  it('places the y-axis title in a rotated group (not at the plot origin over the top tick)', () => {
+    // Regression: a `transform` set on the chakra <text> wasn't applied, so the "Value (unit)"
+    // title rendered at the inner origin and overprinted the top tick. The transform must live on
+    // a wrapping <g> that carries the rotation.
+    renderWithProviders(<TimeSeriesChart buckets={buckets} unit="ppm" />);
+    const title = screen.getByText('Value (ppm)');
+    expect(title.tagName.toLowerCase()).toBe('text');
+    // The title itself must NOT carry the (ineffective) transform...
+    expect(title.getAttribute('transform')).toBeNull();
+    // ...its wrapping group must, and it must rotate the label.
+    const group = title.closest('g');
+    expect(group?.getAttribute('transform')).toMatch(/rotate\(-90\)/);
+  });
 });
 
 describe('BoxPlot', () => {

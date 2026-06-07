@@ -118,15 +118,15 @@ export function TimeSeriesChart({ buckets, unit, displayUnit }: TimeSeriesChartP
         <chakra.path d={model.bandPath} fill="teal.solid" fillOpacity={0.16} />
         <chakra.path d={model.linePath} fill="none" stroke="teal.solid" strokeWidth={2} />
 
-        {/* Axis value label. */}
-        <chakra.text
-          transform={`translate(${-MARGIN.left + 12},${INNER_H / 2}) rotate(-90)`}
-          textAnchor="middle"
-          fontSize="10px"
-          fill="fg.muted"
-        >
-          {t('chart.axisValue', { unit: shownUnit })}
-        </chakra.text>
+        {/* Axis value label — a rotated y-axis title. The transform lives on a wrapping <g> (not on
+            the <text>), because a transform set directly on a chakra <text> isn't applied: the label
+            then renders at the inner origin and collides with the top tick. <g> transforms are
+            honoured (see the tick groups above). */}
+        <chakra.g transform={`translate(${-MARGIN.left + 12},${INNER_H / 2}) rotate(-90)`}>
+          <chakra.text textAnchor="middle" fontSize="10px" fill="fg.muted">
+            {t('chart.axisValue', { unit: shownUnit })}
+          </chakra.text>
+        </chakra.g>
       </chakra.g>
     </chakra.svg>
   );
