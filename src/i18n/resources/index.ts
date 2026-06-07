@@ -6,7 +6,15 @@ export const SUPPORTED_LANGUAGES = ['cs', 'en'] as const;
 export type Language = (typeof SUPPORTED_LANGUAGES)[number];
 
 /** i18next namespaces. `common` is the default; the rest are loaded eagerly (bundled). */
-export const NAMESPACES = ['common', 'glossary', 'forms', 'errors', 'account', 'evidence'] as const;
+export const NAMESPACES = [
+  'common',
+  'glossary',
+  'forms',
+  'errors',
+  'account',
+  'evidence',
+  'map',
+] as const;
 export const DEFAULT_NAMESPACE = 'common';
 
 /** Eagerly-bundled resources (no async backend; the app ships cs+en inline). */

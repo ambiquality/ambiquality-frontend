@@ -25,6 +25,17 @@ if (typeof window !== 'undefined' && !window.localStorage) {
   });
 }
 
+// jsdom doesn't implement ResizeObserver; Chakra/zag-js controls with a moving indicator
+// (SegmentGroup, Tabs…) observe their size on mount. A no-op stub is enough for unit tests.
+if (!('ResizeObserver' in globalThis)) {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
+}
+
 // jsdom doesn't implement matchMedia; some Chakra components read it on mount.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) => ({
