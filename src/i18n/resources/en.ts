@@ -34,6 +34,92 @@ export const en = {
       skipToContent: 'Skip to content',
     },
   },
+  map: {
+    // F18 public interactive map (UC18). Quantity labels themselves come from the backend
+    // (`/v1/properties` + SKOS prefLabels) — only the map's own chrome lives here.
+    title: 'Indoor environmental quality map',
+    intro:
+      'Explore the latest readings from registered buildings. Pick a quantity, then select a ' +
+      'building to see its trend and distribution. Locations are approximate by design.',
+    mapRegionLabel: 'Interactive map of monitored buildings',
+    filter: {
+      label: 'Quantity',
+      placeholder: 'Select a quantity…',
+      loading: 'Loading quantities…',
+    },
+    legend: {
+      title: 'Legend',
+      good: 'Good',
+      moderate: 'Moderate',
+      poor: 'Poor',
+      unknown: 'No recent data',
+      continuous: 'Coloured by value (lighter = lower, darker = higher).',
+    },
+    marker: {
+      label: '{{name}}: {{value}}',
+      valueUnavailable: '{{name}}: no recent data',
+    },
+    value: {
+      withUnit: '{{value}} {{unit}}',
+      stale: 'No recent data',
+      observedAt: 'Measured {{date}}',
+    },
+    degradation: {
+      title: 'Live values are unavailable',
+      body: 'The map is shown without current readings. You can still browse buildings in the list below.',
+      retry: 'Try again',
+    },
+    fallback: {
+      title: 'Buildings',
+      caption: 'Registered buildings and their latest reading',
+      colBuilding: 'Building',
+      colValue: 'Latest value',
+      colObserved: 'Measured',
+      empty: 'No buildings to show for this quantity.',
+      openDetail: 'Open {{name}}',
+    },
+    dialog: {
+      close: 'Close',
+      viewDetail: 'View building detail',
+      sensorCount_one: '{{count}} sensor',
+      sensorCount_few: '{{count}} sensors',
+      sensorCount_other: '{{count}} sensors',
+      loading: 'Loading measurements…',
+      noData: 'No measurements in this period.',
+      error: 'The measurements could not be loaded.',
+      summaryTitle: 'Summary',
+      measurements: '{{count}} measurements',
+    },
+    range: {
+      label: 'Time range',
+      day: 'Last day',
+      week: 'Last week',
+      month: 'Last month',
+      year: 'Last year',
+    },
+    chart: {
+      timeSeriesTitle: 'Trend',
+      timeSeriesDesc: 'Average value over time, with the min–max range shaded.',
+      boxplotTitle: 'Distribution',
+      boxplotDesc:
+        'Spread of values: the box spans the 25th–75th percentile, the line marks the median, ' +
+        'and the whiskers reach the 5th–95th percentile.',
+      axisTime: 'Time',
+      axisValue: 'Value ({{unit}})',
+      seriesAverage: 'Average',
+      rangeBand: 'Min–max range',
+      noData: 'No measurements in this period.',
+    },
+    boxplot: {
+      min: 'Min',
+      p05: '5th pct',
+      p25: '25th pct',
+      median: 'Median',
+      p75: '75th pct',
+      p95: '95th pct',
+      max: 'Max',
+    },
+  },
   glossary: {
     // Single canonical term per concept (thesis glossary). Keys are concept ids; values
     // are the canonical English label. Czech counterparts live in `cs.ts` under the same key.

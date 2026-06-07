@@ -7,8 +7,15 @@ import prettier from 'eslint-config-prettier';
 
 export default tseslint.config(
   {
-    // Generated OpenAPI types — auto-emitted by `npm run gen:api`, not hand-edited.
-    ignores: ['dist', 'node_modules', 'src/api/**/*.generated.ts', 'src/api/**/schema.d.ts'],
+    // Generated OpenAPI types — auto-emitted by `npm run gen:api`, not hand-edited. `public/` holds
+    // vendored static assets (incl. the MSW worker copied by `msw init`), also not hand-edited.
+    ignores: [
+      'dist',
+      'node_modules',
+      'public',
+      'src/api/**/*.generated.ts',
+      'src/api/**/schema.d.ts',
+    ],
   },
   {
     files: ['**/*.{ts,tsx}'],
