@@ -6,6 +6,7 @@ import { UiProvider } from '@/theme';
 import { I18nProvider } from '@/i18n';
 import { createQueryClient } from '@/lib/query-client';
 import { AuthProvider } from '@/auth/AuthProvider';
+import { UnitPreferenceProvider } from '@/units';
 
 export interface RenderWithProvidersOptions extends RenderOptions {
   /** Wrap in a `MemoryRouter` (needed for screens that use router hooks/links). */
@@ -42,7 +43,9 @@ export function renderWithProviders(ui: ReactElement, options?: RenderWithProvid
     return (
       <I18nProvider>
         <UiProvider>
-          <QueryClientProvider client={queryClient}>{authed}</QueryClientProvider>
+          <QueryClientProvider client={queryClient}>
+            <UnitPreferenceProvider>{authed}</UnitPreferenceProvider>
+          </QueryClientProvider>
         </UiProvider>
       </I18nProvider>
     );

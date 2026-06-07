@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { Heading, Stack, Text, VStack } from '@chakra-ui/react';
+import { Heading, HStack, Stack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { scaleSequential } from 'd3-scale';
 import { interpolateViridis } from 'd3-scale-chromatic';
 import { extent } from 'd3-array';
 import { useMapProperties, useMapSnapshot } from '@/api/public/map-hooks';
+import type { MapSnapshotItem } from '@/api/public/map-types';
 import { MapView, type MapMarker, type MarkerSelection } from './MapView';
 import { ParameterFilter } from './ParameterFilter';
 import { MapLegend } from './MapLegend';
@@ -12,6 +13,7 @@ import { BuildingDialog } from './BuildingDialog';
 import { DegradationBanner } from './DegradationBanner';
 import { MarkerTableFallback } from './MarkerTableFallback';
 import { classify, hasBands, resolveStatusColor } from './color-bands';
+import { DisplayUnitControl } from '@/units';
 
 /**
  * F18 — public interactive map (visitor interface, UC18). Reads from Public.Api only.
@@ -48,30 +50,37 @@ export function MapPage() {
 
   const markers = useMemo<MapMarker[]>(() => {
     const unit = snapshot?.unit ?? '';
-    return items.map((item) => {
-      const unknown = item.stale || item.latestValue == null;
-      let color: string;
-      if (unknown) {
-        color = resolveStatusColor('unknown');
-      } else if (banded) {
-        color = resolveStatusColor(classify(parameterCode!, item.latestValue));
-      } else {
-        color = continuousColor ? continuousColor(item.latestValue!) : resolveStatusColor('unknown');
-      }
-      const valueText = `${item.latestValue}${unit ? ` ${unit}` : ''}`;
-      const label = unknown
-        ? t('marker.valueUnavailable', { name: item.name })
-        : t('marker.label', { name: item.name, value: valueText });
-      return {
-        buildingId: item.buildingId,
-        slug: item.slug,
-        name: item.name,
-        lon: item.lon,
-        lat: item.lat,
-        color,
-        label,
-      };
-    });
+    return items
+      // A building without a public coordinate can't be placed on the map; it still appears in the
+      // accessible table below. (Coords/name are nullable in the snapshot schema.)
+      .filter((item): item is MapSnapshotItem & { lat: number; lon: number } =>
+        item.lat != null && item.lon != null,
+      )
+      .map((item) => {
+        const name = item.name ?? item.slug;
+        const unknown = item.stale || item.latestValue == null;
+        let color: string;
+        if (unknown) {
+          color = resolveStatusColor('unknown');
+        } else if (banded) {
+          color = resolveStatusColor(classify(parameterCode!, item.latestValue));
+        } else {
+          color = continuousColor ? continuousColor(item.latestValue!) : resolveStatusColor('unknown');
+        }
+        const valueText = `${item.latestValue}${unit ? ` ${unit}` : ''}`;
+        const label = unknown
+          ? t('marker.valueUnavailable', { name })
+          : t('marker.label', { name, value: valueText });
+        return {
+          buildingId: item.buildingId,
+          slug: item.slug,
+          name,
+          lon: item.lon,
+          lat: item.lat,
+          color,
+          label,
+        };
+      });
   }, [items, banded, parameterCode, continuousColor, snapshot?.unit, t]);
 
   return (
@@ -89,12 +98,15 @@ export function MapPage() {
         align={{ base: 'stretch', md: 'flex-end' }}
         justify="space-between"
       >
-        <ParameterFilter
-          properties={properties}
-          value={parameterCode}
-          onChange={setSelectedParam}
-          isLoading={propertiesLoading}
-        />
+        <HStack gap="4" align="flex-end" wrap="wrap">
+          <ParameterFilter
+            properties={properties}
+            value={parameterCode}
+            onChange={setSelectedParam}
+            isLoading={propertiesLoading}
+          />
+          <DisplayUnitControl canonicalUnit={snapshot?.unit ?? null} />
+        </HStack>
         <MapLegend banded={banded} />
       </Stack>
 

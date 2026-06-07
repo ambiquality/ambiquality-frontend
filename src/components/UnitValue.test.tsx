@@ -37,9 +37,15 @@ describe('UnitValue', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it('ignores the Phase-8 displayUnit seam in Phase 3 (still shows canonical unit)', async () => {
+  it('converts to an explicit displayUnit (PER, display-only): 20 °C → 68 °F', async () => {
     await i18n.changeLanguage('en');
     renderWithProviders(<UnitValue value={20} unit="°C" displayUnit="°F" />);
-    expect(screen.getByText('20 °C')).toBeInTheDocument();
+    expect(screen.getByText('68 °F')).toBeInTheDocument();
+  });
+
+  it('falls back to the canonical unit when the requested displayUnit has no known conversion', async () => {
+    await i18n.changeLanguage('en');
+    renderWithProviders(<UnitValue value={20} unit="ppm" displayUnit="mg/m³" />);
+    expect(screen.getByText('20 ppm')).toBeInTheDocument();
   });
 });

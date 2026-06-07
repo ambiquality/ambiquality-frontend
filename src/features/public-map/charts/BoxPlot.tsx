@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { chakra } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { scaleLinear } from 'd3-scale';
+import { convert } from '@/units';
 import type { AggregateStats } from '@/api/public/map-types';
 
 const WIDTH = 220;
@@ -13,7 +14,10 @@ const BOX_HALF = 34;
 
 export interface BoxPlotProps {
   stats: AggregateStats;
+  /** Canonical unit of the stats values, as returned by the API. */
   unit: string;
+  /** Preferred display unit (PER). When it differs and is convertible, values are shown in it. */
+  displayUnit?: string;
 }
 
 /**
@@ -21,35 +25,43 @@ export interface BoxPlotProps {
  * whiskers = 5th–95th percentile, dots = min/max. d3 supplies the scale; React renders the SVG
  * (via the `chakra` factory for themed colours). Labelled as one `img`; the dialog's numeric
  * summary carries the exact five-number values for assistive tech.
+ *
+ * PER: values are mapped through the canonical→`displayUnit` conversion for display only (the
+ * `stats` data is never mutated); the aria summary follows the shown unit.
  */
-export function BoxPlot({ stats, unit }: BoxPlotProps) {
+export function BoxPlot({ stats, unit, displayUnit }: BoxPlotProps) {
   const { t, i18n } = useTranslation('map');
   const locale = i18n.resolvedLanguage ?? i18n.language;
 
+  const canConvert = displayUnit != null && displayUnit !== unit && convert(0, unit, displayUnit) != null;
+  const shownUnit = canConvert ? displayUnit! : unit;
+
   const model = useMemo(() => {
-    const y = scaleLinear().domain([stats.min, stats.max]).nice().range([INNER_H, 0]);
+    const cv = (v: number) => (canConvert ? convert(v, unit, displayUnit!)! : v);
+    const y = scaleLinear().domain([cv(stats.min), cv(stats.max)]).nice().range([INNER_H, 0]);
     const numberFmt = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
     const cx = INNER_W / 2;
     return {
       cx,
       y,
+      cv,
       yTicks: y.ticks(5).map((v) => ({ y: y(v), label: numberFmt.format(v) })),
-      yp05: y(stats.p05),
-      yp25: y(stats.p25),
-      yp50: y(stats.p50),
-      yp75: y(stats.p75),
-      yp95: y(stats.p95),
-      ymin: y(stats.min),
-      ymax: y(stats.max),
+      yp05: y(cv(stats.p05)),
+      yp25: y(cv(stats.p25)),
+      yp50: y(cv(stats.p50)),
+      yp75: y(cv(stats.p75)),
+      yp95: y(cv(stats.p95)),
+      ymin: y(cv(stats.min)),
+      ymax: y(cv(stats.max)),
       fmt: numberFmt,
     };
-  }, [stats, locale]);
+  }, [stats, locale, canConvert, unit, displayUnit]);
 
   const ariaLabel = `${t('chart.boxplotDesc')} ${t('boxplot.median')} ${model.fmt.format(
-    stats.p50,
-  )} ${unit}, ${t('boxplot.p25')} ${model.fmt.format(stats.p25)}, ${t('boxplot.p75')} ${model.fmt.format(
-    stats.p75,
-  )}, ${t('boxplot.min')} ${model.fmt.format(stats.min)}, ${t('boxplot.max')} ${model.fmt.format(stats.max)}.`;
+    model.cv(stats.p50),
+  )} ${shownUnit}, ${t('boxplot.p25')} ${model.fmt.format(model.cv(stats.p25))}, ${t('boxplot.p75')} ${model.fmt.format(
+    model.cv(stats.p75),
+  )}, ${t('boxplot.min')} ${model.fmt.format(model.cv(stats.min))}, ${t('boxplot.max')} ${model.fmt.format(model.cv(stats.max))}.`;
 
   const { cx } = model;
 

@@ -119,6 +119,11 @@ export const en = {
       p95: '95th pct',
       max: 'Max',
     },
+    units: {
+      // Display-unit chooser (PER). Conversion is display-only; the data stays canonical.
+      label: 'Display unit',
+      ariaLabel: 'Choose display unit',
+    },
   },
   glossary: {
     // Single canonical term per concept (thesis glossary). Keys are concept ids; values

@@ -18,6 +18,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
 import { UnitValue } from '@/components/UnitValue';
+import { useUnitPreference } from '@/units';
 import { useObservationAggregate } from '@/api/public/map-hooks';
 import type { AggregateStats, TimeRange } from '@/api/public/map-types';
 import type { MarkerSelection } from './MapView';
@@ -87,6 +88,7 @@ function DialogBody({
   unit: string | null;
 }) {
   const { t } = useTranslation('map');
+  const { displayUnitFor } = useUnitPreference();
   const [range, setRange] = useState<TimeRange>('day');
 
   const { data, isLoading, isError } = useObservationAggregate({
@@ -94,6 +96,10 @@ function DialogBody({
     parameterCode,
     range,
   });
+
+  // Canonical unit for the quantity (prop wins, else the response's), and the user's display choice.
+  const canonicalUnit = unit ?? data?.unit ?? '';
+  const displayUnit = displayUnitFor(canonicalUnit);
 
   return (
     <>
@@ -151,17 +157,21 @@ function DialogBody({
                 <Text fontWeight="medium" mb="2">
                   {t('chart.timeSeriesTitle')}
                 </Text>
-                <TimeSeriesChart buckets={data.buckets} unit={unit ?? data.unit ?? ''} />
+                <TimeSeriesChart
+                  buckets={data.buckets}
+                  unit={canonicalUnit}
+                  displayUnit={displayUnit}
+                />
               </Box>
               <Stack direction={{ base: 'column', md: 'row' }} gap="6" align="start">
                 <Box>
                   <Text fontWeight="medium" mb="2">
                     {t('chart.boxplotTitle')}
                   </Text>
-                  <BoxPlot stats={data.stats} unit={unit ?? data.unit ?? ''} />
+                  <BoxPlot stats={data.stats} unit={canonicalUnit} displayUnit={displayUnit} />
                 </Box>
                 <Box flex="1" w="full">
-                  <StatsSummary stats={data.stats} unit={unit ?? data.unit ?? ''} />
+                  <StatsSummary stats={data.stats} unit={canonicalUnit} />
                 </Box>
               </Stack>
             </Stack>

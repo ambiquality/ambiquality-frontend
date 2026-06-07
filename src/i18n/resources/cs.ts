@@ -120,6 +120,11 @@ export const cs: Resources = {
       p95: '95. pct',
       max: 'Max',
     },
+    units: {
+      // Volič zobrazené jednotky (PER). Převod je pouze zobrazovací; data zůstávají kanonická.
+      label: 'Zobrazená jednotka',
+      ariaLabel: 'Vyberte zobrazenou jednotku',
+    },
   },
   glossary: {
     building: 'budova',

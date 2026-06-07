@@ -43,27 +43,33 @@ export function RootLayout() {
 
       <Box as="header" borderBottomWidth="1px" px="4" py="3">
         <Container maxW="6xl" px="0">
-          <HStack gap="6">
-            <ChakraLink asChild>
-              <RouterLink to="/">
-                <Image src={logoUrl} alt={t('appName')} h="8" w="auto" />
-              </RouterLink>
-            </ChakraLink>
-            <HStack as="nav" gap="4" aria-label={t('nav.primary')}>
+          {/* Wraps on narrow screens (≤360 px): the account + language group drops to a second
+              line instead of overflowing the viewport. The two HStacks stay intact as wrap units. */}
+          <Flex align="center" gap={{ base: '3', sm: '6' }} rowGap="3" wrap="wrap">
+            <HStack gap={{ base: '4', sm: '6' }}>
               <ChakraLink asChild>
-                <RouterLink to="/">{t('nav.map')}</RouterLink>
+                <RouterLink to="/">
+                  <Image src={logoUrl} alt={t('appName')} h="8" w="auto" />
+                </RouterLink>
               </ChakraLink>
-              <ChakraLink asChild>
-                <RouterLink to="/operator">{t('nav.operator')}</RouterLink>
-              </ChakraLink>
-              <ChakraLink asChild>
-                <RouterLink to="/about">{t('nav.about')}</RouterLink>
-              </ChakraLink>
+              <HStack as="nav" gap="4" aria-label={t('nav.primary')}>
+                <ChakraLink asChild>
+                  <RouterLink to="/">{t('nav.map')}</RouterLink>
+                </ChakraLink>
+                <ChakraLink asChild>
+                  <RouterLink to="/operator">{t('nav.operator')}</RouterLink>
+                </ChakraLink>
+                <ChakraLink asChild>
+                  <RouterLink to="/about">{t('nav.about')}</RouterLink>
+                </ChakraLink>
+              </HStack>
             </HStack>
             <Spacer />
-            <AccountNav />
-            <LanguageSwitch />
-          </HStack>
+            <HStack gap="3">
+              <AccountNav />
+              <LanguageSwitch />
+            </HStack>
+          </Flex>
         </Container>
       </Box>
 

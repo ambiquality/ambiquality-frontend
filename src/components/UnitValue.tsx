@@ -1,5 +1,6 @@
 import { Text, type TextProps } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
+import { convert, useUnitPreference } from '@/units';
 
 /** Non-breaking space — keeps the value and unit together on wrap, e.g. "21.5 °C". */
 const NBSP = ' ';
@@ -13,13 +14,12 @@ export interface UnitValueProps extends Omit<TextProps, 'children'> {
   /** The canonical unit symbol for `value`, e.g. `°C`, `ppm`, `%`. */
   unit: string;
   /**
-   * PHASE-8 SEAM (PER): the user's preferred display unit, if it differs from `unit`.
+   * PER override: force a specific display unit instead of the user's stored preference for `unit`.
    *
-   * Phase 3 does NOT convert — it only formats `value` + `unit`. When Phase 8 adds QUDT
-   * conversion it will: (a) read the logged-in user's preferred unit, (b) convert the canonical
-   * `value`→`displayUnit` using a `/v1/properties applicableUnit` factor table, and (c) render
-   * the converted number with `displayUnit`. The prop already exists so call sites written now
-   * stay source-compatible. Until then, passing `displayUnit` is a no-op (we still show `unit`).
+   * Resolution order for the unit actually rendered: this `displayUnit` (if convertible) → the
+   * user's stored preference for `unit` → the canonical `unit`. When the resolved unit differs from
+   * `unit`, the canonical `value` is converted **for display only** (the passed `value` is never
+   * mutated). Most call sites omit this and let the preference drive; pass it to pin a unit.
    */
   displayUnit?: string;
   /** Maximum number of fraction digits for locale formatting. */
@@ -31,16 +31,13 @@ export interface UnitValueProps extends Omit<TextProps, 'children'> {
  * locale-aware `Intl.NumberFormat` (cs uses a comma decimal separator, en a dot) and appends the
  * unit with a non-breaking space so the value and unit never wrap apart.
  *
- * Display-unit *conversion* is intentionally out of scope here — see the `displayUnit` seam.
+ * PER: it renders in the user's preferred display unit (or an explicit `displayUnit` override),
+ * converting the canonical `value` for display only — the canonical value the caller holds is never
+ * mutated, and a unit with no known conversion falls back to canonical.
  */
-export function UnitValue({
-  value,
-  unit,
-  displayUnit: _displayUnit, // Phase-8 seam; deliberately unused in Phase 3.
-  fractionDigits,
-  ...rest
-}: UnitValueProps) {
+export function UnitValue({ value, unit, displayUnit, fractionDigits, ...rest }: UnitValueProps) {
   const { i18n } = useTranslation();
+  const { displayUnitFor } = useUnitPreference();
   const locale = i18n.resolvedLanguage ?? i18n.language;
 
   if (value == null || Number.isNaN(value)) {
@@ -51,14 +48,21 @@ export function UnitValue({
     );
   }
 
+  // Resolve the unit to show: explicit override wins, else the stored preference for this unit.
+  const target = displayUnit ?? displayUnitFor(unit);
+  const converted = target === unit ? value : convert(value, unit, target);
+  // Fall back to canonical when the requested unit isn't a known conversion.
+  const shownValue = converted ?? value;
+  const shownUnit = converted == null ? unit : target;
+
   const formatted = new Intl.NumberFormat(locale, {
     maximumFractionDigits: fractionDigits ?? 3,
     minimumFractionDigits: fractionDigits,
-  }).format(value);
+  }).format(shownValue);
 
   return (
     <Text as="span" {...rest}>
-      {`${formatted}${NBSP}${unit}`}
+      {`${formatted}${NBSP}${shownUnit}`}
     </Text>
   );
 }

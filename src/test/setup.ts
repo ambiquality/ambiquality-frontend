@@ -52,4 +52,7 @@ if (!window.matchMedia) {
 
 afterEach(() => {
   cleanup();
+  // Display-unit preferences persist to localStorage; clear them so a choice in one test can't
+  // leak into the next (the in-memory storage above is shared across the file).
+  globalThis.localStorage?.removeItem('amq.unit-prefs');
 });

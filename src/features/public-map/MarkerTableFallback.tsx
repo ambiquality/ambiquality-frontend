@@ -39,60 +39,62 @@ export function MarkerTableFallback({
   }
 
   return (
-    <Table.Root size="sm" interactive>
-      <Table.Caption srOnly>{t('fallback.caption')}</Table.Caption>
-      <Table.Header>
-        <Table.Row>
-          <Table.ColumnHeader>{t('fallback.colBuilding')}</Table.ColumnHeader>
-          <Table.ColumnHeader>{t('fallback.colValue')}</Table.ColumnHeader>
-          <Table.ColumnHeader>{t('fallback.colObserved')}</Table.ColumnHeader>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {items.map((item) => {
-          const unknown = item.stale || item.latestValue == null;
-          const status = unknown ? 'unknown' : classify(parameterCode ?? '', item.latestValue);
-          return (
-            <Table.Row key={item.buildingId}>
-              <Table.Cell>
-                <Button
-                  variant="plain"
-                  height="auto"
-                  p="0"
-                  color="brand.fg"
-                  textDecoration="underline"
-                  fontWeight="medium"
-                  onClick={() =>
-                    onSelect({ buildingId: item.buildingId, slug: item.slug, name: item.name })
-                  }
-                >
-                  {item.name}
-                </Button>
-              </Table.Cell>
-              <Table.Cell>
-                {unknown ? (
-                  <Text color="fg.muted">{t('value.stale')}</Text>
-                ) : (
-                  <HStack gap="2">
-                    {banded && (
-                      <Box boxSize="2.5" rounded="full" bg={`ieq.${status}`} aria-hidden />
-                    )}
-                    <UnitValue value={item.latestValue} unit={unit ?? ''} fractionDigits={1} />
-                    {banded && (
-                      <Text color="fg.muted" fontSize="xs">
-                        {t(`legend.${status}`)}
-                      </Text>
-                    )}
-                  </HStack>
-                )}
-              </Table.Cell>
-              <Table.Cell color="fg.muted">
-                {item.observedAt ? dateFmt.format(new Date(item.observedAt)) : '—'}
-              </Table.Cell>
-            </Table.Row>
-          );
-        })}
-      </Table.Body>
-    </Table.Root>
+    <Table.ScrollArea borderWidth="1px" rounded="md" maxW="full">
+      <Table.Root size="sm" interactive>
+        <Table.Caption srOnly>{t('fallback.caption')}</Table.Caption>
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>{t('fallback.colBuilding')}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t('fallback.colValue')}</Table.ColumnHeader>
+            <Table.ColumnHeader>{t('fallback.colObserved')}</Table.ColumnHeader>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {items.map((item) => {
+            const unknown = item.stale || item.latestValue == null;
+            const status = unknown ? 'unknown' : classify(parameterCode ?? '', item.latestValue);
+            // `name` is nullable in the snapshot schema; fall back to the (always-present) slug.
+            const name = item.name ?? item.slug;
+            return (
+              <Table.Row key={item.buildingId}>
+                <Table.Cell>
+                  <Button
+                    variant="plain"
+                    height="auto"
+                    p="0"
+                    color="brand.fg"
+                    textDecoration="underline"
+                    fontWeight="medium"
+                    onClick={() => onSelect({ buildingId: item.buildingId, slug: item.slug, name })}
+                  >
+                    {name}
+                  </Button>
+                </Table.Cell>
+                <Table.Cell>
+                  {unknown ? (
+                    <Text color="fg.muted">{t('value.stale')}</Text>
+                  ) : (
+                    <HStack gap="2">
+                      {banded && (
+                        <Box boxSize="2.5" rounded="full" bg={`ieq.${status}`} aria-hidden />
+                      )}
+                      <UnitValue value={item.latestValue} unit={unit ?? ''} fractionDigits={1} />
+                      {banded && (
+                        <Text color="fg.muted" fontSize="xs">
+                          {t(`legend.${status}`)}
+                        </Text>
+                      )}
+                    </HStack>
+                  )}
+                </Table.Cell>
+                <Table.Cell color="fg.muted">
+                  {item.observedAt ? dateFmt.format(new Date(item.observedAt)) : '—'}
+                </Table.Cell>
+              </Table.Row>
+            );
+          })}
+        </Table.Body>
+      </Table.Root>
+    </Table.ScrollArea>
   );
 }
