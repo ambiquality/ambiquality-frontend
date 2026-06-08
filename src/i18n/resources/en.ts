@@ -16,6 +16,7 @@ export const en = {
     appName: 'Ambiquality',
     nav: {
       map: 'Map',
+      archive: 'Archive',
       operator: 'Operator',
       about: 'About',
       primary: 'Primary',
@@ -461,6 +462,42 @@ export const en = {
       basemapNote:
         'Basemap tiles and styles are provided by OpenFreeMap and OpenMapTiles; the underlying ' +
         'geographic data is © OpenStreetMap contributors and licensed under ODbL.',
+    },
+  },
+  archive: {
+    // F17 — the visitor "file server": a list of downloadable monthly data archives, plus a link
+    // to the live full CSV export. Reads the DCAT catalogue's distributions (Public.Api).
+    title: 'Data archive',
+    intro:
+      'Download monthly archives of the open measurement data, or fetch the full current dataset ' +
+      'directly. All files are published under the {{license}} licence.',
+    live: {
+      heading: 'Download all current data',
+      description: 'Stream the complete, up-to-date dataset as CSV — no archiving required.',
+      csvLabel: 'Download all observations (CSV)',
+    },
+    table: {
+      heading: 'Monthly archives',
+      caption: 'Downloadable monthly archives of the measurement data',
+      colPeriod: 'Period',
+      colFormat: 'Format',
+      colSize: 'Size',
+      colDownload: 'Download',
+      download: 'Download',
+      downloadLabel: 'Download archive for {{period}}',
+      sizeUnknown: '—',
+    },
+    empty: {
+      title: 'No archives published yet',
+      body: 'No monthly archives have been published yet. You can still download the full current ' +
+        'dataset above.',
+    },
+    loading: 'Loading archives…',
+    error: {
+      title: 'Archives are unavailable',
+      body: 'The archive listing could not be loaded. Please try again later; you can still use the ' +
+        'full current-data download above when it is available.',
+      retry: 'Try again',
     },
   },
   legal: {

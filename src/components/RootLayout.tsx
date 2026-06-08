@@ -58,6 +58,9 @@ export function RootLayout() {
                   <RouterLink to="/">{t('nav.map')}</RouterLink>
                 </ChakraLink>
                 <ChakraLink asChild>
+                  <RouterLink to="/archive">{t('nav.archive')}</RouterLink>
+                </ChakraLink>
+                <ChakraLink asChild>
                   <RouterLink to="/operator">{t('nav.operator')}</RouterLink>
                 </ChakraLink>
                 <ChakraLink asChild>

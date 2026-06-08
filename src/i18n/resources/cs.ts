@@ -19,6 +19,7 @@ export const cs: Resources = {
     appName: 'Ambiquality',
     nav: {
       map: 'Mapa',
+      archive: 'Archiv',
       operator: 'Provozovatel',
       about: 'O aplikaci',
       primary: 'Hlavní',
@@ -450,6 +451,40 @@ export const cs: Resources = {
       basemapNote:
         'Mapové podklady a styly poskytují OpenFreeMap a OpenMapTiles; podkladová geografická ' +
         'data jsou © přispěvatelé OpenStreetMap a jsou licencována pod ODbL.',
+    },
+  },
+  archive: {
+    title: 'Archiv dat',
+    intro:
+      'Stáhněte si měsíční archivy otevřených naměřených dat nebo si přímo stáhněte kompletní ' +
+      'aktuální datovou sadu. Všechny soubory jsou zveřejněny pod licencí {{license}}.',
+    live: {
+      heading: 'Stáhnout všechna aktuální data',
+      description: 'Stáhněte si kompletní aktuální datovou sadu ve formátu CSV — bez čekání na archiv.',
+      csvLabel: 'Stáhnout všechna pozorování (CSV)',
+    },
+    table: {
+      heading: 'Měsíční archivy',
+      caption: 'Stažitelné měsíční archivy naměřených dat',
+      colPeriod: 'Období',
+      colFormat: 'Formát',
+      colSize: 'Velikost',
+      colDownload: 'Stažení',
+      download: 'Stáhnout',
+      downloadLabel: 'Stáhnout archiv za období {{period}}',
+      sizeUnknown: '—',
+    },
+    empty: {
+      title: 'Zatím nebyly zveřejněny žádné archivy',
+      body: 'Zatím nebyly zveřejněny žádné měsíční archivy. Kompletní aktuální datovou sadu si ' +
+        'můžete stáhnout výše.',
+    },
+    loading: 'Načítání archivů…',
+    error: {
+      title: 'Archivy nejsou dostupné',
+      body: 'Seznam archivů se nepodařilo načíst. Zkuste to prosím později; kompletní stažení ' +
+        'aktuálních dat výše zůstává k dispozici, pokud je dostupné.',
+      retry: 'Zkusit znovu',
     },
   },
   legal: {

@@ -3,6 +3,7 @@ import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { ErrorPage } from '@/components/ErrorPage';
 import { RootLayout } from '@/components/RootLayout';
 import { AboutPage } from '@/features/about/AboutPage';
+import { ArchivePage } from '@/features/archive/ArchivePage';
 import { PrivacyPolicyPage } from '@/features/legal/PrivacyPolicyPage';
 import { LoginPage } from '@/features/account/LoginPage';
 import { RegisterPage } from '@/features/account/RegisterPage';
@@ -41,6 +42,9 @@ export const router = createBrowserRouter([
       { path: 'buildings/:slug', element: <EntityDetailPage kind="building" /> },
       { path: 'rooms/:slug', element: <EntityDetailPage kind="room" /> },
       { path: 'sensors/:slug', element: <EntityDetailPage kind="sensor" /> },
+
+      // --- Open data (Public.Api) ---
+      { path: 'archive', element: <ArchivePage /> },
 
       // --- Informational ---
       { path: 'about', element: <AboutPage /> },
