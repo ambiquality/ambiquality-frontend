@@ -14,6 +14,10 @@ export const NAMESPACES = [
   'account',
   'evidence',
   'map',
+  'about',
+  'catalog',
+  'archive',
+  'legal',
 ] as const;
 export const DEFAULT_NAMESPACE = 'common';
 

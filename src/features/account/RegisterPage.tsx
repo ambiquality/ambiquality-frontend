@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   Heading,
   Input,
   Link as ChakraLink,
@@ -35,6 +36,8 @@ export function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [consented, setConsented] = useState(false);
+  const [consentError, setConsentError] = useState<string | null>(null);
   const [problem, setProblem] = useState<ProblemErrorObject | null>(null);
   const [genericError, setGenericError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -51,6 +54,13 @@ export function RegisterPage() {
       return;
     }
     setConfirmError(null);
+
+    // Privacy consent is mandatory: block the submit (and the `register` call) until it is given.
+    if (!consented) {
+      setConsentError(t('register.consentRequired'));
+      return;
+    }
+    setConsentError(null);
 
     setSubmitting(true);
     const outcome = await register(email, password);
@@ -172,6 +182,44 @@ export function RegisterPage() {
               onChange={(e) => setConfirm(e.target.value)}
             />
           </FormField>
+
+          <Box>
+            <Checkbox.Root
+              checked={consented}
+              onCheckedChange={(e) => {
+                setConsented(e.checked === true);
+                if (e.checked === true) setConsentError(null);
+              }}
+              invalid={consentError != null}
+            >
+              <Checkbox.HiddenInput name="privacyConsent" />
+              <Checkbox.Control />
+              <Checkbox.Label>
+                {/* The label embeds the Privacy Policy link. Split the i18n sentence on the
+                    interpolated link slot (a sentinel) and place the styled router link in it. */}
+                {(() => {
+                  const SENTINEL = '\u0000';
+                  const [before, after] = t('register.consentLabel', { link: SENTINEL }).split(
+                    SENTINEL,
+                  );
+                  return (
+                    <>
+                      {before}
+                      <ChakraLink asChild colorPalette="brand">
+                        <RouterLink to="/privacy">{t('register.consentLink')}</RouterLink>
+                      </ChakraLink>
+                      {after}
+                    </>
+                  );
+                })()}
+              </Checkbox.Label>
+            </Checkbox.Root>
+            {consentError && (
+              <Text color="fieldError.fg" role="alert" mt="1" fontSize="sm">
+                {consentError}
+              </Text>
+            )}
+          </Box>
 
           <FormActions>
             <Button type="submit" colorPalette="brand" loading={submitting}>

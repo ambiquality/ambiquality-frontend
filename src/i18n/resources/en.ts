@@ -16,6 +16,8 @@ export const en = {
     appName: 'Ambiquality',
     nav: {
       map: 'Map',
+      catalog: 'Catalogue',
+      archive: 'Archive',
       operator: 'Operator',
       about: 'About',
       primary: 'Primary',
@@ -32,6 +34,13 @@ export const en = {
       cancel: 'Cancel',
       submit: 'Submit',
       skipToContent: 'Skip to content',
+    },
+    footer: {
+      label: 'Site footer',
+      privacy: 'Privacy Policy',
+      github: 'GitHub',
+      contact: 'Contact',
+      dataLicense: 'Open data licensed under {{license}}.',
     },
   },
   map: {
@@ -187,6 +196,9 @@ export const en = {
         'We sent a confirmation link to {{email}}. Open it to activate your account, then sign in.',
       resend: 'Resend confirmation email',
       resendDone: 'If the address is registered, a new link is on its way.',
+      consentLabel: 'I agree to the {{link}}',
+      consentLink: 'Privacy Policy',
+      consentRequired: 'You must agree to the Privacy Policy to create an account.',
     },
     settings: {
       title: 'Account settings',
@@ -403,5 +415,230 @@ export const en = {
       'The server encountered an error. Please try again.',
     'urn:ambiquality:evidence:domain-rule-violation': 'This change breaks a domain rule.',
     'urn:ambiquality:public:not-found': 'The requested resource was not found.',
+  },
+  about: {
+    // F-scope: the public "About" page — platform description + open-source attribution.
+    // Library/licence names and OSS project names are proper nouns and stay untranslated;
+    // only the surrounding prose lives here.
+    title: 'About Ambiquality',
+    intro: {
+      heading: 'About the platform',
+      lead:
+        'Ambiquality is an open-source platform for monitoring Indoor Environmental Quality ' +
+        '(IEQ). It collects measurements from IoT sensors across the four IEQ domains — indoor ' +
+        'air quality, thermal comfort, acoustic comfort and visual comfort — covering ' +
+        'parameters such as CO₂, temperature, humidity, particulate matter, volatile organic ' +
+        'compounds, acoustics and light, and publishes them as open data.',
+      app:
+        'This web application is the platform’s visitor and operator interface: the public can ' +
+        'explore measurements on an interactive map and browse the catalog of buildings, rooms ' +
+        'and sensors, while operators register and maintain that catalog.',
+      thesis:
+        'Built as a bachelor thesis at VŠE Prague (Prague University of Economics and ' +
+        'Business) by Vilém Charwot, submission May 2026.',
+    },
+    contact: {
+      heading: 'Contact',
+      authorLabel: 'Author',
+      authorName: 'Vilém Charwot',
+      emailLabel: 'Email',
+    },
+    source: {
+      heading: 'Source code',
+      description:
+        'Ambiquality is open source. The frontend and backend repositories are published on ' +
+        'GitHub.',
+      linkLabel: 'View the source on GitHub',
+    },
+    data: {
+      heading: 'Data licence',
+      description: 'The measurements published by the platform are open data, licensed under:',
+    },
+    acknowledgements: {
+      heading: 'Acknowledgements',
+      description:
+        'This application is built with open-source software. We gratefully acknowledge the ' +
+        'following projects, retaining their licence notices.',
+      licenseLabel: 'Licence: {{license}}',
+      basemapNote:
+        'Basemap tiles and styles are provided by OpenFreeMap and OpenMapTiles; the underlying ' +
+        'geographic data is © OpenStreetMap contributors and licensed under ODbL.',
+    },
+  },
+  archive: {
+    // F17 — the visitor "file server": a list of downloadable monthly data archives, plus a link
+    // to the live full CSV export. Reads the DCAT catalogue's distributions (Public.Api).
+    title: 'Data archive',
+    intro:
+      'Download monthly archives of the open measurement data, or fetch the full current dataset ' +
+      'directly. All files are published under the {{license}} licence.',
+    live: {
+      heading: 'Download all current data',
+      description: 'Stream the complete, up-to-date dataset as CSV — no archiving required.',
+      csvLabel: 'Download all observations (CSV)',
+    },
+    table: {
+      heading: 'Monthly archives',
+      caption: 'Downloadable monthly archives of the measurement data',
+      colPeriod: 'Period',
+      colFormat: 'Format',
+      colSize: 'Size',
+      colDownload: 'Download',
+      download: 'Download',
+      downloadLabel: 'Download archive for {{period}}',
+      sizeUnknown: '—',
+    },
+    empty: {
+      title: 'No archives published yet',
+      body: 'No monthly archives have been published yet. You can still download the full current ' +
+        'dataset above.',
+    },
+    loading: 'Loading archives…',
+    error: {
+      title: 'Archives are unavailable',
+      body: 'The archive listing could not be loaded. Please try again later; you can still use the ' +
+        'full current-data download above when it is available.',
+      retry: 'Try again',
+    },
+  },
+  catalog: {
+    // F16 — the human-readable rendering of the DCAT-AP open-data catalogue metadata. Reads the
+    // single `/v1/catalog` endpoint (Public.Api) via the shared `useCatalog` hook. Downloadable
+    // archives live on the separate Archive tab; this page covers the descriptive metadata and the
+    // live API access points only.
+    fallbackTitle: 'Open data catalogue',
+    intro:
+      'Machine-readable, DCAT-AP metadata describing the published open observation data and the ' +
+      'live access points where it can be retrieved.',
+    dataset: {
+      heading: 'Dataset',
+      publisherLabel: 'Publisher',
+      licenseLabel: 'Licence',
+      themeLabel: 'Theme',
+      periodicityLabel: 'Update frequency',
+      keywordsLabel: 'Keywords',
+      contactLabel: 'Contact',
+    },
+    coverage: {
+      heading: 'Coverage',
+      issuedLabel: 'Published',
+      temporalLabel: 'Time period',
+      temporalRange: '{{start}} – {{end}}',
+      spatialLabel: 'Spatial extent',
+      bboxLabel: 'Longitude {{minLon}} to {{maxLon}}, latitude {{minLat}} to {{maxLat}}',
+    },
+    distributions: {
+      heading: 'Live data access',
+      intro: 'Retrieve the live observation data directly from the open API:',
+    },
+    // Friendly labels for the EU controlled-vocabulary URIs the backend emits. Unmapped URIs fall
+    // back to the raw URI text (still rendered as a dereferenceable link).
+    theme: {
+      ENVI: 'Environment',
+    },
+    periodicity: {
+      CONT: 'Continuous',
+    },
+    loading: 'Loading catalogue…',
+    error: {
+      title: 'Catalogue is unavailable',
+      body: 'The catalogue metadata could not be loaded. Please try again later.',
+      retry: 'Try again',
+    },
+  },
+  legal: {
+    // Public Privacy Policy page (GDPR/EU framing). Structured as semantic sections; paragraphs
+    // are discrete keys so translators keep cs/en parallel and we never inject raw HTML.
+    privacy: {
+      title: 'Privacy Policy',
+      lastUpdated: 'Last updated: June 2026',
+      intro:
+        'This Privacy Policy explains how the Ambiquality platform processes personal data when ' +
+        'you use this web application. It is written to comply with Regulation (EU) 2016/679 ' +
+        '(the General Data Protection Regulation, “GDPR”).',
+      controller: {
+        heading: 'Data controller',
+        body:
+          'The data controller is the Ambiquality project, operated as a bachelor-thesis project ' +
+          'at Prague University of Economics and Business (VŠE Praha). For any privacy-related ' +
+          'request you can reach us at the contact address below.',
+        contactLabel: 'Contact',
+      },
+      data: {
+        heading: 'What data we collect',
+        intro: 'Depending on how you use the application, we process the following personal data:',
+        accountEmail:
+          'Account email address — when you register as an operator, we store the email address ' +
+          'you provide. It is used to identify your account, to confirm it, and to contact you ' +
+          'about your account.',
+        addressData:
+          'Building and location data — operators enter the address and location of the ' +
+          'buildings they register. This address data may or may not be the registering ' +
+          'operator’s own: an operator may register a building that belongs to a third party, ' +
+          'so the address can describe premises other than the operator’s home or workplace.',
+        technical:
+          'Technical data — standard request metadata (such as the IP address and timestamp of ' +
+          'API requests) may be processed transiently by the backend services to operate and ' +
+          'secure the platform.',
+      },
+      purpose: {
+        heading: 'Purpose and legal basis',
+        intro: 'We process the data above on the following legal bases under GDPR Article 6:',
+        contract:
+          'Performance of a contract (Art. 6(1)(b)) — to create and manage your operator account ' +
+          'and provide the registration and catalog-maintenance functions you request.',
+        legitimate:
+          'Legitimate interests (Art. 6(1)(f)) — to keep the platform secure and operational and ' +
+          'to prevent abuse.',
+        openData:
+          'Public-interest / open-data publication — building and location data are published as ' +
+          'open data. Public map coordinates are intentionally coarsened (masked) for non-owners ' +
+          'so that exact locations are not revealed.',
+      },
+      retention: {
+        heading: 'Retention period',
+        body:
+          'We keep account data for as long as your operator account exists. If you delete your ' +
+          'account, associated personal data is removed or anonymized, except where we must keep ' +
+          'it to meet a legal obligation. Published open data may be retained as part of the ' +
+          'open-data record.',
+      },
+      recipients: {
+        heading: 'Recipients and processors',
+        body:
+          'Personal data is processed by the platform’s own backend services (authentication, ' +
+          'catalog/evidence and the public open-data API). An email-delivery provider is used to ' +
+          'send account-confirmation and notification messages. We do not sell personal data.',
+      },
+      rights: {
+        heading: 'Your rights',
+        intro:
+          'As a data subject you have the following rights under the GDPR, which you can exercise ' +
+          'by contacting us at the address below:',
+        access: 'Right of access — to obtain a copy of the personal data we hold about you.',
+        rectification: 'Right to rectification — to have inaccurate data corrected.',
+        erasure: 'Right to erasure — to have your personal data deleted (“right to be forgotten”).',
+        restriction: 'Right to restriction — to limit how we process your data.',
+        objection: 'Right to object — to object to processing based on legitimate interests.',
+        portability:
+          'Right to data portability — to receive your data in a structured, machine-readable ' +
+          'format.',
+        complaint:
+          'You also have the right to lodge a complaint with a supervisory authority (in the ' +
+          'Czech Republic, the Office for Personal Data Protection / Úřad pro ochranu osobních ' +
+          'údajů).',
+      },
+      contact: {
+        heading: 'How to contact us',
+        body: 'For any privacy request or question, contact us at:',
+      },
+      disclaimer: {
+        heading: 'Status of this notice',
+        body:
+          'Ambiquality is a student bachelor-thesis project at Prague University of Economics and ' +
+          'Business (VŠE Praha). This Privacy Policy is provisional and is pending the author’s ' +
+          'legal review; it may change before any production deployment.',
+      },
+    },
   },
 } as const;
