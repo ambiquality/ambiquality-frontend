@@ -3,6 +3,7 @@ import { ProtectedRoute } from '@/auth/ProtectedRoute';
 import { ErrorPage } from '@/components/ErrorPage';
 import { RootLayout } from '@/components/RootLayout';
 import { AboutPage } from '@/features/about/AboutPage';
+import { PrivacyPolicyPage } from '@/features/legal/PrivacyPolicyPage';
 import { LoginPage } from '@/features/account/LoginPage';
 import { RegisterPage } from '@/features/account/RegisterPage';
 import { AccountSettingsPage } from '@/features/account/AccountSettingsPage';
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
 
       // --- Informational ---
       { path: 'about', element: <AboutPage /> },
+      { path: 'privacy', element: <PrivacyPolicyPage /> },
 
       // --- Account (Auth.Api), anonymous ---
       { path: 'login', element: <LoginPage /> },

@@ -20,6 +20,7 @@ async function fillForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(/^email/i), 'new@user.cz');
   await user.type(screen.getByLabelText(/^password/i), 'password1');
   await user.type(screen.getByLabelText(/confirm password/i), 'password1');
+  await user.click(screen.getByRole('checkbox', { name: /privacy policy/i }));
 }
 
 afterEach(() => {
@@ -52,6 +53,34 @@ describe('RegisterPage', () => {
 
     expect(await screen.findByText('The passwords do not match.')).toBeInTheDocument();
     expect(register).not.toHaveBeenCalled();
+  });
+
+  it('blocks submission until the privacy-policy consent is checked', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<RegisterPage />, { withRouter: true });
+
+    // Fill a valid form but leave the consent checkbox UNCHECKED.
+    await user.type(screen.getByLabelText(/^email/i), 'new@user.cz');
+    await user.type(screen.getByLabelText(/^password/i), 'password1');
+    await user.type(screen.getByLabelText(/confirm password/i), 'password1');
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(
+      await screen.findByText('You must agree to the Privacy Policy to create an account.'),
+    ).toBeInTheDocument();
+    expect(register).not.toHaveBeenCalled();
+  });
+
+  it('submits once the privacy-policy consent is checked', async () => {
+    const user = userEvent.setup();
+    register.mockResolvedValue({ ok: true });
+    renderWithProviders(<RegisterPage />, { withRouter: true });
+
+    await fillForm(user); // fillForm now also checks the consent box
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(register).toHaveBeenCalledWith('new@user.cz', 'password1');
+    expect(await screen.findByText('Check your email')).toBeInTheDocument();
   });
 
   it('shows a generic message on 409 conflict (anti-enumeration)', async () => {

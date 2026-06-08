@@ -33,6 +33,13 @@ export const en = {
       submit: 'Submit',
       skipToContent: 'Skip to content',
     },
+    footer: {
+      label: 'Site footer',
+      privacy: 'Privacy Policy',
+      github: 'GitHub',
+      contact: 'Contact',
+      dataLicense: 'Open data licensed under {{license}}.',
+    },
   },
   map: {
     // F18 public interactive map (UC18). Quantity labels themselves come from the backend
@@ -187,6 +194,9 @@ export const en = {
         'We sent a confirmation link to {{email}}. Open it to activate your account, then sign in.',
       resend: 'Resend confirmation email',
       resendDone: 'If the address is registered, a new link is on its way.',
+      consentLabel: 'I agree to the {{link}}',
+      consentLink: 'Privacy Policy',
+      consentRequired: 'You must agree to the Privacy Policy to create an account.',
     },
     settings: {
       title: 'Account settings',
@@ -451,6 +461,101 @@ export const en = {
       basemapNote:
         'Basemap tiles and styles are provided by OpenFreeMap and OpenMapTiles; the underlying ' +
         'geographic data is © OpenStreetMap contributors and licensed under ODbL.',
+    },
+  },
+  legal: {
+    // Public Privacy Policy page (GDPR/EU framing). Structured as semantic sections; paragraphs
+    // are discrete keys so translators keep cs/en parallel and we never inject raw HTML.
+    privacy: {
+      title: 'Privacy Policy',
+      lastUpdated: 'Last updated: June 2026',
+      intro:
+        'This Privacy Policy explains how the Ambiquality platform processes personal data when ' +
+        'you use this web application. It is written to comply with Regulation (EU) 2016/679 ' +
+        '(the General Data Protection Regulation, “GDPR”).',
+      controller: {
+        heading: 'Data controller',
+        body:
+          'The data controller is the Ambiquality project, operated as a bachelor-thesis project ' +
+          'at Prague University of Economics and Business (VŠE Praha). For any privacy-related ' +
+          'request you can reach us at the contact address below.',
+        contactLabel: 'Contact',
+      },
+      data: {
+        heading: 'What data we collect',
+        intro: 'Depending on how you use the application, we process the following personal data:',
+        accountEmail:
+          'Account email address — when you register as an operator, we store the email address ' +
+          'you provide. It is used to identify your account, to confirm it, and to contact you ' +
+          'about your account.',
+        addressData:
+          'Building and location data — operators enter the address and location of the ' +
+          'buildings they register. This address data may or may not be the registering ' +
+          'operator’s own: an operator may register a building that belongs to a third party, ' +
+          'so the address can describe premises other than the operator’s home or workplace.',
+        technical:
+          'Technical data — standard request metadata (such as the IP address and timestamp of ' +
+          'API requests) may be processed transiently by the backend services to operate and ' +
+          'secure the platform.',
+      },
+      purpose: {
+        heading: 'Purpose and legal basis',
+        intro: 'We process the data above on the following legal bases under GDPR Article 6:',
+        contract:
+          'Performance of a contract (Art. 6(1)(b)) — to create and manage your operator account ' +
+          'and provide the registration and catalog-maintenance functions you request.',
+        legitimate:
+          'Legitimate interests (Art. 6(1)(f)) — to keep the platform secure and operational and ' +
+          'to prevent abuse.',
+        openData:
+          'Public-interest / open-data publication — building and location data are published as ' +
+          'open data. Public map coordinates are intentionally coarsened (masked) for non-owners ' +
+          'so that exact locations are not revealed.',
+      },
+      retention: {
+        heading: 'Retention period',
+        body:
+          'We keep account data for as long as your operator account exists. If you delete your ' +
+          'account, associated personal data is removed or anonymized, except where we must keep ' +
+          'it to meet a legal obligation. Published open data may be retained as part of the ' +
+          'open-data record.',
+      },
+      recipients: {
+        heading: 'Recipients and processors',
+        body:
+          'Personal data is processed by the platform’s own backend services (authentication, ' +
+          'catalog/evidence and the public open-data API). An email-delivery provider is used to ' +
+          'send account-confirmation and notification messages. We do not sell personal data.',
+      },
+      rights: {
+        heading: 'Your rights',
+        intro:
+          'As a data subject you have the following rights under the GDPR, which you can exercise ' +
+          'by contacting us at the address below:',
+        access: 'Right of access — to obtain a copy of the personal data we hold about you.',
+        rectification: 'Right to rectification — to have inaccurate data corrected.',
+        erasure: 'Right to erasure — to have your personal data deleted (“right to be forgotten”).',
+        restriction: 'Right to restriction — to limit how we process your data.',
+        objection: 'Right to object — to object to processing based on legitimate interests.',
+        portability:
+          'Right to data portability — to receive your data in a structured, machine-readable ' +
+          'format.',
+        complaint:
+          'You also have the right to lodge a complaint with a supervisory authority (in the ' +
+          'Czech Republic, the Office for Personal Data Protection / Úřad pro ochranu osobních ' +
+          'údajů).',
+      },
+      contact: {
+        heading: 'How to contact us',
+        body: 'For any privacy request or question, contact us at:',
+      },
+      disclaimer: {
+        heading: 'Status of this notice',
+        body:
+          'Ambiquality is a student bachelor-thesis project at Prague University of Economics and ' +
+          'Business (VŠE Praha). This Privacy Policy is provisional and is pending the author’s ' +
+          'legal review; it may change before any production deployment.',
+      },
     },
   },
 } as const;

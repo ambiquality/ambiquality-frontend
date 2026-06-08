@@ -11,6 +11,7 @@ import {
 import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
+import { Footer } from '@/components/Footer';
 import { useAuth } from '@/auth/useAuth';
 import logoUrl from '@/assets/ambiquality-full.svg';
 
@@ -78,6 +79,8 @@ export function RootLayout() {
           <Outlet />
         </Container>
       </Box>
+
+      <Footer />
     </Flex>
   );
 }

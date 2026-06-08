@@ -36,6 +36,13 @@ export const cs: Resources = {
       submit: 'Odeslat',
       skipToContent: 'Přejít na obsah',
     },
+    footer: {
+      label: 'Patička webu',
+      privacy: 'Zásady ochrany osobních údajů',
+      github: 'GitHub',
+      contact: 'Kontakt',
+      dataLicense: 'Otevřená data pod licencí {{license}}.',
+    },
   },
   map: {
     title: 'Mapa kvality vnitřního prostředí',
@@ -185,6 +192,9 @@ export const cs: Resources = {
         'Na adresu {{email}} jsme odeslali potvrzovací odkaz. Otevřete jej pro aktivaci účtu a poté se přihlaste.',
       resend: 'Odeslat potvrzovací e-mail znovu',
       resendDone: 'Pokud je adresa registrovaná, nový odkaz je na cestě.',
+      consentLabel: 'Souhlasím se {{link}}',
+      consentLink: 'zásadami ochrany osobních údajů',
+      consentRequired: 'Pro vytvoření účtu musíte souhlasit se zásadami ochrany osobních údajů.',
     },
     settings: {
       title: 'Nastavení účtu',
@@ -440,6 +450,98 @@ export const cs: Resources = {
       basemapNote:
         'Mapové podklady a styly poskytují OpenFreeMap a OpenMapTiles; podkladová geografická ' +
         'data jsou © přispěvatelé OpenStreetMap a jsou licencována pod ODbL.',
+    },
+  },
+  legal: {
+    privacy: {
+      title: 'Zásady ochrany osobních údajů',
+      lastUpdated: 'Poslední aktualizace: červen 2026',
+      intro:
+        'Tyto zásady ochrany osobních údajů vysvětlují, jak platforma Ambiquality zpracovává ' +
+        'osobní údaje při používání této webové aplikace. Jsou vypracovány v souladu s nařízením ' +
+        '(EU) 2016/679 (obecné nařízení o ochraně osobních údajů, „GDPR“).',
+      controller: {
+        heading: 'Správce údajů',
+        body:
+          'Správcem údajů je projekt Ambiquality, provozovaný jako bakalářská práce na Vysoké ' +
+          'škole ekonomické v Praze (VŠE Praha). S jakýmkoli požadavkem týkajícím se ochrany ' +
+          'osobních údajů se na nás můžete obrátit na níže uvedené kontaktní adrese.',
+        contactLabel: 'Kontakt',
+      },
+      data: {
+        heading: 'Jaké údaje shromažďujeme',
+        intro: 'V závislosti na způsobu používání aplikace zpracováváme tyto osobní údaje:',
+        accountEmail:
+          'E-mailová adresa účtu — když se zaregistrujete jako provozovatel, uložíme e-mailovou ' +
+          'adresu, kterou zadáte. Slouží k identifikaci vašeho účtu, k jeho potvrzení a ke ' +
+          'kontaktování ohledně vašeho účtu.',
+        addressData:
+          'Údaje o budově a poloze — provozovatelé zadávají adresu a polohu budov, které ' +
+          'registrují. Tato adresa nemusí, ale může být adresou samotného registrujícího ' +
+          'provozovatele: provozovatel může zaregistrovat budovu patřící třetí straně, takže ' +
+          'adresa může popisovat objekt jiný než domov či pracoviště provozovatele.',
+        technical:
+          'Technické údaje — standardní metadata požadavků (například IP adresa a časové razítko ' +
+          'API požadavků) mohou být přechodně zpracovávána backendovými službami za účelem ' +
+          'provozu a zabezpečení platformy.',
+      },
+      purpose: {
+        heading: 'Účel a právní základ',
+        intro: 'Výše uvedené údaje zpracováváme na základě těchto právních základů podle čl. 6 GDPR:',
+        contract:
+          'Plnění smlouvy (čl. 6 odst. 1 písm. b)) — k vytvoření a správě vašeho provozovatelského ' +
+          'účtu a k poskytování funkcí registrace a správy katalogu, které požadujete.',
+        legitimate:
+          'Oprávněné zájmy (čl. 6 odst. 1 písm. f)) — k zajištění bezpečnosti a provozu platformy ' +
+          'a k zabránění zneužití.',
+        openData:
+          'Veřejný zájem / zveřejnění otevřených dat — údaje o budově a poloze jsou zveřejňovány ' +
+          'jako otevřená data. Souřadnice na veřejné mapě jsou pro nevlastníky záměrně zhrubeny ' +
+          '(maskovány), aby nebyla prozrazena přesná poloha.',
+      },
+      retention: {
+        heading: 'Doba uchovávání',
+        body:
+          'Údaje o účtu uchováváme po dobu existence vašeho provozovatelského účtu. Pokud svůj ' +
+          'účet smažete, související osobní údaje jsou odstraněny nebo anonymizovány, s výjimkou ' +
+          'případů, kdy je musíme uchovat ke splnění právní povinnosti. Zveřejněná otevřená data ' +
+          'mohou být uchována jako součást záznamu otevřených dat.',
+      },
+      recipients: {
+        heading: 'Příjemci a zpracovatelé',
+        body:
+          'Osobní údaje jsou zpracovávány vlastními backendovými službami platformy (autentizace, ' +
+          'katalog/evidence a veřejné API otevřených dat). K odesílání zpráv o potvrzení účtu a ' +
+          'oznámení se používá poskytovatel doručování e-mailů. Osobní údaje neprodáváme.',
+      },
+      rights: {
+        heading: 'Vaše práva',
+        intro:
+          'Jako subjekt údajů máte podle GDPR následující práva, která můžete uplatnit ' +
+          'kontaktováním na níže uvedené adrese:',
+        access: 'Právo na přístup — získat kopii osobních údajů, které o vás uchováváme.',
+        rectification: 'Právo na opravu — nechat opravit nepřesné údaje.',
+        erasure: 'Právo na výmaz — nechat vymazat své osobní údaje („právo být zapomenut“).',
+        restriction: 'Právo na omezení — omezit, jak vaše údaje zpracováváme.',
+        objection: 'Právo vznést námitku — vznést námitku proti zpracování na základě oprávněných zájmů.',
+        portability:
+          'Právo na přenositelnost údajů — obdržet své údaje ve strukturovaném, strojově ' +
+          'čitelném formátu.',
+        complaint:
+          'Máte rovněž právo podat stížnost u dozorového úřadu (v České republice u Úřadu pro ' +
+          'ochranu osobních údajů).',
+      },
+      contact: {
+        heading: 'Jak nás kontaktovat',
+        body: 'S jakýmkoli požadavkem nebo dotazem ohledně ochrany osobních údajů nás kontaktujte na:',
+      },
+      disclaimer: {
+        heading: 'Status tohoto dokumentu',
+        body:
+          'Ambiquality je studentská bakalářská práce na Vysoké škole ekonomické v Praze ' +
+          '(VŠE Praha). Tyto zásady ochrany osobních údajů jsou předběžné a čekají na právní ' +
+          'revizi autora; před případným produkčním nasazením se mohou změnit.',
+      },
     },
   },
 };
