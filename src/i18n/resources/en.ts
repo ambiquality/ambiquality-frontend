@@ -372,6 +372,9 @@ export const en = {
       relocateTitle: 'Relocate sensor',
       relocateSubmit: 'Move sensor',
       measuredParametersTitle: 'Measured quantities',
+      ingestionId: 'Sensor ID (for ingestion)',
+      ingestionIdHint:
+        'Use this identifier when sending measurements to the ingestion API.',
       registered: 'The sensor has been registered.',
     },
     apiKey: {

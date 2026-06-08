@@ -19,6 +19,8 @@ export interface SummaryCardProps {
   actions?: ReactNode;
   /** Optional stable `uriSlug` shown as a copyable identifier above the rows. */
   uri?: string;
+  /** Optional extra header content rendered under the URI (e.g. a second copyable identifier). */
+  headerExtra?: ReactNode;
 }
 
 /** Empty when null/undefined or a blank/whitespace-only string. */
@@ -32,7 +34,7 @@ function isEmpty(value: ReactNode): boolean {
  * screens (a past `asOf` projection, no actions). Coded fields should be resolved to their
  * codelist label by the caller before being passed in as a row value.
  */
-export function SummaryCard({ title, rows, actions, uri }: SummaryCardProps) {
+export function SummaryCard({ title, rows, actions, uri, headerExtra }: SummaryCardProps) {
   const { t } = useTranslation('evidence');
   return (
     <Box borderWidth="1px" borderColor="border" rounded="md" p="6">
@@ -40,6 +42,7 @@ export function SummaryCard({ title, rows, actions, uri }: SummaryCardProps) {
         <Stack gap="3">
           <Heading size="lg">{title}</Heading>
           {uri && <CopyField label={t('common.uri')} value={uri} />}
+          {headerExtra}
         </Stack>
         {actions}
       </HStack>

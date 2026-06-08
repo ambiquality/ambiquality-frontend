@@ -366,6 +366,9 @@ export const cs: Resources = {
       relocateTitle: 'Přemístit senzor',
       relocateSubmit: 'Přesunout senzor',
       measuredParametersTitle: 'Měřené veličiny',
+      ingestionId: 'ID senzoru (pro příjem dat)',
+      ingestionIdHint:
+        'Tento identifikátor použijte při odesílání měření do ingestního API.',
       registered: 'Senzor byl zaregistrován.',
     },
     apiKey: {

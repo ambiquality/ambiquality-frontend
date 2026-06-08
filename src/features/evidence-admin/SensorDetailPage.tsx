@@ -1,10 +1,10 @@
-import { Box, Button, HStack, Link as ChakraLink, Spinner, Stack } from '@chakra-ui/react';
+import { Box, Button, HStack, Link as ChakraLink, Spinner, Stack, Text } from '@chakra-ui/react';
 import { Link as RouterLink, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ProblemError, Breadcrumb } from '@/components';
 import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-details';
 import { useSensor, type SensorSnapshot } from './queries';
-import { SummaryCard } from './components';
+import { SummaryCard, CopyField } from './components';
 import { useSensorSummaryRows } from './summaries';
 import { publicEntityUri } from './entity-uri';
 
@@ -77,6 +77,14 @@ function SensorSummary({
     <SummaryCard
       title={title}
       uri={publicEntityUri('sensors', snapshot.uriSlug)}
+      headerExtra={
+        <Stack gap="1">
+          <CopyField label={t('sensor.ingestionId')} value={snapshot.id} />
+          <Text fontSize="xs" color="fg.muted" maxW="md">
+            {t('sensor.ingestionIdHint')}
+          </Text>
+        </Stack>
+      }
       rows={rows}
       actions={
         <HStack gap="2">
