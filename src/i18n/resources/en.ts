@@ -16,6 +16,7 @@ export const en = {
     appName: 'Ambiquality',
     nav: {
       map: 'Map',
+      catalog: 'Catalogue',
       archive: 'Archive',
       operator: 'Operator',
       about: 'About',
@@ -497,6 +498,51 @@ export const en = {
       title: 'Archives are unavailable',
       body: 'The archive listing could not be loaded. Please try again later; you can still use the ' +
         'full current-data download above when it is available.',
+      retry: 'Try again',
+    },
+  },
+  catalog: {
+    // F16 — the human-readable rendering of the DCAT-AP open-data catalogue metadata. Reads the
+    // single `/v1/catalog` endpoint (Public.Api) via the shared `useCatalog` hook. Downloadable
+    // archives live on the separate Archive tab; this page covers the descriptive metadata and the
+    // live API access points only.
+    fallbackTitle: 'Open data catalogue',
+    intro:
+      'Machine-readable, DCAT-AP metadata describing the published open observation data and the ' +
+      'live access points where it can be retrieved.',
+    dataset: {
+      heading: 'Dataset',
+      publisherLabel: 'Publisher',
+      licenseLabel: 'Licence',
+      themeLabel: 'Theme',
+      periodicityLabel: 'Update frequency',
+      keywordsLabel: 'Keywords',
+      contactLabel: 'Contact',
+    },
+    coverage: {
+      heading: 'Coverage',
+      issuedLabel: 'Published',
+      temporalLabel: 'Time period',
+      temporalRange: '{{start}} – {{end}}',
+      spatialLabel: 'Spatial extent',
+      bboxLabel: 'Longitude {{minLon}} to {{maxLon}}, latitude {{minLat}} to {{maxLat}}',
+    },
+    distributions: {
+      heading: 'Live data access',
+      intro: 'Retrieve the live observation data directly from the open API:',
+    },
+    // Friendly labels for the EU controlled-vocabulary URIs the backend emits. Unmapped URIs fall
+    // back to the raw URI text (still rendered as a dereferenceable link).
+    theme: {
+      ENVI: 'Environment',
+    },
+    periodicity: {
+      CONT: 'Continuous',
+    },
+    loading: 'Loading catalogue…',
+    error: {
+      title: 'Catalogue is unavailable',
+      body: 'The catalogue metadata could not be loaded. Please try again later.',
       retry: 'Try again',
     },
   },

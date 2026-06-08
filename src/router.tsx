@@ -4,6 +4,7 @@ import { ErrorPage } from '@/components/ErrorPage';
 import { RootLayout } from '@/components/RootLayout';
 import { AboutPage } from '@/features/about/AboutPage';
 import { ArchivePage } from '@/features/archive/ArchivePage';
+import { CataloguePage } from '@/features/catalogue/CataloguePage';
 import { PrivacyPolicyPage } from '@/features/legal/PrivacyPolicyPage';
 import { LoginPage } from '@/features/account/LoginPage';
 import { RegisterPage } from '@/features/account/RegisterPage';
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
       { path: 'sensors/:slug', element: <EntityDetailPage kind="sensor" /> },
 
       // --- Open data (Public.Api) ---
+      { path: 'catalog', element: <CataloguePage /> },
       { path: 'archive', element: <ArchivePage /> },
 
       // --- Informational ---

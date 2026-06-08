@@ -19,6 +19,7 @@ export const cs: Resources = {
     appName: 'Ambiquality',
     nav: {
       map: 'Mapa',
+      catalog: 'Katalog',
       archive: 'Archiv',
       operator: 'Provozovatel',
       about: 'O aplikaci',
@@ -484,6 +485,45 @@ export const cs: Resources = {
       title: 'Archivy nejsou dostupné',
       body: 'Seznam archivů se nepodařilo načíst. Zkuste to prosím později; kompletní stažení ' +
         'aktuálních dat výše zůstává k dispozici, pokud je dostupné.',
+      retry: 'Zkusit znovu',
+    },
+  },
+  catalog: {
+    fallbackTitle: 'Katalog otevřených dat',
+    intro:
+      'Strojově čitelná metadata ve formátu DCAT-AP popisující zveřejněná otevřená data ' +
+      'pozorování a přístupové body, odkud je lze získat.',
+    dataset: {
+      heading: 'Datová sada',
+      publisherLabel: 'Poskytovatel',
+      licenseLabel: 'Licence',
+      themeLabel: 'Téma',
+      periodicityLabel: 'Četnost aktualizace',
+      keywordsLabel: 'Klíčová slova',
+      contactLabel: 'Kontakt',
+    },
+    coverage: {
+      heading: 'Pokrytí',
+      issuedLabel: 'Zveřejněno',
+      temporalLabel: 'Časové období',
+      temporalRange: '{{start}} – {{end}}',
+      spatialLabel: 'Územní rozsah',
+      bboxLabel: 'Zeměpisná délka {{minLon}} až {{maxLon}}, zeměpisná šířka {{minLat}} až {{maxLat}}',
+    },
+    distributions: {
+      heading: 'Přístup k živým datům',
+      intro: 'Získejte živá data pozorování přímo z otevřeného API:',
+    },
+    theme: {
+      ENVI: 'Životní prostředí',
+    },
+    periodicity: {
+      CONT: 'Průběžně',
+    },
+    loading: 'Načítání katalogu…',
+    error: {
+      title: 'Katalog není dostupný',
+      body: 'Metadata katalogu se nepodařilo načíst. Zkuste to prosím později.',
       retry: 'Zkusit znovu',
     },
   },

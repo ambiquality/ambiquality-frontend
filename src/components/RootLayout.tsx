@@ -53,9 +53,18 @@ export function RootLayout() {
                   <Image src={logoUrl} alt={t('appName')} h="8" w="auto" />
                 </RouterLink>
               </ChakraLink>
-              <HStack as="nav" gap="4" aria-label={t('nav.primary')}>
+              <HStack
+                as="nav"
+                gap={{ base: '3', sm: '4' }}
+                rowGap="2"
+                wrap="wrap"
+                aria-label={t('nav.primary')}
+              >
                 <ChakraLink asChild>
                   <RouterLink to="/">{t('nav.map')}</RouterLink>
+                </ChakraLink>
+                <ChakraLink asChild>
+                  <RouterLink to="/catalog">{t('nav.catalog')}</RouterLink>
                 </ChakraLink>
                 <ChakraLink asChild>
                   <RouterLink to="/archive">{t('nav.archive')}</RouterLink>

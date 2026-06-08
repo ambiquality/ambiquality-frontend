@@ -15,6 +15,7 @@ export const NAMESPACES = [
   'evidence',
   'map',
   'about',
+  'catalog',
   'archive',
   'legal',
 ] as const;
