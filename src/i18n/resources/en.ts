@@ -404,4 +404,53 @@ export const en = {
     'urn:ambiquality:evidence:domain-rule-violation': 'This change breaks a domain rule.',
     'urn:ambiquality:public:not-found': 'The requested resource was not found.',
   },
+  about: {
+    // F-scope: the public "About" page — platform description + open-source attribution.
+    // Library/licence names and OSS project names are proper nouns and stay untranslated;
+    // only the surrounding prose lives here.
+    title: 'About Ambiquality',
+    intro: {
+      heading: 'About the platform',
+      lead:
+        'Ambiquality is an open-source platform for monitoring Indoor Environmental Quality ' +
+        '(IEQ). It collects measurements from IoT sensors across the four IEQ domains — indoor ' +
+        'air quality, thermal comfort, acoustic comfort and visual comfort — covering ' +
+        'parameters such as CO₂, temperature, humidity, particulate matter, volatile organic ' +
+        'compounds, acoustics and light, and publishes them as open data.',
+      app:
+        'This web application is the platform’s visitor and operator interface: the public can ' +
+        'explore measurements on an interactive map and browse the catalog of buildings, rooms ' +
+        'and sensors, while operators register and maintain that catalog.',
+      thesis:
+        'Built as a bachelor thesis at VŠE Prague (Prague University of Economics and ' +
+        'Business) by Vilém Charwot, submission May 2026.',
+    },
+    contact: {
+      heading: 'Contact',
+      authorLabel: 'Author',
+      authorName: 'Vilém Charwot',
+      emailLabel: 'Email',
+    },
+    source: {
+      heading: 'Source code',
+      description:
+        'Ambiquality is open source. The frontend and backend repositories are published on ' +
+        'GitHub.',
+      linkLabel: 'View the source on GitHub',
+    },
+    data: {
+      heading: 'Data licence',
+      description: 'The measurements published by the platform are open data, licensed under:',
+    },
+    acknowledgements: {
+      heading: 'Acknowledgements',
+      description:
+        'This application is built with open-source software. We gratefully acknowledge the ' +
+        'following projects, retaining their licence notices.',
+      licenseLabel: 'Licence: {{license}}',
+      basemapNote:
+        'Basemap tiles and styles are provided by OpenFreeMap and OpenMapTiles; the underlying ' +
+        'geographic data is © OpenStreetMap contributors and licensed under ODbL.',
+    },
+  },
 } as const;

@@ -396,4 +396,50 @@ export const cs: Resources = {
     'urn:ambiquality:evidence:domain-rule-violation': 'Tato změna porušuje doménové pravidlo.',
     'urn:ambiquality:public:not-found': 'Požadovaný zdroj nebyl nalezen.',
   },
+  about: {
+    title: 'O Ambiquality',
+    intro: {
+      heading: 'O platformě',
+      lead:
+        'Ambiquality je open-source platforma pro monitorování kvality vnitřního prostředí ' +
+        '(IEQ). Sbírá měření z IoT senzorů napříč čtyřmi oblastmi IEQ — kvalita vnitřního ' +
+        'ovzduší, tepelný komfort, akustický komfort a zrakový komfort — a pokrývá veličiny ' +
+        'jako CO₂, teplota, vlhkost, prachové částice, těkavé organické látky, akustika a ' +
+        'osvětlení; tato data zveřejňuje jako otevřená data.',
+      app:
+        'Tato webová aplikace je návštěvnické a operátorské rozhraní platformy: veřejnost si ' +
+        'může prohlížet pozorování na interaktivní mapě a procházet katalog budov, místností a ' +
+        'senzorů, zatímco operátoři tento katalog registrují a spravují.',
+      thesis:
+        'Vytvořeno jako bakalářská práce na VŠE v Praze (Vysoká škola ekonomická v Praze), ' +
+        'autor Vilém Charwot, odevzdání květen 2026.',
+    },
+    contact: {
+      heading: 'Kontakt',
+      authorLabel: 'Autor',
+      authorName: 'Vilém Charwot',
+      emailLabel: 'E-mail',
+    },
+    source: {
+      heading: 'Zdrojový kód',
+      description:
+        'Ambiquality je open source. Repozitáře frontendu i backendu jsou zveřejněny na ' +
+        'GitHubu.',
+      linkLabel: 'Zobrazit zdrojový kód na GitHubu',
+    },
+    data: {
+      heading: 'Licence dat',
+      description: 'Měření zveřejňovaná platformou jsou otevřená data pod licencí:',
+    },
+    acknowledgements: {
+      heading: 'Poděkování',
+      description:
+        'Tato aplikace je postavena na open-source softwaru. S vděčností uvádíme následující ' +
+        'projekty a zachováváme jejich licenční ujednání.',
+      licenseLabel: 'Licence: {{license}}',
+      basemapNote:
+        'Mapové podklady a styly poskytují OpenFreeMap a OpenMapTiles; podkladová geografická ' +
+        'data jsou © přispěvatelé OpenStreetMap a jsou licencována pod ODbL.',
+    },
+  },
 };
