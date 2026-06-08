@@ -301,7 +301,7 @@ export interface paths {
         };
         /**
          * List buildings
-         * @description Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed.
+         * @description Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed. Each building carries a Czech OFN address (see the Address schema). Negotiable as JSON (default) or JSON-LD (Accept: application/ld+json).
          */
         get: operations["ListBuildings"];
         put?: never;
@@ -310,7 +310,7 @@ export interface paths {
         options?: never;
         /**
          * List buildings
-         * @description Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed.
+         * @description Filters: buildingType, bbox (minLon,minLat,maxLon,maxLat), page, pageSize. Offset/page paged with a total count: the catalog is small and bounded, so a page index is friendlier than the keyset cursor used by the unbounded observations feed. Each building carries a Czech OFN address (see the Address schema). Negotiable as JSON (default) or JSON-LD (Accept: application/ld+json).
          */
         head: operations["ListBuildings"];
         patch?: never;
@@ -323,13 +323,19 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a building by id */
+        /**
+         * Get a building by id
+         * @description Returns one building with its current OFN address (see the Address schema) and precise coordinates. Negotiable as JSON (default) or JSON-LD; the JSON-LD form emits a conformant OFN Adresa node with dereferenceable RÚIAN IRIs.
+         */
         get: operations["GetBuildingById"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
-        /** Get a building by id */
+        /**
+         * Get a building by id
+         * @description Returns one building with its current OFN address (see the Address schema) and precise coordinates. Negotiable as JSON (default) or JSON-LD; the JSON-LD form emits a conformant OFN Adresa node with dereferenceable RÚIAN IRIs.
+         */
         head: operations["GetBuildingById"];
         patch?: never;
         trace?: never;
@@ -422,6 +428,71 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * @description A building's postal address, modelled on the Czech open formal standard **OFN _Adresy_** (2020-07-01, https://ofn.gov.cz/adresy/2020-07-01/) and anchored on the national address register **RÚIAN**.
+         *
+         *     The single field `addressPointCode` (RÚIAN *kód adresního místa*) identifies the address completely on its own; every other field is supplementary and may be null (small municipalities have no street names, an address may have no orientation number, and the RÚIAN territorial codes are filled in only when known).
+         *
+         *     When you request the building as Linked Data (`Accept: application/ld+json`) this object is re-shaped into a conformant OFN `Adresa` node: each `*Code` below is emitted as a **dereferenceable RÚIAN IRI** (e.g. `https://linked.cuzk.cz/resource/ruian/obec/{municipalityCode}`) and each name is carried as a Czech-language string (`{"cs": …}`). Those IRIs are stable global identifiers you can use to join this data against RÚIAN and other linked datasets.
+         */
+        AddressDto: {
+            /**
+             * Format: int64
+             * @description RÚIAN address-point code (*kód adresního místa*) — the canonical, globally-unique identifier of this exact address. On its own it fully identifies the address; the remaining fields just spare a consumer a RÚIAN lookup. In JSON-LD it becomes the IRI `https://linked.cuzk.cz/resource/ruian/adresni-misto/{code}`.
+             */
+            addressPointCode: null | number | string;
+            /** @description Street name (*název ulice*). Optional — many small municipalities have no named streets, in which case the house number alone locates the building. */
+            streetName: null | string;
+            /**
+             * Format: int32
+             * @description House number (*číslo domovní*) — the building's number within the municipality. Its exact meaning depends on `houseNumberType`.
+             */
+            houseNumber: null | number | string;
+            /** @description Type of the house number (*typ čísla domovního*): `č.p.` = *číslo popisné* (the permanent descriptive number of a regular building) or `č.ev.` = *číslo evidenční* (a registration number used for recreational / temporary structures). */
+            houseNumberType: null | string;
+            /**
+             * Format: int32
+             * @description Orientation number (*číslo orientační*) — the street-level number used for navigation (the part after the slash in e.g. *1938/4*). Optional.
+             */
+            orientationNumber: null | number | string;
+            /** @description Letter suffix of the orientation number (*znak čísla orientačního*), e.g. the `a` in *12a*. Optional. */
+            orientationNumberLetter: null | string;
+            /** @description Municipality name (*název obce*), e.g. *Praha*. */
+            municipalityName: null | string;
+            /** @description Name of the part of the municipality (*název části obce*), e.g. *Žižkov*. Optional. */
+            municipalityPartName: null | string;
+            /** @description Postal code (*PSČ*) — five digits, stored without the conventional space (e.g. `13067`, rendered as *130 67* in the free-text form). */
+            psc: null | string;
+            /** @description District name (*název okresu*), e.g. *Brno-město*. Optional. */
+            districtName: null | string;
+            /** @description Region name (*název kraje*, i.e. the VÚSC), e.g. *Jihomoravský kraj*. Optional. */
+            regionName: null | string;
+            /**
+             * Format: int64
+             * @description RÚIAN street code. When present, the JSON-LD address emits it as the dereferenceable IRI `https://linked.cuzk.cz/resource/ruian/ulice/{code}` (OFN `ulice`). Optional.
+             */
+            streetCode: null | number | string;
+            /**
+             * Format: int64
+             * @description RÚIAN municipality (obec) code → JSON-LD IRI `https://linked.cuzk.cz/resource/ruian/obec/{code}` (OFN `obec`). Optional.
+             */
+            municipalityCode: null | number | string;
+            /**
+             * Format: int64
+             * @description RÚIAN municipality-part code → JSON-LD IRI `https://linked.cuzk.cz/resource/ruian/cast-obce/{code}` (OFN `část_obce`). Optional.
+             */
+            municipalityPartCode: null | number | string;
+            /**
+             * Format: int64
+             * @description RÚIAN district (okres) code → JSON-LD IRI `https://linked.cuzk.cz/resource/ruian/okres/{code}` (OFN `okres`). Optional.
+             */
+            districtCode: null | number | string;
+            /**
+             * Format: int64
+             * @description RÚIAN region / VÚSC (kraj) code → JSON-LD IRI `https://linked.cuzk.cz/resource/ruian/vusc/{code}` (OFN `vúsc`). Optional.
+             */
+            regionCode: null | number | string;
+        };
         AggregateBucketDto: {
             /** Format: date-time */
             t: string;
@@ -472,6 +543,57 @@ export interface components {
             /** Format: double */
             p95: number | string;
         };
+        /** @description A building in the open-data catalog, projected to its current state. `address` is the Czech OFN address (see the Address schema). `latitude`/`longitude` are the precise stored coordinates — this is open data, so they are returned in full to every reader with no anonymization. `license` (CC BY 4.0) applies to the whole response, and `iri` is the building's stable, dereferenceable identifier on this API. */
+        BuildingResponse: {
+            /** Format: uuid */
+            id: string;
+            iri: string;
+            name: null | string;
+            address: components["schemas"]["AddressDto"];
+            buildingTypeCode: null | string;
+            /** Format: double */
+            latitude: null | number | string;
+            /** Format: double */
+            longitude: null | number | string;
+            /** Format: int32 */
+            yearBuilt: null | number | string;
+            /** Format: int32 */
+            yearRenovated: null | number | string;
+            license: string;
+        };
+        CatalogPageOfBuildingResponse: {
+            items: components["schemas"]["BuildingResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int64 */
+            total: number | string;
+            next: null | string;
+            license: string;
+        };
+        CatalogPageOfRoomResponse: {
+            items: components["schemas"]["RoomResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int64 */
+            total: number | string;
+            next: null | string;
+            license: string;
+        };
+        CatalogPageOfSensorResponse: {
+            items: components["schemas"]["SensorResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int64 */
+            total: number | string;
+            next: null | string;
+            license: string;
+        };
         MapSnapshotItem: {
             /** Format: uuid */
             buildingId: string;
@@ -497,6 +619,11 @@ export interface components {
             items: components["schemas"]["MapSnapshotItem"][];
             license: string;
         };
+        MeasuredParameterDto: {
+            code: string;
+            quantityKindUri: null | string;
+            unitUri: null | string;
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -517,6 +644,40 @@ export interface components {
             unitUri: null | string;
             exactMatchIri: null | string;
             closeMatchIri: null | string;
+            license: string;
+        };
+        RoomResponse: {
+            /** Format: uuid */
+            id: string;
+            iri: string;
+            /** Format: uuid */
+            buildingId: string;
+            name: null | string;
+            /** Format: uint8 */
+            floor: number | string;
+            functionCode: null | string;
+            exposureCode: null | string;
+            /** Format: double */
+            areaM2: null | number | string;
+            /** Format: double */
+            ceilingHeightM: null | number | string;
+            ventilationType: null | string;
+            pollutionSources: string[];
+            license: string;
+        };
+        SensorResponse: {
+            /** Format: uuid */
+            id: string;
+            iri: string;
+            /** Format: uuid */
+            buildingId: string;
+            /** Format: uuid */
+            roomId: string;
+            manufacturer: null | string;
+            model: null | string;
+            serialNumber: null | string;
+            statusCode: null | string;
+            measuredParameters: components["schemas"]["MeasuredParameterDto"][];
             license: string;
         };
     };
@@ -1134,7 +1295,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfBuildingResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1152,7 +1333,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfBuildingResponse"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1172,7 +1373,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["BuildingResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1192,7 +1413,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["BuildingResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1212,7 +1453,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfRoomResponse"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1232,7 +1484,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfRoomResponse"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1252,7 +1515,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["RoomResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1272,7 +1555,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["RoomResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1292,7 +1595,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfSensorResponse"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1312,7 +1626,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["CatalogPageOfSensorResponse"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1332,7 +1657,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SensorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
@@ -1352,7 +1697,27 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["SensorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Not Acceptable */
+            406: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };

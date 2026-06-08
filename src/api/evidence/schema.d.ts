@@ -496,16 +496,35 @@ export interface components {
             /** Format: uuid */
             ownerId: string;
             name: string;
-            street: string;
-            city: string;
-            postcode: string;
-            country: string;
+            /** Format: int64 */
+            addressPointCode: number | string;
+            streetName: null | string;
+            /** Format: int32 */
+            houseNumber: number | string;
+            houseNumberType: string;
+            /** Format: int32 */
+            orientationNumber: null | number | string;
+            orientationNumberLetter: null | string;
+            municipalityName: string;
+            municipalityPartName: null | string;
+            psc: string;
+            districtName: null | string;
+            regionName: null | string;
+            /** Format: int64 */
+            streetCode: null | number | string;
+            /** Format: int64 */
+            municipalityCode: null | number | string;
+            /** Format: int64 */
+            municipalityPartCode: null | number | string;
+            /** Format: int64 */
+            districtCode: null | number | string;
+            /** Format: int64 */
+            regionCode: null | number | string;
             buildingTypeCode: string;
             /** Format: double */
             latitude: null | number | string;
             /** Format: double */
             longitude: null | number | string;
-            anonymizationLevel: string;
             /** Format: int16 */
             yearBuilt: null | number | string;
             /** Format: int16 */
@@ -514,19 +533,38 @@ export interface components {
             asOf: string;
         };
         ChangeBuildingAddressRequest: {
-            street: string;
-            city: string;
-            postcode: string;
-            country: string;
+            /** Format: int64 */
+            addressPointCode: number | string;
+            streetName: null | string;
+            /** Format: int32 */
+            houseNumber: number | string;
+            houseNumberType: string;
+            /** Format: int32 */
+            orientationNumber: null | number | string;
+            orientationNumberLetter: null | string;
+            municipalityName: string;
+            municipalityPartName: null | string;
+            psc: string;
+            districtName: null | string;
+            regionName: null | string;
             /** Format: date-time */
             validFrom: string;
+            /** Format: int64 */
+            streetCode?: null | number | string;
+            /** Format: int64 */
+            municipalityCode?: null | number | string;
+            /** Format: int64 */
+            municipalityPartCode?: null | number | string;
+            /** Format: int64 */
+            districtCode?: null | number | string;
+            /** Format: int64 */
+            regionCode?: null | number | string;
         };
         ChangeBuildingLocationRequest: {
             /** Format: double */
             latitude: null | number | string;
             /** Format: double */
             longitude: null | number | string;
-            anonymizationLevel: string;
             /** Format: date-time */
             validFrom: string;
         };
@@ -592,20 +630,39 @@ export interface components {
         };
         RegisterBuildingRequest: {
             name: string;
-            street: string;
-            city: string;
-            postcode: string;
-            country: string;
+            /** Format: int64 */
+            addressPointCode: number | string;
+            streetName: null | string;
+            /** Format: int32 */
+            houseNumber: number | string;
+            houseNumberType: string;
+            /** Format: int32 */
+            orientationNumber: null | number | string;
+            orientationNumberLetter: null | string;
+            municipalityName: string;
+            municipalityPartName: null | string;
+            psc: string;
+            districtName: null | string;
+            regionName: null | string;
             buildingTypeCode: string;
             /** Format: double */
             latitude: null | number | string;
             /** Format: double */
             longitude: null | number | string;
-            anonymizationLevel: string;
             /** Format: int16 */
             yearBuilt: null | number | string;
             /** Format: int16 */
             yearRenovated: null | number | string;
+            /** Format: int64 */
+            streetCode?: null | number | string;
+            /** Format: int64 */
+            municipalityCode?: null | number | string;
+            /** Format: int64 */
+            municipalityPartCode?: null | number | string;
+            /** Format: int64 */
+            districtCode?: null | number | string;
+            /** Format: int64 */
+            regionCode?: null | number | string;
         };
         RegisterBuildingResult: {
             /** Format: uuid */

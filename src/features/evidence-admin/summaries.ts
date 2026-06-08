@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import type { SummaryRow } from './components';
 import { useCodelistOptions, usePropertyOptions } from './codelists';
+import { composeAddressLine } from './address';
 import type { BuildingSnapshot, RoomSnapshot, SensorSnapshot } from './queries';
 
 /**
@@ -13,18 +14,9 @@ export function useBuildingSummaryRows(snapshot: BuildingSnapshot): SummaryRow[]
   const { t } = useTranslation('evidence');
   const buildingTypes = useCodelistOptions('building-type');
 
-  const anonymization = snapshot.anonymizationLevel
-    ? t(`anonymizationLevels.${snapshot.anonymizationLevel}`, {
-        defaultValue: snapshot.anonymizationLevel,
-      })
-    : null;
-
   return [
     { label: t('fields.name'), value: snapshot.name },
-    {
-      label: t('building.addressTitle'),
-      value: `${snapshot.street}, ${snapshot.postcode} ${snapshot.city}, ${snapshot.country}`,
-    },
+    { label: t('building.addressTitle'), value: composeAddressLine(snapshot) },
     { label: t('fields.buildingType'), value: buildingTypes.label(snapshot.buildingTypeCode) },
     {
       label: t('building.locationTitle'),
@@ -33,7 +25,6 @@ export function useBuildingSummaryRows(snapshot: BuildingSnapshot): SummaryRow[]
           ? `${snapshot.latitude}, ${snapshot.longitude}`
           : null,
     },
-    { label: t('fields.anonymizationLevel'), value: anonymization },
     { label: t('fields.yearBuilt'), value: snapshot.yearBuilt },
     { label: t('fields.yearRenovated'), value: snapshot.yearRenovated },
   ];

@@ -7,17 +7,25 @@ import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-det
 import { useRegisterBuilding } from './queries';
 import { SelectField } from './components';
 import { useCodelistOptions } from './codelists';
-import { useCountryOptions } from './countries';
-import { useAnonymizationOptions } from './anonymization';
-import { requiredValidator, optionalIntInRange, optionalNumberInRange } from './validation';
+import { useHouseNumberTypeOptions } from './house-number-type';
+import {
+  requiredValidator,
+  requiredPositiveInt,
+  optionalPositiveInt,
+  pscValidator,
+  optionalIntInRange,
+  optionalNumberInRange,
+} from './validation';
 
 /**
  * F05 register a building (`POST /v1/buildings`). A single registration form (initial state);
- * subsequent changes happen attribute-by-attribute on the detail screen (F07). Building type is
- * picked from the `building-type` SKOS codelist (cs/en prefLabels from Public.Api); coordinate
- * precision from the fixed anonymization enum; country from ISO 3166-1 — so operators choose
- * valid values rather than typing raw codes. Evidence.Api still validates server-side and an
- * `unknown-codelist-code` is surfaced via `ProblemError`. On `201` we route to the new building.
+ * subsequent changes happen attribute-by-attribute on the detail screen (F07). The address is the
+ * Czech OFN Adresy model (RÚIAN-anchored): the registrar supplies the structured fields — there is
+ * no live RÚIAN lookup, so they are entered directly (a CUZK autocomplete is a future enhancement).
+ * Building type is picked from the `building-type` SKOS codelist (cs/en prefLabels from Public.Api)
+ * and the house-number type from a fixed enum, so operators choose valid values rather than typing
+ * raw codes. Evidence.Api still validates server-side and an `unknown-codelist-code` / bad address
+ * is surfaced via `ProblemError`. On `201` we route to the new building.
  */
 export function BuildingNewPage() {
   const { t } = useTranslation('evidence');
@@ -25,22 +33,35 @@ export function BuildingNewPage() {
   const navigate = useNavigate();
   const register = useRegisterBuilding();
 
-  const countryOptions = useCountryOptions();
   const buildingTypes = useCodelistOptions('building-type');
-  const anonymizationOptions = useAnonymizationOptions();
+  const houseNumberTypeOptions = useHouseNumberTypeOptions();
 
   const [name, setName] = useState('');
-  const [street, setStreet] = useState('');
-  const [city, setCity] = useState('');
-  const [postcode, setPostcode] = useState('');
-  const [country, setCountry] = useState('');
+  const [addressPointCode, setAddressPointCode] = useState('');
+  const [streetName, setStreetName] = useState('');
+  const [streetCode, setStreetCode] = useState('');
+  const [houseNumber, setHouseNumber] = useState('');
+  const [houseNumberType, setHouseNumberType] = useState('');
+  const [orientationNumber, setOrientationNumber] = useState('');
+  const [orientationNumberLetter, setOrientationNumberLetter] = useState('');
+  const [municipalityName, setMunicipalityName] = useState('');
+  const [municipalityCode, setMunicipalityCode] = useState('');
+  const [municipalityPartName, setMunicipalityPartName] = useState('');
+  const [municipalityPartCode, setMunicipalityPartCode] = useState('');
+  const [psc, setPsc] = useState('');
+  const [districtName, setDistrictName] = useState('');
+  const [districtCode, setDistrictCode] = useState('');
+  const [regionName, setRegionName] = useState('');
+  const [regionCode, setRegionCode] = useState('');
   const [buildingTypeCode, setBuildingTypeCode] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
-  const [anonymizationLevel, setAnonymizationLevel] = useState('');
   const [yearBuilt, setYearBuilt] = useState('');
   const [yearRenovated, setYearRenovated] = useState('');
   const [problem, setProblem] = useState<ProblemErrorObject | null>(null);
+
+  const trimmedOrNull = (value: string) => (value.trim() === '' ? null : value.trim());
+  const numberOrNull = (value: string) => (value.trim() === '' ? null : Number(value));
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -48,16 +69,27 @@ export function BuildingNewPage() {
     try {
       const result = await register.mutateAsync({
         name,
-        street,
-        city,
-        postcode,
-        country,
+        addressPointCode: Number(addressPointCode),
+        streetName: trimmedOrNull(streetName),
+        streetCode: numberOrNull(streetCode),
+        houseNumber: Number(houseNumber),
+        houseNumberType,
+        orientationNumber: numberOrNull(orientationNumber),
+        orientationNumberLetter: trimmedOrNull(orientationNumberLetter),
+        municipalityName,
+        municipalityCode: numberOrNull(municipalityCode),
+        municipalityPartName: trimmedOrNull(municipalityPartName),
+        municipalityPartCode: numberOrNull(municipalityPartCode),
+        psc,
+        districtName: trimmedOrNull(districtName),
+        districtCode: numberOrNull(districtCode),
+        regionName: trimmedOrNull(regionName),
+        regionCode: numberOrNull(regionCode),
         buildingTypeCode,
-        latitude: latitude.trim() === '' ? null : Number(latitude),
-        longitude: longitude.trim() === '' ? null : Number(longitude),
-        anonymizationLevel,
-        yearBuilt: yearBuilt.trim() === '' ? null : Number(yearBuilt),
-        yearRenovated: yearRenovated.trim() === '' ? null : Number(yearRenovated),
+        latitude: numberOrNull(latitude),
+        longitude: numberOrNull(longitude),
+        yearBuilt: numberOrNull(yearBuilt),
+        yearRenovated: numberOrNull(yearRenovated),
       });
       navigate(`/operator/buildings/${result.id}`);
     } catch (error) {
@@ -78,25 +110,160 @@ export function BuildingNewPage() {
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </FormField>
 
+          <FormField
+            label={t('fields.addressPointCode')}
+            labelHint={t('fields.addressPointCodeHint')}
+            required
+            validate={requiredPositiveInt({
+              required: tf('validation.required'),
+              invalid: tf('validation.invalid'),
+            })}
+          >
+            <Input
+              inputMode="numeric"
+              value={addressPointCode}
+              onChange={(e) => setAddressPointCode(e.target.value)}
+            />
+          </FormField>
+
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.street')} required validate={requiredValidator(tf('validation.required'))}>
-              <Input value={street} onChange={(e) => setStreet(e.target.value)} />
+            <FormField label={t('fields.streetName')}>
+              <Input value={streetName} onChange={(e) => setStreetName(e.target.value)} />
             </FormField>
-            <FormField label={t('fields.city')} required validate={requiredValidator(tf('validation.required'))}>
-              <Input value={city} onChange={(e) => setCity(e.target.value)} />
+            <FormField
+              label={t('fields.streetCode')}
+              labelHint={t('fields.ruianCodeHint')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={streetCode}
+                onChange={(e) => setStreetCode(e.target.value)}
+              />
             </FormField>
-            <FormField label={t('fields.postcode')} required validate={requiredValidator(tf('validation.required'))}>
-              <Input value={postcode} onChange={(e) => setPostcode(e.target.value)} />
+          </SimpleGrid>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+            <FormField
+              label={t('fields.houseNumber')}
+              required
+              validate={requiredPositiveInt({
+                required: tf('validation.required'),
+                invalid: tf('validation.invalid'),
+              })}
+            >
+              <Input
+                inputMode="numeric"
+                value={houseNumber}
+                onChange={(e) => setHouseNumber(e.target.value)}
+              />
             </FormField>
-            <FormField label={t('fields.country')} required validate={requiredValidator(tf('validation.required'))}>
+            <FormField
+              label={t('fields.houseNumberType')}
+              required
+              validate={requiredValidator(tf('validation.required'))}
+            >
               <SelectField
-                value={country}
-                onChange={setCountry}
-                options={countryOptions}
+                value={houseNumberType}
+                onChange={setHouseNumberType}
+                options={houseNumberTypeOptions}
                 placeholder={t('select.placeholder')}
               />
             </FormField>
           </SimpleGrid>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+            <FormField
+              label={t('fields.orientationNumber')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={orientationNumber}
+                onChange={(e) => setOrientationNumber(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.orientationNumberLetter')}>
+              <Input
+                maxLength={1}
+                value={orientationNumberLetter}
+                onChange={(e) => setOrientationNumberLetter(e.target.value)}
+              />
+            </FormField>
+          </SimpleGrid>
+
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+            <FormField
+              label={t('fields.municipalityName')}
+              required
+              validate={requiredValidator(tf('validation.required'))}
+            >
+              <Input value={municipalityName} onChange={(e) => setMunicipalityName(e.target.value)} />
+            </FormField>
+            <FormField
+              label={t('fields.municipalityCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={municipalityCode}
+                onChange={(e) => setMunicipalityCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.municipalityPartName')}>
+              <Input
+                value={municipalityPartName}
+                onChange={(e) => setMunicipalityPartName(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label={t('fields.municipalityPartCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={municipalityPartCode}
+                onChange={(e) => setMunicipalityPartCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.districtName')}>
+              <Input value={districtName} onChange={(e) => setDistrictName(e.target.value)} />
+            </FormField>
+            <FormField
+              label={t('fields.districtCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={districtCode}
+                onChange={(e) => setDistrictCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.regionName')}>
+              <Input value={regionName} onChange={(e) => setRegionName(e.target.value)} />
+            </FormField>
+            <FormField
+              label={t('fields.regionCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={regionCode}
+                onChange={(e) => setRegionCode(e.target.value)}
+              />
+            </FormField>
+          </SimpleGrid>
+
+          <FormField
+            label={t('fields.psc')}
+            required
+            validate={pscValidator({
+              required: tf('validation.required'),
+              invalid: tf('validation.invalid'),
+            })}
+          >
+            <Input inputMode="numeric" value={psc} onChange={(e) => setPsc(e.target.value)} />
+          </FormField>
 
           <FormField label={t('fields.buildingType')} required validate={requiredValidator(tf('validation.required'))}>
             <SelectField
@@ -144,20 +311,6 @@ export function BuildingNewPage() {
               />
             </FormField>
           </SimpleGrid>
-
-          <FormField
-            label={t('fields.anonymizationLevel')}
-            labelHint={t('fields.anonymizationLevelHint')}
-            required
-            validate={requiredValidator(tf('validation.required'))}
-          >
-            <SelectField
-              value={anonymizationLevel}
-              onChange={setAnonymizationLevel}
-              options={anonymizationOptions}
-              placeholder={t('select.placeholder')}
-            />
-          </FormField>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField

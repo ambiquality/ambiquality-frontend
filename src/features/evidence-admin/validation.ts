@@ -67,6 +67,44 @@ export function requiredNumber(messages: { required: string; invalid: string }):
 }
 
 /**
+ * Required positive integer (`> 0`). Used by the OFN address fields the backend requires to be
+ * positive — the RÚIAN address-point code (kód adresního místa) and the house number. Lenient
+ * client check; Evidence.Api stays authoritative (a non-existent code is rejected server-side).
+ */
+export function requiredPositiveInt(messages: {
+  required: string;
+  invalid: string;
+}): FieldValidator {
+  return (value) => {
+    const v = value.trim();
+    if (v === '') return messages.required;
+    if (!/^\d+$/.test(v) || Number(v) <= 0) return messages.invalid;
+    return null;
+  };
+}
+
+/** Optional positive integer (`> 0`); blank is allowed (e.g. číslo orientační). */
+export function optionalPositiveInt(message: string): FieldValidator {
+  return (value) => {
+    const v = value.trim();
+    if (v === '') return null;
+    return /^\d+$/.test(v) && Number(v) > 0 ? null : message;
+  };
+}
+
+/**
+ * Required Czech PSČ — five digits, an optional single space accepted (`130 67`). Mirrors the
+ * backend's structural check (space stripped before validation); CUZK existence is not verified.
+ */
+export function pscValidator(messages: { required: string; invalid: string }): FieldValidator {
+  return (value) => {
+    const v = value.trim();
+    if (v === '') return messages.required;
+    return /^\d{3}\s?\d{2}$/.test(v) ? null : messages.invalid;
+  };
+}
+
+/**
  * A current-instant ISO timestamp suitable as a default `validFrom`. The temporal edit forms
  * default `validFrom` to "now" (the common case: the change takes effect immediately); the
  * operator can override it to schedule/backdate. Kept as a function (not a constant) so each

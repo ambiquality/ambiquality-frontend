@@ -1804,14 +1804,25 @@
           "uriSlug",
           "ownerId",
           "name",
-          "street",
-          "city",
-          "postcode",
-          "country",
+          "addressPointCode",
+          "streetName",
+          "houseNumber",
+          "houseNumberType",
+          "orientationNumber",
+          "orientationNumberLetter",
+          "municipalityName",
+          "municipalityPartName",
+          "psc",
+          "districtName",
+          "regionName",
+          "streetCode",
+          "municipalityCode",
+          "municipalityPartCode",
+          "districtCode",
+          "regionCode",
           "buildingTypeCode",
           "latitude",
           "longitude",
-          "anonymizationLevel",
           "yearBuilt",
           "yearRenovated",
           "asOf"
@@ -1832,17 +1843,114 @@
           "name": {
             "type": "string"
           },
-          "street": {
+          "addressPointCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "streetName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "houseNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "houseNumberType": {
             "type": "string"
           },
-          "city": {
+          "orientationNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "orientationNumberLetter": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "municipalityName": {
             "type": "string"
           },
-          "postcode": {
+          "municipalityPartName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "psc": {
             "type": "string"
           },
-          "country": {
-            "type": "string"
+          "districtName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "streetCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityPartCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "districtCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "regionCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
           },
           "buildingTypeCode": {
             "type": "string"
@@ -1864,9 +1972,6 @@
               "string"
             ],
             "format": "double"
-          },
-          "anonymizationLevel": {
-            "type": "string"
           },
           "yearBuilt": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1894,29 +1999,133 @@
       },
       "ChangeBuildingAddressRequest": {
         "required": [
-          "street",
-          "city",
-          "postcode",
-          "country",
+          "addressPointCode",
+          "streetName",
+          "houseNumber",
+          "houseNumberType",
+          "orientationNumber",
+          "orientationNumberLetter",
+          "municipalityName",
+          "municipalityPartName",
+          "psc",
+          "districtName",
+          "regionName",
           "validFrom"
         ],
         "type": "object",
         "properties": {
-          "street": {
+          "addressPointCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "streetName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "houseNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "houseNumberType": {
             "type": "string"
           },
-          "city": {
+          "orientationNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "orientationNumberLetter": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "municipalityName": {
             "type": "string"
           },
-          "postcode": {
+          "municipalityPartName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "psc": {
             "type": "string"
           },
-          "country": {
-            "type": "string"
+          "districtName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "validFrom": {
             "type": "string",
             "format": "date-time"
+          },
+          "streetCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityPartCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "districtCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "regionCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
           }
         }
       },
@@ -1924,7 +2133,6 @@
         "required": [
           "latitude",
           "longitude",
-          "anonymizationLevel",
           "validFrom"
         ],
         "type": "object",
@@ -1946,9 +2154,6 @@
               "string"
             ],
             "format": "double"
-          },
-          "anonymizationLevel": {
-            "type": "string"
           },
           "validFrom": {
             "type": "string",
@@ -2174,14 +2379,20 @@
       "RegisterBuildingRequest": {
         "required": [
           "name",
-          "street",
-          "city",
-          "postcode",
-          "country",
+          "addressPointCode",
+          "streetName",
+          "houseNumber",
+          "houseNumberType",
+          "orientationNumber",
+          "orientationNumberLetter",
+          "municipalityName",
+          "municipalityPartName",
+          "psc",
+          "districtName",
+          "regionName",
           "buildingTypeCode",
           "latitude",
           "longitude",
-          "anonymizationLevel",
           "yearBuilt",
           "yearRenovated"
         ],
@@ -2190,17 +2401,69 @@
           "name": {
             "type": "string"
           },
-          "street": {
+          "addressPointCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "streetName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "houseNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "houseNumberType": {
             "type": "string"
           },
-          "city": {
+          "orientationNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "orientationNumberLetter": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "municipalityName": {
             "type": "string"
           },
-          "postcode": {
+          "municipalityPartName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "psc": {
             "type": "string"
           },
-          "country": {
-            "type": "string"
+          "districtName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionName": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "buildingTypeCode": {
             "type": "string"
@@ -2223,9 +2486,6 @@
             ],
             "format": "double"
           },
-          "anonymizationLevel": {
-            "type": "string"
-          },
           "yearBuilt": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
@@ -2243,6 +2503,51 @@
               "string"
             ],
             "format": "int16"
+          },
+          "streetCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityPartCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "districtCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "regionCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
           }
         }
       },

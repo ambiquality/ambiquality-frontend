@@ -37,12 +37,12 @@ function setField(labelRe: RegExp, value: string) {
 
 function fillRequired() {
   setField(/^Name/, 'Main hall');
-  setField(/^Street/, 'Náměstí 1');
-  setField(/^City/, 'Praha');
-  setField(/^Postcode/, '11000');
-  setField(/^Country/, 'CZ');
+  setField(/^Address point code/, '21794547');
+  setField(/^House number/, '1938');
+  setField(/^House-number type/, 'č.p.');
+  setField(/^Municipality(?![ -](part|code))/, 'Praha');
+  setField(/^Postal code/, '13067');
   setField(/^Building type/, 'office');
-  setField(/^Coordinate precision/, 'precise');
 }
 
 function submit() {
@@ -64,14 +64,18 @@ describe('BuildingNewPage (F05 register)', () => {
     const body = mutateAsync.mock.calls[0][0];
     expect(body).toMatchObject({
       name: 'Main hall',
-      street: 'Náměstí 1',
-      city: 'Praha',
-      postcode: '11000',
-      country: 'CZ',
+      addressPointCode: 21794547,
+      houseNumber: 1938,
+      houseNumberType: 'č.p.',
+      municipalityName: 'Praha',
+      psc: '13067',
       buildingTypeCode: 'office',
-      anonymizationLevel: 'precise',
     });
-    // Optional numeric fields left blank serialize to null (not 0 / NaN).
+    // Optional fields left blank serialize to null (not '' / 0 / NaN) — incl. the RÚIAN codes.
+    expect(body.streetName).toBeNull();
+    expect(body.streetCode).toBeNull();
+    expect(body.municipalityCode).toBeNull();
+    expect(body.regionCode).toBeNull();
     expect(body.latitude).toBeNull();
     expect(body.yearBuilt).toBeNull();
   });

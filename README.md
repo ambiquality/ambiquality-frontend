@@ -22,9 +22,9 @@ The SPA exposes two distinct interfaces:
   **Evidence.Api**.
 
 > Catalog reads exist on both Evidence.Api and Public.Api. By design the **operator**
-> reads/writes via Evidence.Api (ownership, precise coordinates, `asOf` history); the
-> **visitor** reads via Public.Api (masked coordinates, paginated, cacheable). Keep these
-> two read paths distinct.
+> reads/writes via Evidence.Api (ownership, `asOf` history); the **visitor** reads via
+> Public.Api (paginated, cacheable). Coordinates are precise on both paths (anonymization was
+> dropped backend-side). Keep these two read paths distinct.
 
 ## Tech stack
 

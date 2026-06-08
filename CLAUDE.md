@@ -24,13 +24,14 @@ deliberate architectural decision — do not blur them:
 
 | Interface   | Auth          | Consumes                  | Data characteristics                                  |
 | ----------- | ------------- | ------------------------- | ----------------------------------------------------- |
-| **Visitor** | anonymous     | **Public.Api** (`/v1/*`)  | masked coordinates, paginated, cacheable, open-data shape |
-| **Operator**| authenticated | **Auth.Api** + **Evidence.Api** | ownership-aware, precise coordinates, `asOf` history    |
+| **Visitor** | anonymous     | **Public.Api** (`/v1/*`)  | precise coordinates, paginated, cacheable, open-data shape |
+| **Operator**| authenticated | **Auth.Api** + **Evidence.Api** | ownership-aware, `asOf` history    |
 
-> **Two read sources rule.** Catalog reads exist on **both** Evidence.Api (owner-precise
-> coords, `asOf`) and Public.Api (masked coords, paginated, SSN/SOSA open-data shape). The
-> operator path reads/writes via Evidence.Api; the visitor path reads via Public.Api. Keep
-> their auth / coordinate / `asOf` semantics distinct.
+> **Two read sources rule.** Catalog reads exist on **both** Evidence.Api (owner-scoped,
+> `asOf`) and Public.Api (paginated, SSN/SOSA open-data shape). The operator path reads/writes
+> via Evidence.Api; the visitor path reads via Public.Api. Coordinates are now **precise on
+> both** (anonymization was dropped backend-side, 2026-06-08); keep their auth / `asOf`
+> semantics distinct.
 
 ## Functional scope (from thesis)
 
@@ -130,8 +131,21 @@ When implementing later phases, these are the easy things to get wrong:
   **one** refresh (single-flight), then replay the queued requests; on refresh failure, hard
   logout. Because the refresh token is in `localStorage`, keep the app XSS-clean — rely on
   React/Chakra escaping, never use `dangerouslySetInnerHTML`.
-- **Coordinate masking.** Public.Api coarsens non-owner coordinates (`street`/`municipality`).
-  Map markers are intentionally imprecise — never imply exactness in the UI.
+- **Coordinates are precise everywhere.** Anonymization/coordinate masking was removed
+  backend-side (2026-06-08); Public.Api returns exact lat/lon to everyone. Render coordinates
+  as-is — there is no longer a coordinate-precision (`anonymizationLevel`) field on buildings.
+- **Czech OFN Adresy address model (RÚIAN-anchored).** A building address is NOT flat
+  street/city/postcode/country. It is the structured Czech OFN model: `addressPointCode` (RÚIAN
+  kód adresního místa, required > 0), `streetName?`, `houseNumber` + `houseNumberType`
+  (`č.p.`/`č.ev.`), `orientationNumber?` (+ `orientationNumberLetter?`), `municipalityName`,
+  `municipalityPartName?`, `psc` (5 digits), `districtName?`, `regionName?` (Country dropped —
+  platform is CZ-only). Each territorial element (ulice, obec, část obce, okres, kraj/VÚSC) also
+  has an **optional RÚIAN `*Code`** (`streetCode?`, `municipalityCode?`, `municipalityPartCode?`,
+  `districtCode?`, `regionCode?`, all positive-when-present) that backs a dereferenceable
+  `linked.cuzk.cz` IRI in the JSON-LD — the forms collect these alongside their name fields.
+  There is **no live RÚIAN lookup** — the registration/edit forms collect the fields directly
+  (CUZK autocomplete is a future enhancement). Evidence.Api returns the fields flat; compose
+  display text in the frontend (`evidence-admin/address.ts`).
 - **API key shown once (F08).** Sensor-registration returns `apiKey` (`amq_sk_…`) once and it
   is unrecoverable. Present it prominently with copy + "store it now" warning; never refetch
   or display it afterward.

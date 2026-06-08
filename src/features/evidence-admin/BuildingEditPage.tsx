@@ -23,8 +23,13 @@ import {
 } from './attribute-mutations';
 import { AttributeEditForm, SelectField } from './components';
 import { useCodelistOptions } from './codelists';
-import { useAnonymizationOptions } from './anonymization';
-import { optionalNumberInRange } from './validation';
+import { useHouseNumberTypeOptions } from './house-number-type';
+import {
+  optionalNumberInRange,
+  requiredPositiveInt,
+  optionalPositiveInt,
+  pscValidator,
+} from './validation';
 
 /**
  * F07 building temporal edits. Each attribute (name / address / type / location / years) is its
@@ -81,7 +86,7 @@ function BuildingAttributeForms({
   const { t: tf } = useTranslation('forms');
 
   const buildingTypes = useCodelistOptions('building-type');
-  const anonymizationOptions = useAnonymizationOptions();
+  const houseNumberTypeOptions = useHouseNumberTypeOptions();
 
   const changeName = useChangeBuildingName(buildingId);
   const changeAddress = useChangeBuildingAddress(buildingId);
@@ -89,20 +94,41 @@ function BuildingAttributeForms({
   const changeLocation = useChangeBuildingLocation(buildingId);
   const changeYears = useChangeBuildingYears(buildingId);
 
-  // Each attribute's value field(s) are local controlled state seeded from the snapshot.
+  // Each attribute's value field(s) are local controlled state seeded from the snapshot. The
+  // address is the structured OFN Adresy model (RÚIAN-anchored); nullable fields seed to ''.
   const [name, setName] = useState(snapshot.name);
-  const [street, setStreet] = useState(snapshot.street);
-  const [city, setCity] = useState(snapshot.city);
-  const [postcode, setPostcode] = useState(snapshot.postcode);
-  const [country, setCountry] = useState(snapshot.country);
+  const [addressPointCode, setAddressPointCode] = useState(String(snapshot.addressPointCode ?? ''));
+  const [streetName, setStreetName] = useState(snapshot.streetName ?? '');
+  const [streetCode, setStreetCode] = useState(String(snapshot.streetCode ?? ''));
+  const [houseNumber, setHouseNumber] = useState(String(snapshot.houseNumber ?? ''));
+  const [houseNumberType, setHouseNumberType] = useState(snapshot.houseNumberType);
+  const [orientationNumber, setOrientationNumber] = useState(
+    String(snapshot.orientationNumber ?? ''),
+  );
+  const [orientationNumberLetter, setOrientationNumberLetter] = useState(
+    snapshot.orientationNumberLetter ?? '',
+  );
+  const [municipalityName, setMunicipalityName] = useState(snapshot.municipalityName);
+  const [municipalityCode, setMunicipalityCode] = useState(String(snapshot.municipalityCode ?? ''));
+  const [municipalityPartName, setMunicipalityPartName] = useState(
+    snapshot.municipalityPartName ?? '',
+  );
+  const [municipalityPartCode, setMunicipalityPartCode] = useState(
+    String(snapshot.municipalityPartCode ?? ''),
+  );
+  const [psc, setPsc] = useState(snapshot.psc);
+  const [districtName, setDistrictName] = useState(snapshot.districtName ?? '');
+  const [districtCode, setDistrictCode] = useState(String(snapshot.districtCode ?? ''));
+  const [regionName, setRegionName] = useState(snapshot.regionName ?? '');
+  const [regionCode, setRegionCode] = useState(String(snapshot.regionCode ?? ''));
   const [typeCode, setTypeCode] = useState(snapshot.buildingTypeCode);
   const [latitude, setLatitude] = useState(String(snapshot.latitude ?? ''));
   const [longitude, setLongitude] = useState(String(snapshot.longitude ?? ''));
-  const [anonymizationLevel, setAnonymizationLevel] = useState(snapshot.anonymizationLevel);
   const [yearBuilt, setYearBuilt] = useState(String(snapshot.yearBuilt ?? ''));
   const [yearRenovated, setYearRenovated] = useState(String(snapshot.yearRenovated ?? ''));
 
   const toNum = (v: string) => (v.trim() === '' ? null : Number(v));
+  const strOrNull = (v: string) => (v.trim() === '' ? null : v.trim());
 
   return (
     <Box>
@@ -122,23 +148,167 @@ function BuildingAttributeForms({
 
         <AttributeEditForm
           title={t('building.addressTitle')}
-          buildBody={(validFrom) => ({ street, city, postcode, country, validFrom })}
+          buildBody={(validFrom) => ({
+            addressPointCode: Number(addressPointCode),
+            streetName: strOrNull(streetName),
+            streetCode: toNum(streetCode),
+            houseNumber: Number(houseNumber),
+            houseNumberType,
+            orientationNumber: toNum(orientationNumber),
+            orientationNumberLetter: strOrNull(orientationNumberLetter),
+            municipalityName,
+            municipalityCode: toNum(municipalityCode),
+            municipalityPartName: strOrNull(municipalityPartName),
+            municipalityPartCode: toNum(municipalityPartCode),
+            psc,
+            districtName: strOrNull(districtName),
+            districtCode: toNum(districtCode),
+            regionName: strOrNull(regionName),
+            regionCode: toNum(regionCode),
+            validFrom,
+          })}
           mutateAsync={changeAddress.mutateAsync}
         >
+          <FormField
+            label={t('fields.addressPointCode')}
+            labelHint={t('fields.addressPointCodeHint')}
+            required
+            validate={requiredPositiveInt({
+              required: tf('validation.required'),
+              invalid: tf('validation.invalid'),
+            })}
+          >
+            <Input
+              inputMode="numeric"
+              value={addressPointCode}
+              onChange={(e) => setAddressPointCode(e.target.value)}
+            />
+          </FormField>
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.street')} required>
-              <Input value={street} onChange={(e) => setStreet(e.target.value)} />
+            <FormField label={t('fields.streetName')}>
+              <Input value={streetName} onChange={(e) => setStreetName(e.target.value)} />
             </FormField>
-            <FormField label={t('fields.city')} required>
-              <Input value={city} onChange={(e) => setCity(e.target.value)} />
-            </FormField>
-            <FormField label={t('fields.postcode')} required>
-              <Input value={postcode} onChange={(e) => setPostcode(e.target.value)} />
-            </FormField>
-            <FormField label={t('fields.country')} required>
-              <Input value={country} onChange={(e) => setCountry(e.target.value)} />
+            <FormField
+              label={t('fields.streetCode')}
+              labelHint={t('fields.ruianCodeHint')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={streetCode}
+                onChange={(e) => setStreetCode(e.target.value)}
+              />
             </FormField>
           </SimpleGrid>
+          <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
+            <FormField
+              label={t('fields.houseNumber')}
+              required
+              validate={requiredPositiveInt({
+                required: tf('validation.required'),
+                invalid: tf('validation.invalid'),
+              })}
+            >
+              <Input
+                inputMode="numeric"
+                value={houseNumber}
+                onChange={(e) => setHouseNumber(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.houseNumberType')} required>
+              <SelectField
+                value={houseNumberType}
+                onChange={setHouseNumberType}
+                options={houseNumberTypeOptions}
+                placeholder={t('select.placeholder')}
+              />
+            </FormField>
+            <FormField
+              label={t('fields.orientationNumber')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={orientationNumber}
+                onChange={(e) => setOrientationNumber(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.orientationNumberLetter')}>
+              <Input
+                maxLength={1}
+                value={orientationNumberLetter}
+                onChange={(e) => setOrientationNumberLetter(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.municipalityName')} required>
+              <Input
+                value={municipalityName}
+                onChange={(e) => setMunicipalityName(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label={t('fields.municipalityCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={municipalityCode}
+                onChange={(e) => setMunicipalityCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.municipalityPartName')}>
+              <Input
+                value={municipalityPartName}
+                onChange={(e) => setMunicipalityPartName(e.target.value)}
+              />
+            </FormField>
+            <FormField
+              label={t('fields.municipalityPartCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={municipalityPartCode}
+                onChange={(e) => setMunicipalityPartCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.districtName')}>
+              <Input value={districtName} onChange={(e) => setDistrictName(e.target.value)} />
+            </FormField>
+            <FormField
+              label={t('fields.districtCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={districtCode}
+                onChange={(e) => setDistrictCode(e.target.value)}
+              />
+            </FormField>
+            <FormField label={t('fields.regionName')}>
+              <Input value={regionName} onChange={(e) => setRegionName(e.target.value)} />
+            </FormField>
+            <FormField
+              label={t('fields.regionCode')}
+              validate={optionalPositiveInt(tf('validation.invalid'))}
+            >
+              <Input
+                inputMode="numeric"
+                value={regionCode}
+                onChange={(e) => setRegionCode(e.target.value)}
+              />
+            </FormField>
+          </SimpleGrid>
+          <FormField
+            label={t('fields.psc')}
+            required
+            validate={pscValidator({
+              required: tf('validation.required'),
+              invalid: tf('validation.invalid'),
+            })}
+          >
+            <Input inputMode="numeric" value={psc} onChange={(e) => setPsc(e.target.value)} />
+          </FormField>
         </AttributeEditForm>
 
         <AttributeEditForm
@@ -162,7 +332,6 @@ function BuildingAttributeForms({
           buildBody={(validFrom) => ({
             latitude: toNum(latitude),
             longitude: toNum(longitude),
-            anonymizationLevel,
             validFrom,
           })}
           mutateAsync={changeLocation.mutateAsync}
@@ -203,18 +372,6 @@ function BuildingAttributeForms({
               />
             </FormField>
           </SimpleGrid>
-          <FormField
-            label={t('fields.anonymizationLevel')}
-            labelHint={t('fields.anonymizationLevelHint')}
-            required
-          >
-            <SelectField
-              value={anonymizationLevel}
-              onChange={setAnonymizationLevel}
-              options={anonymizationOptions}
-              placeholder={t('select.placeholder')}
-            />
-          </FormField>
         </AttributeEditForm>
 
         <AttributeEditForm

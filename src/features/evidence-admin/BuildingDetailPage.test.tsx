@@ -9,14 +9,25 @@ const SNAPSHOT = {
   uriSlug: 'bld-x',
   ownerId: 'o1',
   name: 'Main hall',
-  street: 'Náměstí 1',
-  city: 'Praha',
-  postcode: '11000',
-  country: 'CZ',
+  addressPointCode: 21794547,
+  streetName: 'Náměstí Winstona Churchilla',
+  houseNumber: 1938,
+  houseNumberType: 'č.p.',
+  orientationNumber: 4,
+  orientationNumberLetter: null,
+  municipalityName: 'Praha',
+  municipalityPartName: 'Žižkov',
+  psc: '13067',
+  districtName: 'Hlavní město Praha',
+  regionName: 'Hlavní město Praha',
+  streetCode: 466123,
+  municipalityCode: 554782,
+  municipalityPartCode: 490067,
+  districtCode: 1100,
+  regionCode: 19,
   buildingTypeCode: 'office',
   latitude: 50,
   longitude: 14,
-  anonymizationLevel: 'precise',
   yearBuilt: 1990,
   yearRenovated: null,
   asOf: '2026-06-06T00:00:00Z',
@@ -63,7 +74,9 @@ describe('BuildingDetailPage (read-only card + nested rooms)', () => {
     expect(useBuilding).toHaveBeenCalledWith('b1');
     expect(screen.getByRole('heading', { name: 'Main hall' })).toBeInTheDocument();
     expect(screen.getByText('Office building')).toBeInTheDocument();
-    expect(screen.getByText('Náměstí 1, 11000 Praha, CZ')).toBeInTheDocument();
+    expect(
+      screen.getByText('Náměstí Winstona Churchilla 1938/4, 130 67 Praha – Žižkov'),
+    ).toBeInTheDocument();
     // The stable slug is surfaced as a copyable full public URI.
     expect(screen.getByText(/\/buildings\/bld-x$/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
