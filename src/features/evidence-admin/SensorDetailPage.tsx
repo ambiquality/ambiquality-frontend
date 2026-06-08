@@ -6,6 +6,7 @@ import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-det
 import { useSensor, type SensorSnapshot } from './queries';
 import { SummaryCard, CopyField } from './components';
 import { useSensorSummaryRows } from './summaries';
+import { SensorCharts } from './SensorCharts';
 import { publicEntityUri } from './entity-uri';
 
 /**
@@ -50,6 +51,7 @@ export function SensorDetailPage() {
             snapshot={sensor.data}
             title={title}
           />
+          <SensorCharts sensorId={sensor.data.id} snapshot={sensor.data} />
         </Stack>
       )}
     </Box>

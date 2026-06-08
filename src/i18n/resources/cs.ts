@@ -369,6 +369,10 @@ export const cs: Resources = {
       ingestionId: 'ID senzoru (pro příjem dat)',
       ingestionIdHint:
         'Tento identifikátor použijte při odesílání měření do ingestního API.',
+      chartsTitle: 'Poslední měření',
+      chartsSubtitle: 'Posledních 24 hodin, jeden graf na měřenou veličinu.',
+      chartError: 'Měření se nepodařilo načíst.',
+      chartNoData: 'Za posledních 24 hodin nejsou žádná měření.',
       registered: 'Senzor byl zaregistrován.',
     },
     apiKey: {

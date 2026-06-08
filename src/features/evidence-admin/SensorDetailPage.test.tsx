@@ -21,6 +21,12 @@ vi.mock('./queries', () => ({
   useSensor: () => ({ data: sensorSnapshot, isLoading: false, error: null }),
 }));
 
+// The embedded SensorCharts fetches per-parameter aggregates; stub the hook so this page test
+// stays isolated (no network) — SensorCharts.test.tsx covers the data/loading/error states.
+vi.mock('@/api/public/map-hooks', () => ({
+  useObservationAggregate: () => ({ data: undefined, isLoading: false, isError: false }),
+}));
+
 vi.mock('@/api/public/hooks', () => ({
   useCodelistScheme: () => ({
     data: { active: { code: 'active', prefLabel: { en: 'Active', cs: 'Aktivní' } } },
@@ -58,6 +64,11 @@ describe('SensorDetailPage (read-only card)', () => {
     // No inline edit/collection controls on the read-only screen.
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Move to room/)).toBeNull();
+  });
+
+  it('renders the recent-measurements charts section', () => {
+    renderPage();
+    expect(screen.getByText('Recent measurements')).toBeInTheDocument();
   });
 
   it('shows the GUID id as a copyable ingestion identifier', () => {

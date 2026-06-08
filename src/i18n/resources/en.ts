@@ -375,6 +375,10 @@ export const en = {
       ingestionId: 'Sensor ID (for ingestion)',
       ingestionIdHint:
         'Use this identifier when sending measurements to the ingestion API.',
+      chartsTitle: 'Recent measurements',
+      chartsSubtitle: 'Last 24 hours, one chart per measured quantity.',
+      chartError: 'Measurements could not be loaded.',
+      chartNoData: 'No measurements in the last 24 hours.',
       registered: 'The sensor has been registered.',
     },
     apiKey: {
