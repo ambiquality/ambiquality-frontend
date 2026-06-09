@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FormField, FormActions, ProblemError } from '@/components';
 import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-details';
 import { useRegisterBuilding } from './queries';
-import { SelectField } from './components';
+import { SelectField, AddressAutocomplete } from './components';
+import type { ResolvedAddress } from './ruian/useAddressLookup';
 import { useCodelistOptions } from './codelists';
 import { useHouseNumberTypeOptions } from './house-number-type';
 import {
@@ -63,6 +64,34 @@ export function BuildingNewPage() {
   const trimmedOrNull = (value: string) => (value.trim() === '' ? null : value.trim());
   const numberOrNull = (value: string) => (value.trim() === '' ? null : Number(value));
 
+  /**
+   * Fill the address fields from a RÚIAN-resolved address (the autocomplete pick). Values are
+   * coerced to the controls' string state; every field stays editable afterward, so the lookup is
+   * a convenience, not a lock-in. Evidence.Api re-validates the codes on submit.
+   */
+  function applyResolvedAddress(a: ResolvedAddress) {
+    const str = (value: number | string | null | undefined) =>
+      value == null ? '' : String(value);
+    setAddressPointCode(str(a.addressPointCode));
+    setStreetName(a.streetName ?? '');
+    setStreetCode(str(a.streetCode));
+    setHouseNumber(str(a.houseNumber));
+    setHouseNumberType(a.houseNumberType || 'č.p.');
+    setOrientationNumber(str(a.orientationNumber));
+    setOrientationNumberLetter(a.orientationNumberLetter ?? '');
+    setMunicipalityName(a.municipalityName);
+    setMunicipalityCode(str(a.municipalityCode));
+    setMunicipalityPartName(a.municipalityPartName ?? '');
+    setMunicipalityPartCode(str(a.municipalityPartCode));
+    setPsc(a.psc);
+    setDistrictName(a.districtName ?? '');
+    setDistrictCode(str(a.districtCode));
+    setRegionName(a.regionName ?? '');
+    setRegionCode(str(a.regionCode));
+    setLatitude(str(a.latitude));
+    setLongitude(str(a.longitude));
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setProblem(null);
@@ -109,6 +138,8 @@ export function BuildingNewPage() {
           <FormField label={t('fields.name')} required validate={requiredValidator(tf('validation.required'))}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </FormField>
+
+          <AddressAutocomplete onResolve={applyResolvedAddress} />
 
           <FormField
             label={t('fields.addressPointCode')}

@@ -274,6 +274,17 @@ export const en = {
       loading: 'Loading…',
       roomPlaceholder: 'Select a room…',
     },
+    // RÚIAN address autocomplete (ČÚZK, open data / CC BY 4.0) on the building-registration form —
+    // the registrar picks an address instead of hand-copying the ~18 OFN fields from the registry.
+    addressLookup: {
+      label: 'Find address in RÚIAN',
+      placeholder: 'Start typing an address, e.g. “Revoluční 93, Dobrovíz”…',
+      hint: 'Pick an address from the RÚIAN registry and the fields below fill in automatically. You can still edit them.',
+      searching: 'Searching…',
+      noResults: 'No matching address.',
+      unavailable: 'Address lookup (RÚIAN) is unavailable — enter the address manually below.',
+      attribution: 'Address data: ČÚZK / RÚIAN — open data (CC BY 4.0).',
+    },
     // House-number type is a fixed backend enum (not a SKOS codelist), so its labels live in the
     // frontend dictionary. The address follows the Czech OFN Adresy model (anchored on RÚIAN).
     houseNumberTypes: {

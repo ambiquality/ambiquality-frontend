@@ -36,6 +36,20 @@ if (!('ResizeObserver' in globalThis)) {
   globalThis.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
 }
 
+// jsdom doesn't implement these Element methods; zag-js popover-style controls (Combobox, Menu…)
+// call them while opening/navigating the listbox. No-op stubs keep interaction tests from throwing.
+const elementStubs: Record<string, () => unknown> = {
+  scrollIntoView: () => {},
+  hasPointerCapture: () => false,
+  setPointerCapture: () => {},
+  releasePointerCapture: () => {},
+};
+for (const [method, impl] of Object.entries(elementStubs)) {
+  if (!(method in Element.prototype)) {
+    Object.defineProperty(Element.prototype, method, { value: impl, configurable: true });
+  }
+}
+
 // jsdom doesn't implement matchMedia; some Chakra components read it on mount.
 if (!window.matchMedia) {
   window.matchMedia = (query: string) => ({

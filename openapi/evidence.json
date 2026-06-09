@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080/"
+      "url": "http://localhost:6200/"
     }
   ],
   "paths": {
@@ -1762,6 +1762,84 @@
           {}
         ]
       }
+    },
+    "/v1/address-lookup/suggest": {
+      "get": {
+        "tags": [
+          "AddressLookup"
+        ],
+        "description": "Autocomplete Czech addresses against RÚIAN (ČÚZK, CC BY 4.0)",
+        "operationId": "SuggestAddresses",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressSuggestionsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
+    "/v1/address-lookup/resolve": {
+      "get": {
+        "tags": [
+          "AddressLookup"
+        ],
+        "description": "Resolve a suggestion key to the full OFN address (RÚIAN codes + WGS84 coordinates)",
+        "operationId": "ResolveAddress",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedAddress"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
     }
   },
   "components": {
@@ -1795,6 +1873,35 @@
           "validFrom": {
             "type": "string",
             "format": "date-time"
+          }
+        }
+      },
+      "AddressSuggestion": {
+        "required": [
+          "text",
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          }
+        }
+      },
+      "AddressSuggestionsResponse": {
+        "required": [
+          "suggestions"
+        ],
+        "type": "object",
+        "properties": {
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddressSuggestion"
+            }
           }
         }
       },
@@ -2689,6 +2796,162 @@
           }
         }
       },
+      "ResolvedAddress": {
+        "required": [
+          "addressPointCode",
+          "streetName",
+          "houseNumber",
+          "houseNumberType",
+          "orientationNumber",
+          "orientationNumberLetter",
+          "municipalityName",
+          "municipalityPartName",
+          "psc",
+          "districtName",
+          "regionName",
+          "streetCode",
+          "municipalityCode",
+          "municipalityPartCode",
+          "districtCode",
+          "regionCode",
+          "latitude",
+          "longitude",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "addressPointCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "streetName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "houseNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "houseNumberType": {
+            "type": "string"
+          },
+          "orientationNumber": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "orientationNumberLetter": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "municipalityName": {
+            "type": "string"
+          },
+          "municipalityPartName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "psc": {
+            "type": "string"
+          },
+          "districtName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "regionName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "streetCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "municipalityPartCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "districtCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "regionCode": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "latitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "longitude": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "text": {
+            "type": "string"
+          }
+        }
+      },
       "RoomSnapshotResponse": {
         "required": [
           "id",
@@ -2907,6 +3170,9 @@
     },
     {
       "name": "Sensors"
+    },
+    {
+      "name": "AddressLookup"
     }
   ]
 }
