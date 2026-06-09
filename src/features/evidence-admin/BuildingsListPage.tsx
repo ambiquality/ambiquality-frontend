@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { ProblemError } from '@/components';
 import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-details';
 import { useBuildings } from './queries';
+import { composeAddressShort } from './address';
 
 /**
  * F05–F09 operator evidence admin landing: the catalog of buildings the operator owns, plus the
@@ -62,7 +63,7 @@ export function BuildingsListPage() {
                   <RouterLink to={`/operator/buildings/${b.id}`}>{b.name}</RouterLink>
                 </ChakraLink>
                 <Text color="fg.muted" fontSize="sm">
-                  {b.street}, {b.city}
+                  {composeAddressShort(b)}
                 </Text>
               </Box>
               <ChakraLink asChild>

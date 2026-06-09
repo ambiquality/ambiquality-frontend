@@ -2,9 +2,9 @@
  * Synthetic data for the map MSW mock (dev + tests). Deterministic: every value is derived from a
  * seeded hash of its keys, so the map looks the same on each load and tests can assert on it.
  *
- * Coordinates sit in central Prague and are already "masked" (3 decimals ≈ street level) to match
- * the Public.Api contract. Values are generated within realistic display ranges that deliberately
- * straddle the good/moderate/poor bands so the map is visibly colourful.
+ * Coordinates sit in central Prague and are precise — Public.Api no longer coarsens them (the
+ * anonymization model was dropped backend-side). Values are generated within realistic display
+ * ranges that deliberately straddle the good/moderate/poor bands so the map is visibly colourful.
  */
 
 import type {
@@ -63,7 +63,7 @@ interface MockBuilding {
   parameters: string[];
 }
 
-/** A small catalogue of Prague buildings with masked coordinates. */
+/** A small catalogue of Prague buildings with precise coordinates. */
 export const MOCK_BUILDINGS: MockBuilding[] = [
   {
     buildingId: '11111111-1111-1111-1111-111111111111',

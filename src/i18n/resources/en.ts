@@ -274,12 +274,11 @@ export const en = {
       loading: 'Loading…',
       roomPlaceholder: 'Select a room…',
     },
-    // Coordinate-precision levels are a fixed backend enum (not a SKOS codelist), so their
-    // labels live in the frontend dictionary. Non-owners see coordinates coarsened to this level.
-    anonymizationLevels: {
-      precise: 'Precise (exact coordinates)',
-      street: 'Street level',
-      municipality: 'Municipality level',
+    // House-number type is a fixed backend enum (not a SKOS codelist), so its labels live in the
+    // frontend dictionary. The address follows the Czech OFN Adresy model (anchored on RÚIAN).
+    houseNumberTypes: {
+      cp: 'Descriptive number (č. p.)',
+      cev: 'Registry number (č. ev.)',
     },
     asOf: {
       title: 'History viewer',
@@ -296,19 +295,31 @@ export const en = {
     },
     fields: {
       name: 'Name',
-      street: 'Street',
-      city: 'City',
-      postcode: 'Postcode',
-      country: 'Country',
+      addressPointCode: 'Address point code (RÚIAN)',
+      addressPointCodeHint:
+        'Identifier of the address point in the Czech RÚIAN registry (kód adresního místa). The ' +
+        'backend does not verify the address against RÚIAN — enter the correct code.',
+      streetName: 'Street name',
+      streetCode: 'Street code (RÚIAN)',
+      ruianCodeHint:
+        'Optional RÚIAN code for the territorial element; enables its dereferenceable IRI ' +
+        '(linked.cuzk.cz). Leave blank if unknown.',
+      houseNumber: 'House number',
+      houseNumberType: 'House-number type',
+      orientationNumber: 'Orientation number',
+      orientationNumberLetter: 'Orientation-number letter',
+      municipalityName: 'Municipality',
+      municipalityCode: 'Municipality code (RÚIAN)',
+      municipalityPartName: 'Municipality part',
+      municipalityPartCode: 'Municipality-part code (RÚIAN)',
+      psc: 'Postal code',
+      districtName: 'District',
+      districtCode: 'District code (RÚIAN)',
+      regionName: 'Region',
+      regionCode: 'Region / VÚSC code (RÚIAN)',
       buildingType: 'Building type',
       latitude: 'Latitude',
       longitude: 'Longitude',
-      anonymizationLevel: 'Coordinate precision',
-      anonymizationLevelHint:
-        'How precisely this building’s location is shared publicly — anyone who is not the owner ' +
-        'sees the coordinates coarsened to this level. Prefer a coarser level: it protects ' +
-        'privacy (people may not want their home pinpointed on a public map) and security ' +
-        '(some readings reveal occupancy — e.g. unusually low CO₂ can signal that nobody is home).',
       yearBuilt: 'Year built',
       yearRenovated: 'Year renovated',
       floor: 'Floor',
@@ -361,6 +372,13 @@ export const en = {
       relocateTitle: 'Relocate sensor',
       relocateSubmit: 'Move sensor',
       measuredParametersTitle: 'Measured quantities',
+      ingestionId: 'Sensor ID (for ingestion)',
+      ingestionIdHint:
+        'Use this identifier when sending measurements to the ingestion API.',
+      chartsTitle: 'Recent measurements',
+      chartsSubtitle: 'Last 24 hours, one chart per measured quantity.',
+      chartError: 'Measurements could not be loaded.',
+      chartNoData: 'No measurements in the last 24 hours.',
       registered: 'The sensor has been registered.',
     },
     apiKey: {

@@ -43,8 +43,20 @@ export const mapQueryKeys = {
   properties: () => ['public', 'map', 'properties'] as const,
   snapshot: (parameterCode: string, bbox?: string) =>
     ['public', 'map', 'snapshot', parameterCode, bbox ?? null] as const,
-  aggregate: (buildingId: string, parameterCode: string, range: TimeRange) =>
-    ['public', 'observations', 'aggregate', buildingId, parameterCode, range] as const,
+  aggregate: (
+    target: { buildingId?: string | null; sensorId?: string | null },
+    parameterCode: string,
+    range: TimeRange,
+  ) =>
+    [
+      'public',
+      'observations',
+      'aggregate',
+      target.buildingId ?? null,
+      target.sensorId ?? null,
+      parameterCode,
+      range,
+    ] as const,
 };
 
 /**
@@ -81,24 +93,29 @@ export function useMapSnapshot(
 }
 
 export interface ObservationAggregateParams {
-  buildingId: string | null;
+  /** Aggregate across a building's sensors. Mutually exclusive with {@link sensorId}. */
+  buildingId?: string | null;
+  /** Aggregate a single sensor (operator sensor-detail charts). Mutually exclusive with `buildingId`. */
+  sensorId?: string | null;
   parameterCode: string | null;
   range: TimeRange;
 }
 
 /**
- * Bucketed series + distribution stats for a building's quantity over a time range. Fetched only
- * after a building is selected (drives the dialog's trend line + boxplot). Each `(building,
- * quantity, range)` is cached, so switching ranges back and forth doesn't refetch.
+ * Bucketed series + distribution stats for one quantity over a time range, scoped to either a
+ * building (the map dialog's trend line + boxplot) or a single sensor (the operator sensor-detail
+ * charts). Fetched only once a target + quantity are known; each `(target, quantity, range)` is
+ * cached, so switching ranges back and forth doesn't refetch.
  */
 export function useObservationAggregate({
   buildingId,
+  sensorId,
   parameterCode,
   range,
 }: ObservationAggregateParams): UseQueryResult<ObservationAggregate> {
   return useQuery({
-    queryKey: mapQueryKeys.aggregate(buildingId ?? '', parameterCode ?? '', range),
-    enabled: !!buildingId && !!parameterCode,
+    queryKey: mapQueryKeys.aggregate({ buildingId, sensorId }, parameterCode ?? '', range),
+    enabled: !!(buildingId || sensorId) && !!parameterCode,
     staleTime: 5 * 60_000,
     queryFn: ({ signal }) => {
       const to = Date.now();
@@ -106,7 +123,8 @@ export function useObservationAggregate({
       return publicGet<ObservationAggregate>(
         '/v1/observations/aggregate',
         {
-          buildingId: buildingId!,
+          buildingId: buildingId ?? undefined,
+          sensorId: sensorId ?? undefined,
           parameterCode: parameterCode!,
           from: new Date(from).toISOString(),
           to: new Date(to).toISOString(),

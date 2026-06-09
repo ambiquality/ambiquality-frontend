@@ -268,12 +268,11 @@ export const cs: Resources = {
       loading: 'Načítání…',
       roomPlaceholder: 'Vyberte místnost…',
     },
-    // Úrovně přesnosti souřadnic jsou pevný výčet na backendu (ne SKOS číselník), proto jsou
-    // jejich popisky zde. Pro nevlastníky jsou souřadnice zhrubeny na zvolenou úroveň.
-    anonymizationLevels: {
-      precise: 'Přesné (přesné souřadnice)',
-      street: 'Úroveň ulice',
-      municipality: 'Úroveň obce',
+    // Typ čísla domovního je pevný výčet na backendu (ne SKOS číselník), proto jsou jeho popisky
+    // zde. Adresa vychází z českého OFN modelu Adresy (kotveno na RÚIAN).
+    houseNumberTypes: {
+      cp: 'Číslo popisné (č. p.)',
+      cev: 'Číslo evidenční (č. ev.)',
     },
     asOf: {
       title: 'Prohlížeč historie',
@@ -290,20 +289,31 @@ export const cs: Resources = {
     },
     fields: {
       name: 'Název',
-      street: 'Ulice',
-      city: 'Město',
-      postcode: 'PSČ',
-      country: 'Země',
+      addressPointCode: 'Kód adresního místa (RÚIAN)',
+      addressPointCodeHint:
+        'Identifikátor adresního místa z registru RÚIAN (kód adresního místa). Backend adresu ' +
+        'neověřuje v RÚIAN — zadejte správný kód.',
+      streetName: 'Název ulice',
+      streetCode: 'Kód ulice (RÚIAN)',
+      ruianCodeHint:
+        'Volitelný kód územního prvku z registru RÚIAN; zpřístupní jeho dereferencovatelné IRI ' +
+        '(linked.cuzk.cz). Nechte prázdné, pokud jej neznáte.',
+      houseNumber: 'Číslo domovní',
+      houseNumberType: 'Typ čísla domovního',
+      orientationNumber: 'Číslo orientační',
+      orientationNumberLetter: 'Písmeno orientačního čísla',
+      municipalityName: 'Obec',
+      municipalityCode: 'Kód obce (RÚIAN)',
+      municipalityPartName: 'Část obce',
+      municipalityPartCode: 'Kód části obce (RÚIAN)',
+      psc: 'PSČ',
+      districtName: 'Okres',
+      districtCode: 'Kód okresu (RÚIAN)',
+      regionName: 'Kraj',
+      regionCode: 'Kód kraje / VÚSC (RÚIAN)',
       buildingType: 'Typ budovy',
       latitude: 'Zeměpisná šířka',
       longitude: 'Zeměpisná délka',
-      anonymizationLevel: 'Přesnost souřadnic',
-      anonymizationLevelHint:
-        'Jak přesně se poloha této budovy sdílí s veřejností — kdokoli, kdo není vlastníkem, ' +
-        'uvidí souřadnice zhrubené na tuto úroveň. Volte raději hrubší úroveň: chrání soukromí ' +
-        '(ne každý chce mít svůj domov přesně zaměřený na veřejné mapě) i bezpečnost ' +
-        '(některé hodnoty prozrazují přítomnost osob — např. neobvykle nízké CO₂ může ' +
-        'signalizovat, že nikdo není doma).',
       yearBuilt: 'Rok výstavby',
       yearRenovated: 'Rok rekonstrukce',
       floor: 'Podlaží',
@@ -356,6 +366,13 @@ export const cs: Resources = {
       relocateTitle: 'Přemístit senzor',
       relocateSubmit: 'Přesunout senzor',
       measuredParametersTitle: 'Měřené veličiny',
+      ingestionId: 'ID senzoru (pro příjem dat)',
+      ingestionIdHint:
+        'Tento identifikátor použijte při odesílání měření do ingestního API.',
+      chartsTitle: 'Poslední měření',
+      chartsSubtitle: 'Posledních 24 hodin, jeden graf na měřenou veličinu.',
+      chartError: 'Měření se nepodařilo načíst.',
+      chartNoData: 'Za posledních 24 hodin nejsou žádná měření.',
       registered: 'Senzor byl zaregistrován.',
     },
     apiKey: {

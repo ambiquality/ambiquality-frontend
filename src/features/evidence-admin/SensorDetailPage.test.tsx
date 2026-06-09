@@ -21,6 +21,12 @@ vi.mock('./queries', () => ({
   useSensor: () => ({ data: sensorSnapshot, isLoading: false, error: null }),
 }));
 
+// The embedded SensorCharts fetches per-parameter aggregates; stub the hook so this page test
+// stays isolated (no network) — SensorCharts.test.tsx covers the data/loading/error states.
+vi.mock('@/api/public/map-hooks', () => ({
+  useObservationAggregate: () => ({ data: undefined, isLoading: false, isError: false }),
+}));
+
 vi.mock('@/api/public/hooks', () => ({
   useCodelistScheme: () => ({
     data: { active: { code: 'active', prefLabel: { en: 'Active', cs: 'Aktivní' } } },
@@ -52,11 +58,25 @@ describe('SensorDetailPage (read-only card)', () => {
     renderPage();
     expect(screen.getByRole('heading', { name: 'Acme X100' })).toBeInTheDocument();
     expect(screen.getByText('Active')).toBeInTheDocument();
-    // Measured quantities are listed on the card (resolved to their property label).
-    expect(screen.getByText('Carbon dioxide')).toBeInTheDocument();
+    // Measured quantities are listed on the card (resolved to their property label). The label also
+    // titles the charts section below, so it may appear more than once.
+    expect(screen.getAllByText('Carbon dioxide').length).toBeGreaterThanOrEqual(1);
     // No inline edit/collection controls on the read-only screen.
     expect(screen.queryByRole('button', { name: 'Save' })).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/Move to room/)).toBeNull();
+  });
+
+  it('renders the recent-measurements charts section', () => {
+    renderPage();
+    expect(screen.getByText('Recent measurements')).toBeInTheDocument();
+  });
+
+  it('shows the GUID id as a copyable ingestion identifier', () => {
+    renderPage();
+    const idField = screen.getByText('Sensor ID (for ingestion)');
+    expect(idField).toBeInTheDocument();
+    // The raw GUID (the sensor id, not the uriSlug-based public URI) is rendered for copying.
+    expect(screen.getByText('sns-1', { selector: 'code' })).toBeInTheDocument();
   });
 
   it('links to the Edit and History sub-routes', () => {
