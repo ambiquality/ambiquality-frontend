@@ -1,22 +1,23 @@
-import { Code, Heading, Text, VStack } from '@chakra-ui/react';
 import { useParams } from 'react-router-dom';
+import { BuildingDetail } from './BuildingDetail';
+import { RoomDetail } from './RoomDetail';
+import { SensorDetail } from './SensorDetail';
 
 /**
- * Visitor entity detail (building / room / sensor) with breadcrumb + d3 time-series
- * chart. Placeholder for Phase 6. The `slug` is the backend-issued stable id
- * (`bld-…` / `rm-…` / `sns-…`) so detail URLs are shareable.
+ * Public per-entity detail page (UC18 click-through target: map dialog → building,
+ * then drill-down building → rooms → sensors). The `:id` URL segment is the
+ * backend-issued GUID — the same persistent identifier the Public.Api catalog and
+ * linked-data IRIs use, so detail URLs are stable and shareable (SYS-03).
  */
 export function EntityDetailPage({ kind }: { kind: 'building' | 'room' | 'sensor' }) {
-  const { slug } = useParams<{ slug: string }>();
-  return (
-    <VStack gap="3" align="start">
-      <Heading size="2xl">{kind} detail</Heading>
-      <Text color="fg.muted">
-        Detail view with breadcrumb and time-series chart arrives in Phase 6.
-      </Text>
-      <Text color="fg.muted">
-        slug: <Code>{slug}</Code>
-      </Text>
-    </VStack>
-  );
+  const { id } = useParams<{ id: string }>();
+
+  switch (kind) {
+    case 'building':
+      return <BuildingDetail id={id} />;
+    case 'room':
+      return <RoomDetail id={id} />;
+    case 'sensor':
+      return <SensorDetail id={id} />;
+  }
 }

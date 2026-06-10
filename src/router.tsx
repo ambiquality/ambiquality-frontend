@@ -10,6 +10,7 @@ import { LoginPage } from '@/features/account/LoginPage';
 import { RegisterPage } from '@/features/account/RegisterPage';
 import { AccountSettingsPage } from '@/features/account/AccountSettingsPage';
 import { ConfirmEmailPage } from '@/features/account/ConfirmEmailPage';
+import { BrowsePage } from '@/features/catalog-browse/BrowsePage';
 import { EntityDetailPage } from '@/features/entity-detail/EntityDetailPage';
 import { BuildingsListPage } from '@/features/evidence-admin/BuildingsListPage';
 import { BuildingNewPage } from '@/features/evidence-admin/BuildingNewPage';
@@ -29,8 +30,9 @@ import { MapPage } from '@/features/public-map/MapPage';
 /**
  * React Router v7 data router.
  *
- * Public routes use backend-issued slugs (`bld-…` / `rm-…` / `sns-…`) so visitor
- * detail URLs are stable and shareable. Operator routes live under `/operator/*` behind
+ * Public detail routes use the backend-issued GUID — the persistent identifier the
+ * Public.Api catalog and its linked-data IRIs resolve — so visitor detail URLs are
+ * stable and shareable. Operator routes live under `/operator/*` behind
  * `ProtectedRoute` — Phase 4 wires the real auth boundary and the account screens.
  */
 export const router = createBrowserRouter([
@@ -40,9 +42,10 @@ export const router = createBrowserRouter([
     children: [
       // --- Visitor (Public.Api) ---
       { index: true, element: <MapPage /> },
-      { path: 'buildings/:slug', element: <EntityDetailPage kind="building" /> },
-      { path: 'rooms/:slug', element: <EntityDetailPage kind="room" /> },
-      { path: 'sensors/:slug', element: <EntityDetailPage kind="sensor" /> },
+      { path: 'browse', element: <BrowsePage /> },
+      { path: 'buildings/:id', element: <EntityDetailPage kind="building" /> },
+      { path: 'rooms/:id', element: <EntityDetailPage kind="room" /> },
+      { path: 'sensors/:id', element: <EntityDetailPage kind="sensor" /> },
 
       // --- Open data (Public.Api) ---
       { path: 'catalog', element: <CataloguePage /> },

@@ -19,10 +19,12 @@ export const cs: Resources = {
     appName: 'Ambiquality',
     nav: {
       map: 'Mapa',
+      browse: 'Procházet',
       catalog: 'Katalog',
       archive: 'Archiv',
       operator: 'Provozovatel',
       about: 'O aplikaci',
+      help: 'Nápověda',
       primary: 'Hlavní',
       breadcrumb: 'Drobečková navigace',
     },
@@ -43,6 +45,7 @@ export const cs: Resources = {
       privacy: 'Zásady ochrany osobních údajů',
       github: 'GitHub',
       contact: 'Kontakt',
+      apiDocs: 'Dokumentace API',
       dataLicense: 'Otevřená data pod licencí {{license}}.',
     },
   },
@@ -299,6 +302,33 @@ export const cs: Resources = {
       tooEarly: 'Datum „platné od“ musí být pozdější než začátek aktuální verze.',
     },
     fields: {
+      buildingNameHint: 'Čitelný název budovy zobrazený na veřejné mapě a v katalogu (např. zažitý název areálu nebo ulice). Sbírá se, aby návštěvník poznal místo, ke kterému měření patří.',
+      roomNameHint: 'Označení místnosti používané v budově (např. NB 471). Publikuje se v katalogu otevřených dat, aby šlo měření dohledat ke konkrétnímu prostoru.',
+      streetNameHint: 'Ulice poštovní adresy (OFN Adresy). Zobrazuje se návštěvníkům a slouží k sestavení adresního řádku.',
+      houseNumberHint: 'Číslo popisné nebo evidenční budovy. Součást publikované adresy dle OFN.',
+      houseNumberTypeHint: 'Zda jde o číslo popisné, nebo evidenční.',
+      orientationNumberHint: 'Číslo orientační v rámci ulice, pokud je přiděleno.',
+      orientationNumberLetterHint: 'Písmeno čísla orientačního (např. „a" ve 12a), pokud je přiděleno.',
+      municipalityNameHint: 'Obec adresy. Publikuje se v katalogu otevřených dat.',
+      municipalityPartNameHint: 'Část obce, pokud ji adresa používá.',
+      districtNameHint: 'Okres adresy; volitelný kontext pro konzumenty otevřených dat.',
+      regionNameHint: 'Kraj (VÚSC) adresy; volitelný kontext pro konzumenty otevřených dat.',
+      pscHint: 'Poštovní směrovací číslo, pět číslic. Součást publikované adresy.',
+      buildingTypeHint: 'Typ budovy z číselníku platformy. Sbírá se, aby šlo srovnávat prostředí stejného druhu (kanceláře s kancelářemi, školy se školami).',
+      latitudeHint: 'Zeměpisná šířka (WGS84). Určuje polohu značky na veřejné mapě; publikuje se jako přesná otevřená data.',
+      longitudeHint: 'Zeměpisná délka (WGS84). Určuje polohu značky na veřejné mapě; publikuje se jako přesná otevřená data.',
+      yearBuiltHint: 'Rok výstavby. Pomáhá konzumentům interpretovat měření v kontextu stáří budovy.',
+      yearRenovatedHint: 'Rok poslední větší rekonstrukce — relevantní pro kontext větrání a zateplení.',
+      floorHint: 'Podlaží, ve kterém se místnost nachází (0 = přízemí). Slouží k umístění místnosti v budově.',
+      functionHint: 'K čemu místnost slouží, z číselníku platformy. Limity a očekávání kvality vnitřního prostředí se podle funkce liší.',
+      exposureHint: 'Typická délka pobytu osob (krátkodobý / střednědobý / dlouhodobý). Sbírá se, protože délka expozice určuje zdravotní význam naměřených koncentrací.',
+      areaM2Hint: 'Podlahová plocha v m². Spolu s výškou stropu dává objem místnosti, který ředí škodliviny.',
+      ceilingHeightMHint: 'Výška stropu v metrech. Spolu s plochou dává objem místnosti, který ředí škodliviny.',
+      ventilationHint: 'Způsob větrání místnosti z číselníku platformy. Strategie větrání zásadně ovlivňuje hromadění CO₂ a škodlivin.',
+      manufacturerHint: 'Výrobce senzoru (např. Sensirion). Publikuje se, aby konzument dat mohl posoudit princip a třídu přesnosti měření.',
+      modelHint: 'Modelové označení zařízení. Publikuje se spolu s měřeními kvůli původu dat.',
+      serialNumberHint: 'Jednoznačný identifikátor konkrétního kusu zařízení (sériové číslo). Odlišuje zařízení stejného modelu.',
+      statusHint: 'Stav životního cyklu senzoru. Měření smí odesílat pouze aktivní senzor; údržba a vyřazení příjem odmítají.',
       name: 'Název',
       addressPointCode: 'Kód adresního místa (RÚIAN)',
       addressPointCodeHint:
@@ -381,7 +411,7 @@ export const cs: Resources = {
       ingestionIdHint:
         'Tento identifikátor použijte při odesílání měření do ingestního API.',
       chartsTitle: 'Poslední měření',
-      chartsSubtitle: 'Posledních 24 hodin, jeden graf na měřenou veličinu.',
+      chartsSubtitle: 'Jeden graf na měřenou veličinu za zvolené období.',
       chartError: 'Měření se nepodařilo načíst.',
       chartNoData: 'Za posledních 24 hodin nejsou žádná měření.',
       registered: 'Senzor byl zaregistrován.',
@@ -517,6 +547,45 @@ export const cs: Resources = {
     },
   },
   catalog: {
+    docs: {
+      heading: 'Dokumentace datové sady',
+      intro:
+        'Datová sada pozorování je plochá řada validovaných měření ze senzorů. Jeden záznam ' +
+        'představuje jednu veličinu změřenou jedním senzorem v jednom okamžiku; kontext entit ' +
+        '(budova, místnost, umístění senzoru) publikují katalogové endpointy a každý záznam na ně odkazuje.',
+      fieldsHeading: 'Struktura záznamu (pozorování)',
+      fields: {
+        id: { name: 'id', meaning: 'Stabilní jednoznačný identifikátor pozorování (UUID). Nikdy se nepřiděluje znovu.' },
+        sensorId: {
+          name: 'sensorId',
+          meaning: 'Identifikátor senzoru, který pozorování provedl; dohledatelný ve veřejném katalogu senzorů (sosa:madeBySensor).',
+        },
+        parameterCode: {
+          name: 'parameterCode',
+          meaning: 'Kód měřené veličiny ze slovníku platformy (např. co2, pm2_5); mapovaný na QUDT v endpointu /v1/properties (sosa:observedProperty).',
+        },
+        value: { name: 'value', meaning: 'Číselný výsledek měření (sosa:hasSimpleResult).' },
+        unit: { name: 'unit', meaning: 'Kanonická jednotka hodnoty, pevně daná pro veličinu a validovaná při příjmu (např. ppm, °C, µg/m³).' },
+        observedAt: {
+          name: 'observedAt',
+          meaning: 'Kdy platforma pozorování zaznamenala (UTC, serverové hodiny — hodinám senzorů se nedůvěřuje).',
+        },
+        receivedAt: { name: 'receivedAt', meaning: 'Kdy platforma měření přijala (UTC). Podle tohoto okamžiku jsou děleny archivní soubory.' },
+        isInvalid: {
+          name: 'isInvalid',
+          meaning: 'True, pokud bylo pozorování zpětně označeno za neplatné (např. zjištěná závada senzoru). Publikované hodnoty se nikdy tiše neupravují ani nemažou — zneplatnění je vždy tento explicitní příznak.',
+        },
+      },
+      updatesHeading: 'Frekvence aktualizace',
+      updatesBody:
+        'Živé API publikuje měření průběžně, jak je senzory odesílají. Stažitelné archivy ' +
+        '(záložka Archiv) se generují měsíčně; aktuální měsíc je proto dostupný pouze přes živé API.',
+      termsHeading: 'Podmínky užití',
+      termsBody: 'Všechna publikovaná data jsou otevřená data pod licencí',
+      termsQuality:
+        'Měření pocházejí z nízkonákladových komunitních senzorů a poskytují se tak, jak jsou, bez ' +
+        'záruky metrologické přesnosti. Záznamy s příznakem isInvalid je vhodné z analýz vyloučit.',
+    },
     fallbackTitle: 'Katalog otevřených dat',
     intro:
       'Strojově čitelná metadata ve formátu DCAT-AP popisující zveřejněná otevřená data ' +
@@ -645,6 +714,130 @@ export const cs: Resources = {
           '(VŠE Praha). Tyto zásady ochrany osobních údajů jsou předběžné a čekají na právní ' +
           'revizi autora; před případným produkčním nasazením se mohou změnit.',
       },
+    },
+  },
+  browse: {
+    title: 'Procházet data',
+    subtitle: 'Registrované budovy publikující měření vnitřního prostředí. Otevřením budovy se dostanete k jejím místnostem a senzorům.',
+    filter: {
+      buildingType: 'Typ budovy',
+      allTypes: 'Všechny typy',
+    },
+    resultCount_one: '{{count}} budova',
+    resultCount_few: '{{count}} budovy',
+    resultCount_other: '{{count}} budov',
+    unnamedBuilding: 'Budova bez názvu',
+    empty: 'Zvoleným filtrům neodpovídají žádné budovy.',
+    pagination: {
+      previous: 'Předchozí',
+      next: 'Další',
+      pageOf: 'Strana {{page}} z {{pageCount}}',
+    },
+  },
+  entity: {
+    common: {
+      map: 'Mapa',
+      loading: 'Načítání…',
+      error: 'Požadovaný záznam se nepodařilo načíst.',
+    },
+    building: {
+      title: 'Budova',
+      type: 'Typ budovy',
+      address: 'Adresa',
+      coordinates: 'Souřadnice (WGS84)',
+      yearBuilt: 'Rok výstavby',
+      yearRenovated: 'Rok rekonstrukce',
+      roomsTitle: 'Místnosti',
+      noRooms: 'V této budově nejsou registrovány žádné místnosti.',
+    },
+    room: {
+      title: 'Místnost',
+      fallbackName: 'Místnost v {{floor}}. podlaží',
+      floor: 'Podlaží',
+      function: 'Funkce',
+      exposure: 'Typická délka pobytu',
+      area: 'Podlahová plocha',
+      ceilingHeight: 'Výška stropu',
+      ventilation: 'Větrání',
+      pollutionSources: 'Zdroje znečištění',
+      sensorsTitle: 'Senzory',
+      noSensors: 'V této místnosti nejsou registrovány žádné senzory.',
+    },
+    sensor: {
+      title: 'Senzor',
+      manufacturer: 'Výrobce',
+      model: 'Model',
+      serialNumber: 'Sériové číslo',
+      status: 'Stav',
+      parameters: 'Měřené veličiny',
+      chartsTitle: 'Historie měření',
+      chartError: 'Časovou řadu se nepodařilo načíst.',
+      chartNoData: 'Ve zvoleném období nejsou žádná měření.',
+    },
+  },
+  help: {
+    title: 'Nápověda',
+    intro:
+      'Stručný průvodce platformou otevřených dat Ambiquality: čtení živé mapy, procházení a ' +
+      'stahování publikovaných měření a registrace vlastních budov a senzorů. Každý registrační ' +
+      'formulář navíc nabízí nápovědu u jednotlivých polí — hledejte ikonu ⓘ vedle popisku.',
+    map: {
+      heading: 'Čtení mapy',
+      p1:
+        'Mapa na úvodní stránce zobrazuje každou registrovanou budovu jako značku obarvenou podle ' +
+        'poslední hodnoty zvolené veličiny (výchozí je CO₂). Jinou veličinu vyberete ve filtru nad mapou; ' +
+        'barevná pásma vysvětluje legenda.',
+      p2:
+        'Kliknutím na značku (nebo přes přístupnou tabulku pod mapou) otevřete dialog budovy s grafem ' +
+        'vývoje a souhrnem rozdělení za volitelné období — poslední den, týden, měsíc či rok. Odkaz ' +
+        '„Zobrazit detail budovy" vede na úplný záznam.',
+    },
+    browse: {
+      heading: 'Procházení katalogu',
+      p1:
+        'Stránka Procházet vypisuje všechny registrované budovy a umí je filtrovat podle typu. Stránka ' +
+        'budovy vypisuje její místnosti, stránka místnosti senzory — se všemi atributy, které provozovatelé ' +
+        'zaznamenali (funkce místnosti, délka pobytu, větrání, výrobce senzoru a měřené veličiny).',
+      p2:
+        'Stránky senzorů vykreslují celou historii měření po veličinách, opět za volitelné období. Adresy ' +
+        'detailů jsou stabilní identifikátory — lze je sdílet i citovat.',
+    },
+    download: {
+      heading: 'Stahování dat',
+      p1:
+        'Stránka Archiv nabízí měsíčně předgenerované archivy všech měření (CSV a JSON-LD, zip) a živý ' +
+        'CSV export, který lze omezit časovým intervalem, oblastí nebo entitou.',
+      p2:
+        'Stránka Katalog nese metadata DCAT-AP, dokumentaci polí datové sady a podmínky užití — vše ' +
+        'potřebné pro programové zpracování dat nebo jejich registraci v katalogu otevřených dat.',
+    },
+    operators: {
+      heading: 'Pro provozovatele',
+      p1:
+        'Po registraci účtu a potvrzení e-mailu umožňuje sekce Správa registrovat budovy, jejich ' +
+        'místnosti a senzory v nich umístěné. Registrace je hierarchická: budova → místnost → senzor.',
+      p2:
+        'Vytvoření senzoru jednorázově vydá jeho tajný klíč API — bezpečně si jej uložte. Senzor se ' +
+        'tímto klíčem autentizuje při odesílání měření; přijímají se jen aktivní senzory a každé čtení ' +
+        'musí odpovídat deklarované veličině, její jednotce a povolenému rozsahu.',
+      p3:
+        'Změny atributů jsou časové: úprava atributu zaznamená, odkdy platí, a uchová celou historii, ' +
+        'kterou si kdokoli může přehrát přes veřejné API (asOf).',
+    },
+    preferences: {
+      heading: 'Jazyk a jednotky',
+      p1:
+        'Rozhraní je dostupné česky a anglicky — přepnout lze kdykoli v záhlaví a volba se pamatuje. ' +
+        'Teploty a tlaky lze zobrazovat v preferovaných jednotkách, aniž by se měnila podkladová otevřená data.',
+    },
+    api: {
+      heading: 'Použití API',
+      p1:
+        'Vše, co web zobrazuje, pochází z veřejného čtecího API (JSON a JSON-LD, otevřené CORS, bez ' +
+        'autentizace). Interaktivní reference dokumentuje všechny endpointy, parametry i tvary chyb.',
+      referenceLink: 'Reference API',
+      catalogLink: 'Katalog otevřených dat',
+      archiveLink: 'Archiv ke stažení',
     },
   },
 };

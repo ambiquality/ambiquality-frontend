@@ -135,7 +135,7 @@ export function BuildingNewPage() {
         <VStack gap="4" align="stretch">
           <ProblemError error={problem} />
 
-          <FormField label={t('fields.name')} required validate={requiredValidator(tf('validation.required'))}>
+          <FormField label={t('fields.name')} labelHint={t('fields.buildingNameHint')} required validate={requiredValidator(tf('validation.required'))}>
             <Input value={name} onChange={(e) => setName(e.target.value)} />
           </FormField>
 
@@ -158,7 +158,7 @@ export function BuildingNewPage() {
           </FormField>
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.streetName')}>
+            <FormField label={t('fields.streetName')} labelHint={t('fields.streetNameHint')}>
               <Input value={streetName} onChange={(e) => setStreetName(e.target.value)} />
             </FormField>
             <FormField
@@ -176,7 +176,7 @@ export function BuildingNewPage() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField
-              label={t('fields.houseNumber')}
+              label={t('fields.houseNumber')} labelHint={t('fields.houseNumberHint')}
               required
               validate={requiredPositiveInt({
                 required: tf('validation.required'),
@@ -190,7 +190,7 @@ export function BuildingNewPage() {
               />
             </FormField>
             <FormField
-              label={t('fields.houseNumberType')}
+              label={t('fields.houseNumberType')} labelHint={t('fields.houseNumberTypeHint')}
               required
               validate={requiredValidator(tf('validation.required'))}
             >
@@ -205,7 +205,7 @@ export function BuildingNewPage() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField
-              label={t('fields.orientationNumber')}
+              label={t('fields.orientationNumber')} labelHint={t('fields.orientationNumberHint')}
               validate={optionalPositiveInt(tf('validation.invalid'))}
             >
               <Input
@@ -214,7 +214,7 @@ export function BuildingNewPage() {
                 onChange={(e) => setOrientationNumber(e.target.value)}
               />
             </FormField>
-            <FormField label={t('fields.orientationNumberLetter')}>
+            <FormField label={t('fields.orientationNumberLetter')} labelHint={t('fields.orientationNumberLetterHint')}>
               <Input
                 maxLength={1}
                 value={orientationNumberLetter}
@@ -225,14 +225,14 @@ export function BuildingNewPage() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField
-              label={t('fields.municipalityName')}
+              label={t('fields.municipalityName')} labelHint={t('fields.municipalityNameHint')}
               required
               validate={requiredValidator(tf('validation.required'))}
             >
               <Input value={municipalityName} onChange={(e) => setMunicipalityName(e.target.value)} />
             </FormField>
             <FormField
-              label={t('fields.municipalityCode')}
+              label={t('fields.municipalityCode')} labelHint={t('fields.ruianCodeHint')}
               validate={optionalPositiveInt(tf('validation.invalid'))}
             >
               <Input
@@ -241,14 +241,14 @@ export function BuildingNewPage() {
                 onChange={(e) => setMunicipalityCode(e.target.value)}
               />
             </FormField>
-            <FormField label={t('fields.municipalityPartName')}>
+            <FormField label={t('fields.municipalityPartName')} labelHint={t('fields.municipalityPartNameHint')}>
               <Input
                 value={municipalityPartName}
                 onChange={(e) => setMunicipalityPartName(e.target.value)}
               />
             </FormField>
             <FormField
-              label={t('fields.municipalityPartCode')}
+              label={t('fields.municipalityPartCode')} labelHint={t('fields.ruianCodeHint')}
               validate={optionalPositiveInt(tf('validation.invalid'))}
             >
               <Input
@@ -257,11 +257,11 @@ export function BuildingNewPage() {
                 onChange={(e) => setMunicipalityPartCode(e.target.value)}
               />
             </FormField>
-            <FormField label={t('fields.districtName')}>
+            <FormField label={t('fields.districtName')} labelHint={t('fields.districtNameHint')}>
               <Input value={districtName} onChange={(e) => setDistrictName(e.target.value)} />
             </FormField>
             <FormField
-              label={t('fields.districtCode')}
+              label={t('fields.districtCode')} labelHint={t('fields.ruianCodeHint')}
               validate={optionalPositiveInt(tf('validation.invalid'))}
             >
               <Input
@@ -270,11 +270,11 @@ export function BuildingNewPage() {
                 onChange={(e) => setDistrictCode(e.target.value)}
               />
             </FormField>
-            <FormField label={t('fields.regionName')}>
+            <FormField label={t('fields.regionName')} labelHint={t('fields.regionNameHint')}>
               <Input value={regionName} onChange={(e) => setRegionName(e.target.value)} />
             </FormField>
             <FormField
-              label={t('fields.regionCode')}
+              label={t('fields.regionCode')} labelHint={t('fields.ruianCodeHint')}
               validate={optionalPositiveInt(tf('validation.invalid'))}
             >
               <Input
@@ -286,7 +286,7 @@ export function BuildingNewPage() {
           </SimpleGrid>
 
           <FormField
-            label={t('fields.psc')}
+            label={t('fields.psc')} labelHint={t('fields.pscHint')}
             required
             validate={pscValidator({
               required: tf('validation.required'),
@@ -296,7 +296,7 @@ export function BuildingNewPage() {
             <Input inputMode="numeric" value={psc} onChange={(e) => setPsc(e.target.value)} />
           </FormField>
 
-          <FormField label={t('fields.buildingType')} required validate={requiredValidator(tf('validation.required'))}>
+          <FormField label={t('fields.buildingType')} labelHint={t('fields.buildingTypeHint')} required validate={requiredValidator(tf('validation.required'))}>
             <SelectField
               value={buildingTypeCode}
               onChange={setBuildingTypeCode}
@@ -308,7 +308,7 @@ export function BuildingNewPage() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField
-              label={t('fields.latitude')}
+              label={t('fields.latitude')} labelHint={t('fields.latitudeHint')}
               validate={optionalNumberInRange(-90, 90, {
                 invalid: tf('validation.invalid'),
                 range: tf('validation.range', { min: '-90', max: '90' }),
@@ -325,7 +325,7 @@ export function BuildingNewPage() {
               />
             </FormField>
             <FormField
-              label={t('fields.longitude')}
+              label={t('fields.longitude')} labelHint={t('fields.longitudeHint')}
               validate={optionalNumberInRange(-180, 180, {
                 invalid: tf('validation.invalid'),
                 range: tf('validation.range', { min: '-180', max: '180' }),
@@ -345,7 +345,7 @@ export function BuildingNewPage() {
 
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
             <FormField
-              label={t('fields.yearBuilt')}
+              label={t('fields.yearBuilt')} labelHint={t('fields.yearBuiltHint')}
               validate={optionalIntInRange(1000, 2200, {
                 invalid: tf('validation.invalid'),
                 range: tf('validation.invalid'),
@@ -354,7 +354,7 @@ export function BuildingNewPage() {
               <Input value={yearBuilt} onChange={(e) => setYearBuilt(e.target.value)} />
             </FormField>
             <FormField
-              label={t('fields.yearRenovated')}
+              label={t('fields.yearRenovated')} labelHint={t('fields.yearRenovatedHint')}
               validate={optionalIntInRange(1000, 2200, {
                 invalid: tf('validation.invalid'),
                 range: tf('validation.invalid'),

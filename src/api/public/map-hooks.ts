@@ -14,7 +14,8 @@ import { env } from '@/lib/env';
 import { problemErrorFromResponse } from '@/api/middleware';
 import type { MapProperty, MapSnapshot, ObservationAggregate, TimeRange } from './map-types';
 
-async function publicGet<T>(
+/** Late-bound GET against Public.Api (prose-only spec paths); shared by the map and entity hooks. */
+export async function publicGet<T>(
   path: string,
   query: Record<string, string | number | undefined>,
   signal?: AbortSignal,

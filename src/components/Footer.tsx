@@ -2,6 +2,7 @@ import { Box, Container, Flex, Link as ChakraLink, Text } from '@chakra-ui/react
 import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CONTACT_EMAIL, DATA_LICENSE, GITHUB_ORG_URL } from '@/lib/constants';
+import { env } from '@/lib/env';
 
 /**
  * Site-wide footer. Rendered by `RootLayout` after the `<main>` box so it sticks to the bottom
@@ -33,6 +34,15 @@ export function Footer() {
           </ChakraLink>
           <ChakraLink colorPalette="brand" href={`mailto:${CONTACT_EMAIL}`}>
             {t('footer.contact')}
+          </ChakraLink>
+          {/* F15: surface the machine-readable API description (OpenAPI + Scalar reference). */}
+          <ChakraLink
+            colorPalette="brand"
+            href={`${env.publicApiBase}/scalar/v1`}
+            target="_blank"
+            rel="noopener"
+          >
+            {t('footer.apiDocs')}
           </ChakraLink>
         </Flex>
 

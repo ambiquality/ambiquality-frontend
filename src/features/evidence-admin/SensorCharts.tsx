@@ -1,17 +1,21 @@
+import { useState } from 'react';
 import { Alert, Box, EmptyState, Flex, Heading, HStack, Spinner, Stack, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { LuChartNoAxesColumn } from 'react-icons/lu';
 import { UnitValue } from '@/components/UnitValue';
 import { useUnitPreference } from '@/units';
 import { useObservationAggregate } from '@/api/public/map-hooks';
-import type { AggregateStats } from '@/api/public/map-types';
+import type { AggregateStats, TimeRange } from '@/api/public/map-types';
+import { RangeSelector } from '@/features/public-map/RangeSelector';
 import { TimeSeriesChart } from '@/features/public-map/charts/TimeSeriesChart';
 import { usePropertyOptions } from './codelists';
 import type { SensorSnapshot } from './queries';
 
 /**
- * Last-24h trend charts for an operator's sensor — one {@link TimeSeriesChart} per measured
- * quantity, each with a compact numeric summary beneath it.
+ * Trend charts for an operator's sensor — one {@link TimeSeriesChart} per measured
+ * quantity, each with a compact numeric summary beneath it, over a selectable look-back
+ * window (ROZ-03: day / week / month / year, shared {@link RangeSelector}). One selector
+ * drives every chart so the quantities stay comparable.
  *
  * Data source note (the "two read sources" rule): observations live ONLY on Public.Api (they are
  * not dual-sourced catalog data), so the series come from `/v1/observations/aggregate` keyed by the
@@ -20,6 +24,7 @@ import type { SensorSnapshot } from './queries';
  */
 export function SensorCharts({ sensorId, snapshot }: { sensorId: string; snapshot: SensorSnapshot }) {
   const { t } = useTranslation('evidence');
+  const [range, setRange] = useState<TimeRange>('day');
   const parameters = snapshot.measuredParameters ?? [];
 
   if (parameters.length === 0) return null;
@@ -29,26 +34,37 @@ export function SensorCharts({ sensorId, snapshot }: { sensorId: string; snapsho
       <Heading size="md" mb="1">
         {t('sensor.chartsTitle')}
       </Heading>
-      <Text color="fg.muted" fontSize="sm" mb="6">
+      <Text color="fg.muted" fontSize="sm" mb="4">
         {t('sensor.chartsSubtitle')}
       </Text>
+      <Box mb="6">
+        <RangeSelector value={range} onChange={setRange} />
+      </Box>
       <Stack gap="8">
         {parameters.map((p) => (
-          <ParameterChart key={p.code} sensorId={sensorId} parameterCode={p.code} />
+          <ParameterChart key={p.code} sensorId={sensorId} parameterCode={p.code} range={range} />
         ))}
       </Stack>
     </Box>
   );
 }
 
-function ParameterChart({ sensorId, parameterCode }: { sensorId: string; parameterCode: string }) {
+function ParameterChart({
+  sensorId,
+  parameterCode,
+  range,
+}: {
+  sensorId: string;
+  parameterCode: string;
+  range: TimeRange;
+}) {
   const { t } = useTranslation('evidence');
   const properties = usePropertyOptions();
   const { displayUnitFor } = useUnitPreference();
   const { data, isLoading, isError } = useObservationAggregate({
     sensorId,
     parameterCode,
-    range: 'day',
+    range,
   });
 
   const canonicalUnit = data?.unit ?? '';

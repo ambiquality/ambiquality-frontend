@@ -16,10 +16,12 @@ export const en = {
     appName: 'Ambiquality',
     nav: {
       map: 'Map',
+      browse: 'Browse',
       catalog: 'Catalogue',
       archive: 'Archive',
       operator: 'Operator',
       about: 'About',
+      help: 'Help',
       primary: 'Primary',
       breadcrumb: 'Breadcrumb',
     },
@@ -40,6 +42,7 @@ export const en = {
       privacy: 'Privacy Policy',
       github: 'GitHub',
       contact: 'Contact',
+      apiDocs: 'API documentation',
       dataLicense: 'Open data licensed under {{license}}.',
     },
   },
@@ -305,6 +308,33 @@ export const en = {
       tooEarly: 'The valid-from date must be later than the current version’s start.',
     },
     fields: {
+      buildingNameHint: 'Human-readable building name shown on the public map and in the catalog (e.g. the campus or street name everyone uses). Collected so visitors can recognise the place behind the measurements.',
+      roomNameHint: 'Room designation as used in the building (e.g. NB 471). Published in the open-data catalog so a measurement can be traced to a concrete space.',
+      streetNameHint: 'Street part of the postal address (OFN Adresy). Shown to visitors and used to render the address line.',
+      houseNumberHint: 'Descriptive (popisné) or registration (evidenční) number of the building. Part of the published OFN address.',
+      houseNumberTypeHint: 'Whether the number above is descriptive (číslo popisné) or registration (číslo evidenční).',
+      orientationNumberHint: 'Orientation number within the street (číslo orientační), when assigned.',
+      orientationNumberLetterHint: 'Letter suffix of the orientation number (e.g. the "a" in 12a), when assigned.',
+      municipalityNameHint: 'Municipality (obec) of the address. Published in the open-data catalog.',
+      municipalityPartNameHint: 'Part of municipality (část obce), when the address uses one.',
+      districtNameHint: 'District (okres) of the address; optional context for consumers of the open data.',
+      regionNameHint: 'Region (kraj / VÚSC) of the address; optional context for consumers of the open data.',
+      pscHint: 'Postal code (PSČ), five digits. Part of the published address.',
+      buildingTypeHint: 'Building typology from the platform codelist. Collected so data consumers can compare environments of the same kind (offices with offices, schools with schools).',
+      latitudeHint: 'WGS84 latitude of the building. Drives the marker position on the public map; published as precise open data.',
+      longitudeHint: 'WGS84 longitude of the building. Drives the marker position on the public map; published as precise open data.',
+      yearBuiltHint: 'Year of construction. Helps consumers interpret measurements in the context of the building stock age.',
+      yearRenovatedHint: 'Year of the last major renovation, if any — relevant for ventilation and insulation context.',
+      floorHint: 'Floor the room is on (0 = ground floor). Collected to locate the room within the building.',
+      functionHint: 'What the room is used for, from the platform codelist. Indoor-quality limits and expectations differ by room function.',
+      exposureHint: 'Typical length of stay of occupants (short / medium / long). Collected because exposure time determines how significant the measured concentrations are for health.',
+      areaM2Hint: 'Floor area in square metres. Together with ceiling height it gives the room volume that dilutes pollutants.',
+      ceilingHeightMHint: 'Ceiling height in metres. Together with the floor area it gives the room volume that dilutes pollutants.',
+      ventilationHint: 'How the room is ventilated, from the platform codelist. Ventilation strategy strongly influences CO₂ and pollutant build-up.',
+      manufacturerHint: 'Maker of the sensor device (e.g. Sensirion). Published so data consumers can judge the measurement principle and accuracy class.',
+      modelHint: 'Device model designation. Published alongside measurements for provenance.',
+      serialNumberHint: 'Unique identifier of this physical device (serial number). Distinguishes devices of the same model.',
+      statusHint: 'Lifecycle state of the sensor. Only active sensors may submit measurements; maintenance and decommissioned states reject ingestion.',
       name: 'Name',
       addressPointCode: 'Address point code (RÚIAN)',
       addressPointCodeHint:
@@ -387,7 +417,7 @@ export const en = {
       ingestionIdHint:
         'Use this identifier when sending measurements to the ingestion API.',
       chartsTitle: 'Recent measurements',
-      chartsSubtitle: 'Last 24 hours, one chart per measured quantity.',
+      chartsSubtitle: 'One chart per measured quantity over the selected look-back window.',
       chartError: 'Measurements could not be loaded.',
       chartNoData: 'No measurements in the last 24 hours.',
       registered: 'The sensor has been registered.',
@@ -531,6 +561,46 @@ export const en = {
     },
   },
   catalog: {
+    docs: {
+      heading: 'Dataset documentation',
+      intro:
+        'The observations dataset is a flat series of validated sensor readings. One record ' +
+        'represents one quantity measured by one sensor at one moment; entity context (building, ' +
+        'room, sensor placement) is published in the catalog endpoints and linked from each record.',
+      fieldsHeading: 'Record structure (observations)',
+      fields: {
+        id: { name: 'id', meaning: 'Stable unique identifier of the observation (UUID). Never reassigned.' },
+        sensorId: {
+          name: 'sensorId',
+          meaning: 'Identifier of the sensor that made the observation; resolvable via the public sensor catalog (sosa:madeBySensor).',
+        },
+        parameterCode: {
+          name: 'parameterCode',
+          meaning: 'Measured quantity code from the platform vocabulary (e.g. co2, pm2_5); mapped to QUDT quantity kinds in the /v1/properties endpoint (sosa:observedProperty).',
+        },
+        value: { name: 'value', meaning: 'The numeric measurement result (sosa:hasSimpleResult).' },
+        unit: { name: 'unit', meaning: 'Canonical unit of the value, fixed per quantity and validated at ingestion (e.g. ppm, °C, µg/m³).' },
+        observedAt: {
+          name: 'observedAt',
+          meaning: 'When the platform recorded the observation (UTC, server clock — sensor clocks are not trusted).',
+        },
+        receivedAt: { name: 'receivedAt', meaning: 'When the platform accepted the measurement (UTC). Archive files are partitioned by this instant.' },
+        isInvalid: {
+          name: 'isInvalid',
+          meaning: 'True when the observation was retroactively flagged invalid (e.g. a detected sensor fault). Published values are never silently edited or deleted — invalidation is always this explicit flag.',
+        },
+      },
+      updatesHeading: 'Update frequency',
+      updatesBody:
+        'The live API publishes measurements continuously as sensors report them. The downloadable ' +
+        'archives (see the Archive tab) are regenerated monthly; the current month is therefore only ' +
+        'available through the live API.',
+      termsHeading: 'Terms of use',
+      termsBody: 'All published data are open data, licensed under',
+      termsQuality:
+        'Measurements come from low-cost community sensors and are provided as-is, without a ' +
+        'guarantee of metrological accuracy. Records flagged isInvalid should be excluded from analyses.',
+    },
     // F16 — the human-readable rendering of the DCAT-AP open-data catalogue metadata. Reads the
     // single `/v1/catalog` endpoint (Public.Api) via the shared `useCatalog` hook. Downloadable
     // archives live on the separate Archive tab; this page covers the descriptive metadata and the
@@ -668,6 +738,132 @@ export const en = {
           'Business (VŠE Praha). This Privacy Policy is provisional and is pending the author’s ' +
           'legal review; it may change before any production deployment.',
       },
+    },
+  },
+  browse: {
+    title: 'Browse data',
+    subtitle: 'Registered buildings publishing indoor environmental measurements. Open a building to drill down to its rooms and sensors.',
+    filter: {
+      buildingType: 'Building type',
+      allTypes: 'All types',
+    },
+    resultCount_one: '{{count}} building',
+    resultCount_few: '{{count}} buildings',
+    resultCount_other: '{{count}} buildings',
+    unnamedBuilding: 'Unnamed building',
+    empty: 'No buildings match the selected filters.',
+    pagination: {
+      previous: 'Previous',
+      next: 'Next',
+      pageOf: 'Page {{page}} of {{pageCount}}',
+    },
+  },
+  entity: {
+    common: {
+      map: 'Map',
+      loading: 'Loading…',
+      error: 'The requested record could not be loaded.',
+    },
+    building: {
+      title: 'Building',
+      type: 'Building type',
+      address: 'Address',
+      coordinates: 'Coordinates (WGS84)',
+      yearBuilt: 'Year built',
+      yearRenovated: 'Year renovated',
+      roomsTitle: 'Rooms',
+      noRooms: 'No rooms are registered in this building.',
+    },
+    room: {
+      title: 'Room',
+      fallbackName: 'Room on floor {{floor}}',
+      floor: 'Floor',
+      function: 'Function',
+      exposure: 'Typical occupancy',
+      area: 'Floor area',
+      ceilingHeight: 'Ceiling height',
+      ventilation: 'Ventilation',
+      pollutionSources: 'Pollution sources',
+      sensorsTitle: 'Sensors',
+      noSensors: 'No sensors are registered in this room.',
+    },
+    sensor: {
+      title: 'Sensor',
+      manufacturer: 'Manufacturer',
+      model: 'Model',
+      serialNumber: 'Serial number',
+      status: 'Status',
+      parameters: 'Measured quantities',
+      chartsTitle: 'Measurement history',
+      chartError: 'The series could not be loaded.',
+      chartNoData: 'No measurements in the selected window.',
+    },
+  },
+  help: {
+    title: 'Help',
+    intro:
+      'A quick guide to the Ambiquality open-data platform: reading the live map, browsing and ' +
+      'downloading the published measurements, and registering your own buildings and sensors. ' +
+      'Every registration form also offers per-field hints — look for the ⓘ icon next to a label.',
+    map: {
+      heading: 'Reading the map',
+      p1:
+        'The map on the home page shows every registered building as a marker coloured by the latest ' +
+        'value of the selected quantity (CO₂ by default). Pick a different quantity in the filter above ' +
+        'the map; the legend explains the colour bands.',
+      p2:
+        'Click a marker (or use the accessible table below the map) to open the building dialog with a ' +
+        'trend chart and distribution summary over a selectable window — last day, week, month or year. ' +
+        'From there, “View building detail” drills into the full record.',
+    },
+    browse: {
+      heading: 'Browsing the catalog',
+      p1:
+        'The Browse page lists all registered buildings and can filter them by building type. Every ' +
+        'building page lists its rooms, every room its sensors — with each attribute the operators recorded ' +
+        '(room function, occupancy, ventilation, sensor make and measured quantities).',
+      p2:
+        'Sensor pages chart the full measurement history per quantity, again over a selectable look-back ' +
+        'window. Detail URLs are stable identifiers, so you can share or cite them.',
+    },
+    download: {
+      heading: 'Downloading the data',
+      p1:
+        'The Archive page offers monthly pre-generated archives of all measurements (CSV and JSON-LD, ' +
+        'zipped) and a live CSV export that can be narrowed by time interval, area or entity.',
+      p2:
+        'The Catalogue page carries the DCAT-AP metadata, the dataset field documentation and the terms ' +
+        'of use — everything needed to consume the data programmatically or register it in an open-data catalog.',
+    },
+    operators: {
+      heading: 'For operators',
+      p1:
+        'After registering an account and confirming your email, the Operator section lets you register ' +
+        'buildings, their rooms and the sensors placed in them. Registration is hierarchical: building → ' +
+        'room → sensor.',
+      p2:
+        'Creating a sensor issues its secret API key exactly once — store it safely. The sensor ' +
+        'authenticates with this key when submitting measurements; only active sensors are accepted, and ' +
+        'every reading must match the declared quantity, its unit and the permitted range.',
+      p3:
+        'Attribute changes are temporal: editing an attribute records when the change takes effect and ' +
+        'keeps the full history, which anyone can replay through the public API (asOf).',
+    },
+    preferences: {
+      heading: 'Language and units',
+      p1:
+        'The interface is available in Czech and English — switch any time in the header; the choice is ' +
+        'remembered. Temperatures and pressures can be displayed in your preferred units without changing ' +
+        'the underlying open data.',
+    },
+    api: {
+      heading: 'Using the API',
+      p1:
+        'Everything the site shows comes from the public read API (JSON and JSON-LD, CORS-open, no ' +
+        'authentication). The interactive reference documents every endpoint, parameter and error shape.',
+      referenceLink: 'API reference',
+      catalogLink: 'Open data catalogue',
+      archiveLink: 'Download archive',
     },
   },
 } as const;

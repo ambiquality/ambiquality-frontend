@@ -9,7 +9,6 @@ import {
   HStack,
   Link as ChakraLink,
   Portal,
-  SegmentGroup,
   Spinner,
   Stack,
   Text,
@@ -22,10 +21,9 @@ import { useUnitPreference } from '@/units';
 import { useObservationAggregate } from '@/api/public/map-hooks';
 import type { AggregateStats, TimeRange } from '@/api/public/map-types';
 import type { MarkerSelection } from './MapView';
+import { RangeSelector } from './RangeSelector';
 import { TimeSeriesChart } from './charts/TimeSeriesChart';
 import { BoxPlot } from './charts/BoxPlot';
-
-const TIME_RANGES: TimeRange[] = ['day', 'week', 'month', 'year'];
 
 export interface BuildingDialogProps {
   /** The clicked building, or `null` when the dialog is closed. */
@@ -112,19 +110,7 @@ function DialogBody({
 
       <Dialog.Body>
         <Stack gap="5">
-          <SegmentGroup.Root
-            value={range}
-            onValueChange={(e) => e.value && setRange(e.value as TimeRange)}
-            size="sm"
-          >
-            <SegmentGroup.Indicator />
-            {TIME_RANGES.map((value) => (
-              <SegmentGroup.Item key={value} value={value}>
-                <SegmentGroup.ItemText>{t(`range.${value}`)}</SegmentGroup.ItemText>
-                <SegmentGroup.ItemHiddenInput />
-              </SegmentGroup.Item>
-            ))}
-          </SegmentGroup.Root>
+          <RangeSelector value={range} onChange={setRange} />
 
           {isLoading && (
             <HStack gap="3" color="fg.muted" py="6" justify="center">
@@ -181,7 +167,7 @@ function DialogBody({
 
       <Dialog.Footer>
         <ChakraLink asChild color="brand.fg">
-          <RouterLink to={`/buildings/${selection.slug}`}>{t('dialog.viewDetail')}</RouterLink>
+          <RouterLink to={`/buildings/${selection.buildingId}`}>{t('dialog.viewDetail')}</RouterLink>
         </ChakraLink>
       </Dialog.Footer>
     </>
