@@ -66,6 +66,7 @@ export function CataloguePage() {
           <DatasetSection catalog={data} />
           <CoverageSection catalog={data} locale={locale} />
           <DistributionsSection distributions={data.liveDistributions} />
+          <DataDocumentationSection />
         </>
       )}
     </VStack>
@@ -332,4 +333,64 @@ function parseBboxWkt(
     minLat: Math.min(...lats),
     maxLat: Math.max(...lats),
   };
+}
+/**
+ * DOK-01 — per-dataset HTML documentation: the structure and meaning of each published
+ * observation field, the update cadence, and the terms of use. Lives on the catalogue page
+ * so the dataset's metadata (above) and its field semantics share one cohesive web page;
+ * print styling comes from the browser's CSS print path, not a PDF.
+ */
+function DataDocumentationSection() {
+  const { t } = useTranslation('catalog');
+
+  const FIELD_KEYS = [
+    'id',
+    'sensorId',
+    'parameterCode',
+    'value',
+    'unit',
+    'observedAt',
+    'receivedAt',
+    'isInvalid',
+  ] as const;
+
+  return (
+    <VStack gap="4" align="start" w="full">
+      <Heading size="lg" as="h2">
+        {t('docs.heading')}
+      </Heading>
+      <Text color="fg.muted">{t('docs.intro')}</Text>
+
+      <Heading size="md" as="h3">
+        {t('docs.fieldsHeading')}
+      </Heading>
+      <Box as="dl" w="full" borderWidth="1px" borderColor="border" rounded="md" px="4" py="1">
+        {FIELD_KEYS.map((key) => (
+          <Box key={key} py="2" borderBottomWidth="1px" _last={{ borderBottomWidth: 0 }}>
+            <Code as="dt">{t(`docs.fields.${key}.name`)}</Code>
+            <Text as="dd" color="fg.muted" mt="1">
+              {t(`docs.fields.${key}.meaning`)}
+            </Text>
+          </Box>
+        ))}
+      </Box>
+
+      <Heading size="md" as="h3">
+        {t('docs.updatesHeading')}
+      </Heading>
+      <Text color="fg.muted">{t('docs.updatesBody')}</Text>
+
+      <Heading size="md" as="h3">
+        {t('docs.termsHeading')}
+      </Heading>
+      <Text color="fg.muted">
+        {t('docs.termsBody')}{' '}
+        <ChakraLink colorPalette="brand" href={DATA_LICENSE.url} target="_blank" rel="noopener">
+          {DATA_LICENSE.name}
+        </ChakraLink>
+        .
+      </Text>
+      <Text color="fg.muted">{t('docs.termsQuality')}</Text>
+    </VStack>
+  );
 }

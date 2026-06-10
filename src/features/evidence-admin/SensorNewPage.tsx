@@ -85,23 +85,23 @@ export function SensorNewPage() {
           <ProblemError error={problem} />
 
           <FormField
-            label={t('fields.manufacturer')}
+            label={t('fields.manufacturer')} labelHint={t('fields.manufacturerHint')}
             required
             validate={requiredValidator(tf('validation.required'))}
           >
             <Input value={manufacturer} onChange={(e) => setManufacturer(e.target.value)} />
           </FormField>
-          <FormField label={t('fields.model')} required validate={requiredValidator(tf('validation.required'))}>
+          <FormField label={t('fields.model')} labelHint={t('fields.modelHint')} required validate={requiredValidator(tf('validation.required'))}>
             <Input value={model} onChange={(e) => setModel(e.target.value)} />
           </FormField>
           <FormField
-            label={t('fields.serialNumber')}
+            label={t('fields.serialNumber')} labelHint={t('fields.serialNumberHint')}
             required
             validate={requiredValidator(tf('validation.required'))}
           >
             <Input value={serialNumber} onChange={(e) => setSerialNumber(e.target.value)} />
           </FormField>
-          <FormField label={t('fields.status')} required validate={requiredValidator(tf('validation.required'))}>
+          <FormField label={t('fields.status')} labelHint={t('fields.statusHint')} required validate={requiredValidator(tf('validation.required'))}>
             <SelectField
               value={statusCode}
               onChange={setStatusCode}

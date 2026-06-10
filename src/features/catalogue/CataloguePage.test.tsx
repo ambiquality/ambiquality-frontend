@@ -102,9 +102,12 @@ describe('CataloguePage', () => {
     // Publisher.
     expect(screen.getByText('Ambiquality project')).toBeInTheDocument();
 
-    // License rendered as a link (human label via DATA_LICENSE when URL matches).
-    const license = screen.getByRole('link', { name: /CC BY 4.0/i });
-    expect(license).toHaveAttribute('href', 'https://creativecommons.org/licenses/by/4.0/');
+    // License rendered as a link (human label via DATA_LICENSE when URL matches) — once in the
+    // dataset metadata and once in the terms-of-use documentation section (DOK-01).
+    const licenseLinks = screen.getAllByRole('link', { name: /CC BY 4.0/i });
+    expect(licenseLinks.length).toBeGreaterThanOrEqual(1);
+    for (const license of licenseLinks)
+      expect(license).toHaveAttribute('href', 'https://creativecommons.org/licenses/by/4.0/');
 
     // Keywords as tags.
     expect(screen.getByText('IEQ')).toBeInTheDocument();
