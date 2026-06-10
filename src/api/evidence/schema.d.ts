@@ -441,6 +441,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/installation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Record new sensor installation details (F08) effective from validFrom (appends history, does not overwrite) */
+        put: operations["ChangeSensorInstallation"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/measured-parameters": {
         parameters: {
             query?: never;
@@ -653,6 +670,23 @@ export interface components {
             /** Format: date-time */
             validFrom: string;
         };
+        ChangeSensorInstallationRequest: {
+            positionNote: null | string;
+            /** Format: double */
+            distanceWindowM: null | number | string;
+            /** Format: double */
+            distanceDoorM: null | number | string;
+            /** Format: double */
+            distanceSourceM: null | number | string;
+            /** Format: int32 */
+            measurementFrequencySeconds: null | number | string;
+            /** Format: date */
+            installedOn: null | string;
+            /** Format: date */
+            lastCalibratedOn: null | string;
+            /** Format: date-time */
+            validFrom: string;
+        };
         ChangeSensorPlacementRequest: {
             /** Format: uuid */
             newRoomId: string;
@@ -729,6 +763,7 @@ export interface components {
             serialNumber: string;
             statusCode: string;
             measuredParameters: string[];
+            installation?: null | components["schemas"]["SensorInstallationRequest"];
         };
         RemoveMeasuredParameterRequest: {
             /** Format: date-time */
@@ -789,6 +824,36 @@ export interface components {
             /** Format: date-time */
             asOf: string;
         };
+        SensorInstallationRequest: {
+            positionNote: null | string;
+            /** Format: double */
+            distanceWindowM: null | number | string;
+            /** Format: double */
+            distanceDoorM: null | number | string;
+            /** Format: double */
+            distanceSourceM: null | number | string;
+            /** Format: int32 */
+            measurementFrequencySeconds: null | number | string;
+            /** Format: date */
+            installedOn: null | string;
+            /** Format: date */
+            lastCalibratedOn: null | string;
+        };
+        SensorInstallationResponse: {
+            positionNote: null | string;
+            /** Format: double */
+            distanceWindowM: null | number | string;
+            /** Format: double */
+            distanceDoorM: null | number | string;
+            /** Format: double */
+            distanceSourceM: null | number | string;
+            /** Format: int32 */
+            measurementFrequencySeconds: null | number | string;
+            /** Format: date */
+            installedOn: null | string;
+            /** Format: date */
+            lastCalibratedOn: null | string;
+        };
         SensorRegisteredResponse: {
             /** Format: uuid */
             id: string;
@@ -802,6 +867,7 @@ export interface components {
             serialNumber: string;
             statusCode: string;
             measuredParameters: components["schemas"]["MeasuredParameterResponse"][];
+            installation: null | components["schemas"]["SensorInstallationResponse"];
             /** Format: date-time */
             asOf: string;
             apiKey: string;
@@ -819,6 +885,7 @@ export interface components {
             serialNumber: string;
             statusCode: string;
             measuredParameters: components["schemas"]["MeasuredParameterResponse"][];
+            installation: null | components["schemas"]["SensorInstallationResponse"];
             /** Format: date-time */
             asOf: string;
         };
@@ -1785,6 +1852,32 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["ChangeSensorStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ChangeSensorInstallation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                buildingId: string;
+                roomId: string;
+                sensorId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeSensorInstallationRequest"];
             };
         };
         responses: {

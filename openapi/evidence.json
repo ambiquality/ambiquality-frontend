@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:6200/"
+      "url": "http://localhost:8080/"
     }
   ],
   "paths": {
@@ -1643,6 +1643,62 @@
         ]
       }
     },
+    "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/installation": {
+      "put": {
+        "tags": [
+          "Sensors"
+        ],
+        "description": "Record new sensor installation details (F08) effective from validFrom (appends history, does not overwrite)",
+        "operationId": "ChangeSensorInstallation",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "roomId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "sensorId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeSensorInstallationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "security": [
+          {}
+        ]
+      }
+    },
     "/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/measured-parameters": {
       "post": {
         "tags": [
@@ -2425,6 +2481,81 @@
           }
         }
       },
+      "ChangeSensorInstallationRequest": {
+        "required": [
+          "positionNote",
+          "distanceWindowM",
+          "distanceDoorM",
+          "distanceSourceM",
+          "measurementFrequencySeconds",
+          "installedOn",
+          "lastCalibratedOn",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "positionNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "distanceWindowM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceDoorM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceSourceM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "measurementFrequencySeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "installedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "lastCalibratedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "validFrom": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "ChangeSensorPlacementRequest": {
         "required": [
           "newRoomId",
@@ -2769,6 +2900,16 @@
             "items": {
               "type": "string"
             }
+          },
+          "installation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SensorInstallationRequest"
+              }
+            ]
           }
         }
       },
@@ -3039,6 +3180,146 @@
           }
         }
       },
+      "SensorInstallationRequest": {
+        "required": [
+          "positionNote",
+          "distanceWindowM",
+          "distanceDoorM",
+          "distanceSourceM",
+          "measurementFrequencySeconds",
+          "installedOn",
+          "lastCalibratedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "positionNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "distanceWindowM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceDoorM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceSourceM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "measurementFrequencySeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "installedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "lastCalibratedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
+      "SensorInstallationResponse": {
+        "required": [
+          "positionNote",
+          "distanceWindowM",
+          "distanceDoorM",
+          "distanceSourceM",
+          "measurementFrequencySeconds",
+          "installedOn",
+          "lastCalibratedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "positionNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "distanceWindowM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceDoorM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "distanceSourceM": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "measurementFrequencySeconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "installedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          },
+          "lastCalibratedOn": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date"
+          }
+        }
+      },
       "SensorRegisteredResponse": {
         "required": [
           "id",
@@ -3050,6 +3331,7 @@
           "serialNumber",
           "statusCode",
           "measuredParameters",
+          "installation",
           "asOf",
           "apiKey"
         ],
@@ -3088,6 +3370,16 @@
               "$ref": "#/components/schemas/MeasuredParameterResponse"
             }
           },
+          "installation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SensorInstallationResponse"
+              }
+            ]
+          },
           "asOf": {
             "type": "string",
             "format": "date-time"
@@ -3108,6 +3400,7 @@
           "serialNumber",
           "statusCode",
           "measuredParameters",
+          "installation",
           "asOf"
         ],
         "type": "object",
@@ -3144,6 +3437,16 @@
             "items": {
               "$ref": "#/components/schemas/MeasuredParameterResponse"
             }
+          },
+          "installation": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SensorInstallationResponse"
+              }
+            ]
           },
           "asOf": {
             "type": "string",

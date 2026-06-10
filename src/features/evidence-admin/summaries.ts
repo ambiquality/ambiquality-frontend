@@ -69,6 +69,7 @@ export function useSensorSummaryRows(snapshot: SensorSnapshot): SummaryRow[] {
   const properties = usePropertyOptions();
 
   const measured = (snapshot.measuredParameters ?? []).map((p) => properties.label(p.code));
+  const installation = snapshot.installation;
 
   return [
     { label: t('fields.manufacturer'), value: snapshot.manufacturer },
@@ -79,5 +80,16 @@ export function useSensorSummaryRows(snapshot: SensorSnapshot): SummaryRow[] {
       label: t('sensor.measuredParametersTitle'),
       value: measured.length > 0 ? measured.join(', ') : null,
     },
+    // F08 installation details — every field optional; absent values render as an em-dash.
+    { label: t('fields.positionNote'), value: installation?.positionNote ?? null },
+    { label: t('fields.distanceWindowM'), value: installation?.distanceWindowM ?? null },
+    { label: t('fields.distanceDoorM'), value: installation?.distanceDoorM ?? null },
+    { label: t('fields.distanceSourceM'), value: installation?.distanceSourceM ?? null },
+    {
+      label: t('fields.measurementFrequencySeconds'),
+      value: installation?.measurementFrequencySeconds ?? null,
+    },
+    { label: t('fields.installedOn'), value: installation?.installedOn ?? null },
+    { label: t('fields.lastCalibratedOn'), value: installation?.lastCalibratedOn ?? null },
   ];
 }

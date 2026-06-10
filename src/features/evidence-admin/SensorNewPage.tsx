@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Box, Button, Heading, Input, VStack } from '@chakra-ui/react';
+import { Box, Button, Heading, Input, Stack, Text, VStack } from '@chakra-ui/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FormField, FormActions, ProblemError, Breadcrumb } from '@/components';
@@ -8,6 +8,12 @@ import { useRegisterSensor, type SensorRegistered } from './queries';
 import { useCodelistOptions } from './codelists';
 import { requiredValidator } from './validation';
 import { ApiKeyReveal, SelectField } from './components';
+import {
+  InstallationFields,
+  hasAnyInstallationValue,
+  installationFormState,
+  toInstallationValues,
+} from './installation-form';
 
 /**
  * F08 register a sensor under a room (`POST .../sensors`). The response carries a one-time
@@ -29,12 +35,16 @@ export function SensorNewPage() {
   const [model, setModel] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
   const [statusCode, setStatusCode] = useState('');
+  const [installation, setInstallation] = useState(installationFormState());
   const [problem, setProblem] = useState<ProblemErrorObject | null>(null);
   const [registered, setRegistered] = useState<SensorRegistered | null>(null);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setProblem(null);
+    // F08: the installation block is optional — nest it only when at least one
+    // field was filled in, mirroring the backend (no all-null row is opened).
+    const installationValues = toInstallationValues(installation);
     try {
       const result = await register.mutateAsync({
         manufacturer,
@@ -42,6 +52,7 @@ export function SensorNewPage() {
         serialNumber,
         statusCode,
         measuredParameters: [],
+        installation: hasAnyInstallationValue(installationValues) ? installationValues : null,
       });
       setRegistered(result);
     } catch (error) {
@@ -110,6 +121,17 @@ export function SensorNewPage() {
               placeholder={statusCodes.isLoading ? t('select.loading') : t('select.placeholder')}
             />
           </FormField>
+
+          <Stack gap="1" mt="2">
+            <Heading size="md">{t('sensor.installationTitle')}</Heading>
+            <Text fontSize="sm" color="fg.muted">
+              {t('sensor.installationOptionalHint')}
+            </Text>
+          </Stack>
+          <InstallationFields
+            state={installation}
+            onChange={(patch) => setInstallation((s) => ({ ...s, ...patch }))}
+          />
 
           <FormActions>
             <Button type="submit" colorPalette="brand" loading={register.isPending}>

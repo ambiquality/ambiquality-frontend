@@ -18,11 +18,13 @@ import {
   useChangeSensorIdentity,
   useChangeSensorStatus,
   useChangeSensorPlacement,
+  useChangeSensorInstallation,
   useAddMeasuredParameter,
   useRemoveMeasuredParameter,
 } from './attribute-mutations';
 import { AttributeEditForm, CollectionEditor, SelectField } from './components';
 import { useCodelistOptions, usePropertyOptions } from './codelists';
+import { InstallationFields, installationFormState, toInstallationValues } from './installation-form';
 
 /**
  * F08 sensor temporal edits + F09 lifecycle + the measured-parameters collection. Identity
@@ -109,12 +111,14 @@ function SensorAttributeForms({
   const changeIdentity = useChangeSensorIdentity(buildingId, roomId, sensorId);
   const changeStatus = useChangeSensorStatus(buildingId, roomId, sensorId);
   const changePlacement = useChangeSensorPlacement(buildingId, roomId, sensorId);
+  const changeInstallation = useChangeSensorInstallation(buildingId, roomId, sensorId);
 
   const [manufacturer, setManufacturer] = useState(snapshot.manufacturer);
   const [model, setModel] = useState(snapshot.model);
   const [serialNumber, setSerialNumber] = useState(snapshot.serialNumber);
   const [statusCode, setStatusCode] = useState(snapshot.statusCode);
   const [newRoomId, setNewRoomId] = useState('');
+  const [installation, setInstallation] = useState(installationFormState(snapshot.installation));
 
   return (
     <Box>
@@ -170,6 +174,17 @@ function SensorAttributeForms({
               placeholder={rooms.isLoading ? t('select.loading') : t('select.roomPlaceholder')}
             />
           </FormField>
+        </AttributeEditForm>
+
+        <AttributeEditForm
+          title={t('sensor.installationTitle')}
+          buildBody={(validFrom) => ({ ...toInstallationValues(installation), validFrom })}
+          mutateAsync={changeInstallation.mutateAsync}
+        >
+          <InstallationFields
+            state={installation}
+            onChange={(patch) => setInstallation((s) => ({ ...s, ...patch }))}
+          />
         </AttributeEditForm>
       </VStack>
     </Box>

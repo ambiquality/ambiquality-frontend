@@ -260,6 +260,20 @@ export function useChangeSensorPlacement(buildingId: string, roomId: string, sen
   });
 }
 
+/** F08: supplementary installation details — one composite temporal attribute. */
+export function useChangeSensorInstallation(buildingId: string, roomId: string, sensorId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: Schemas['ChangeSensorInstallationRequest']) => {
+      await evidenceClient.PUT(
+        '/v1/buildings/{buildingId}/rooms/{roomId}/sensors/{sensorId}/installation',
+        { params: { path: { buildingId, roomId, sensorId } }, body },
+      );
+    },
+    onSuccess: sensorInvalidator(qc, buildingId, roomId, sensorId),
+  });
+}
+
 export function useAddMeasuredParameter(buildingId: string, roomId: string, sensorId: string) {
   const qc = useQueryClient();
   return useMutation({

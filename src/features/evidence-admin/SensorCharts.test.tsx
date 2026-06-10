@@ -31,6 +31,7 @@ function snapshotWith(codes: string[]): SensorSnapshot {
     serialNumber: 'SN-1',
     statusCode: 'active',
     measuredParameters: codes.map((code) => ({ code, quantityKindUri: null, unitUri: null })),
+    installation: null,
     asOf: '2026-06-06T00:00:00Z',
   };
 }
