@@ -475,6 +475,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/address-lookup/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Autocomplete Czech addresses against RÚIAN (ČÚZK, CC BY 4.0) */
+        get: operations["SuggestAddresses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/address-lookup/resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Resolve a suggestion key to the full OFN address (RÚIAN codes + WGS84 coordinates) */
+        get: operations["ResolveAddress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -488,6 +522,13 @@ export interface components {
             sourceCode: string;
             /** Format: date-time */
             validFrom: string;
+        };
+        AddressSuggestion: {
+            text: string;
+            key: string;
+        };
+        AddressSuggestionsResponse: {
+            suggestions: components["schemas"]["AddressSuggestion"][];
         };
         BuildingSnapshotResponse: {
             /** Format: uuid */
@@ -696,6 +737,37 @@ export interface components {
         RemovePollutionSourceRequest: {
             /** Format: date-time */
             validTo: string;
+        };
+        ResolvedAddress: {
+            /** Format: int64 */
+            addressPointCode: number | string;
+            streetName: null | string;
+            /** Format: int32 */
+            houseNumber: number | string;
+            houseNumberType: string;
+            /** Format: int32 */
+            orientationNumber: null | number | string;
+            orientationNumberLetter: null | string;
+            municipalityName: string;
+            municipalityPartName: null | string;
+            psc: string;
+            districtName: null | string;
+            regionName: null | string;
+            /** Format: int64 */
+            streetCode: null | number | string;
+            /** Format: int64 */
+            municipalityCode: null | number | string;
+            /** Format: int64 */
+            municipalityPartCode: null | number | string;
+            /** Format: int64 */
+            districtCode: null | number | string;
+            /** Format: int64 */
+            regionCode: null | number | string;
+            /** Format: double */
+            latitude: null | number | string;
+            /** Format: double */
+            longitude: null | number | string;
+            text: string;
         };
         RoomSnapshotResponse: {
             /** Format: uuid */
@@ -1775,6 +1847,51 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    SuggestAddresses: {
+        parameters: {
+            query?: {
+                q?: string;
+                limit?: number | string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddressSuggestionsResponse"];
+                };
+            };
+        };
+    };
+    ResolveAddress: {
+        parameters: {
+            query?: {
+                key?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResolvedAddress"];
+                };
             };
         };
     };

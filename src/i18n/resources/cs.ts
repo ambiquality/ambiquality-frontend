@@ -268,6 +268,17 @@ export const cs: Resources = {
       loading: 'Načítání…',
       roomPlaceholder: 'Vyberte místnost…',
     },
+    // Adresní našeptávač nad daty RÚIAN (ČÚZK, otevřená data / CC BY 4.0) na registračním
+    // formuláři budovy — registrátor adresu vybere místo opisování ~18 polí z registru.
+    addressLookup: {
+      label: 'Najít adresu v RÚIAN',
+      placeholder: 'Začněte psát adresu, např. „Revoluční 93, Dobrovíz“…',
+      hint: 'Vyberte adresu z registru RÚIAN a pole níže se vyplní automaticky. Údaje můžete poté upravit.',
+      searching: 'Vyhledávání…',
+      noResults: 'Žádná adresa neodpovídá.',
+      unavailable: 'Vyhledávání adres (RÚIAN) je nedostupné — vyplňte adresu ručně níže.',
+      attribution: 'Zdroj adres: ČÚZK / RÚIAN — otevřená data (CC BY 4.0).',
+    },
     // Typ čísla domovního je pevný výčet na backendu (ne SKOS číselník), proto jsou jeho popisky
     // zde. Adresa vychází z českého OFN modelu Adresy (kotveno na RÚIAN).
     houseNumberTypes: {

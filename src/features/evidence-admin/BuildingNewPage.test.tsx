@@ -1,12 +1,27 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Routes, Route } from 'react-router-dom';
 import { renderWithProviders } from '@/test/render';
 import { BuildingNewPage } from './BuildingNewPage';
+import type { AddressSuggestion, ResolvedAddress } from './ruian/useAddressLookup';
 
 const mutateAsync = vi.fn();
 vi.mock('./queries', () => ({
   useRegisterBuilding: () => ({ mutateAsync, isPending: false }),
+}));
+
+// Control the RÚIAN address autocomplete so the registration form's lookup path is deterministic.
+const ruianSuggest: { data: AddressSuggestion[]; isFetching: boolean; isError: boolean } = {
+  data: [],
+  isFetching: false,
+  isError: false,
+};
+const resolveFn = vi.fn<(key: string) => Promise<ResolvedAddress>>();
+vi.mock('./ruian/useAddressLookup', () => ({
+  MIN_SUGGEST_LENGTH: 2,
+  useAddressSuggest: () => ruianSuggest,
+  useResolveAddress: () => resolveFn,
 }));
 
 // Building type is a Public.Api SKOS codelist select; supply a ready scheme so its options exist.
@@ -49,7 +64,35 @@ function submit() {
   fireEvent.click(screen.getByRole('button', { name: 'Register building' }));
 }
 
-beforeEach(() => mutateAsync.mockReset());
+beforeEach(() => {
+  mutateAsync.mockReset();
+  ruianSuggest.data = [];
+  ruianSuggest.isFetching = false;
+  ruianSuggest.isError = false;
+  resolveFn.mockReset();
+});
+
+const RESOLVED: ResolvedAddress = {
+  addressPointCode: 6265154,
+  streetName: 'Revoluční',
+  houseNumber: 93,
+  houseNumberType: 'č.p.',
+  orientationNumber: null,
+  orientationNumberLetter: null,
+  municipalityName: 'Dobrovíz',
+  municipalityPartName: null,
+  psc: '25261',
+  districtName: 'Praha-západ',
+  regionName: 'Středočeský kraj',
+  streetCode: 428582,
+  municipalityCode: 539171,
+  municipalityPartCode: null,
+  districtCode: 3210,
+  regionCode: 27,
+  latitude: 50.1166,
+  longitude: 14.2181,
+  text: 'Revoluční 93, 252 61 Dobrovíz',
+};
 
 describe('BuildingNewPage (F05 register)', () => {
   it('POSTs the building and navigates to its detail on success', async () => {
@@ -78,6 +121,25 @@ describe('BuildingNewPage (F05 register)', () => {
     expect(body.regionCode).toBeNull();
     expect(body.latitude).toBeNull();
     expect(body.yearBuilt).toBeNull();
+  });
+
+  it('fills the address fields from a RÚIAN autocomplete pick', async () => {
+    ruianSuggest.data = [{ text: 'Revoluční 93, 25261 Dobrovíz', key: '1_555742' }];
+    resolveFn.mockResolvedValue(RESOLVED);
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('combobox', { name: /Find address in RÚIAN/i }));
+    await user.click(await screen.findByRole('option', { name: /Revoluční 93/i }));
+
+    // The resolved RÚIAN address populates the required + optional fields (still editable).
+    await waitFor(() =>
+      expect(screen.getByLabelText(/^Address point code/)).toHaveValue('6265154'),
+    );
+    expect(screen.getByLabelText(/^Municipality(?![ -](part|code))/)).toHaveValue('Dobrovíz');
+    expect(screen.getByLabelText(/^Postal code/)).toHaveValue('25261');
+    expect(screen.getByLabelText('Street name')).toHaveValue('Revoluční');
+    expect(screen.getByLabelText('Region')).toHaveValue('Středočeský kraj');
   });
 
   it('coerces filled optional numeric fields to numbers', async () => {

@@ -5,6 +5,8 @@ export { ApiKeyReveal } from './ApiKeyReveal';
 export { CollectionEditor } from './CollectionEditor';
 export { SelectField } from './SelectField';
 export type { SelectOption, SelectFieldProps } from './SelectField';
+export { AddressAutocomplete } from './AddressAutocomplete';
+export type { AddressAutocompleteProps } from './AddressAutocomplete';
 export { SummaryCard } from './SummaryCard';
 export type { SummaryCardProps, SummaryRow } from './SummaryCard';
 export { CopyField } from './CopyField';
