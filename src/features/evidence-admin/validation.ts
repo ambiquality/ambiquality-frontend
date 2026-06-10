@@ -83,6 +83,19 @@ export function requiredPositiveInt(messages: {
   };
 }
 
+/**
+ * Optional positive finite number (`> 0`, decimals allowed); blank is allowed. Used for the
+ * F08 installation distances, which the backend rejects when non-positive.
+ */
+export function optionalPositiveNumber(message: string): FieldValidator {
+  return (value) => {
+    const v = value.trim();
+    if (v === '') return null;
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? null : message;
+  };
+}
+
 /** Optional positive integer (`> 0`); blank is allowed (e.g. číslo orientační). */
 export function optionalPositiveInt(message: string): FieldValidator {
   return (value) => {

@@ -73,6 +73,39 @@ describe('SensorNewPage (F08 one-time API key)', () => {
     expect(screen.getByText(/only time this key is shown/i)).toBeInTheDocument();
   });
 
+  it('sends installation: null when no F08 installation field is filled', async () => {
+    mutateAsync.mockResolvedValue({ id: 'sns-1', apiKey: 'amq_sk_secret' });
+    renderPage();
+
+    fill();
+    fireEvent.click(screen.getByRole('button', { name: 'Register sensor' }));
+    await screen.findByTestId('api-key-value');
+
+    expect(mutateAsync.mock.calls[0][0].installation).toBeNull();
+  });
+
+  it('nests the F08 installation block when at least one field is filled', async () => {
+    mutateAsync.mockResolvedValue({ id: 'sns-1', apiKey: 'amq_sk_secret' });
+    renderPage();
+
+    fill();
+    setField(/^Position in the room/, 'wall opposite the window');
+    setField(/^Distance to window/, '2.5');
+    setField(/^Installed on/, '2026-01-15');
+    fireEvent.click(screen.getByRole('button', { name: 'Register sensor' }));
+    await screen.findByTestId('api-key-value');
+
+    expect(mutateAsync.mock.calls[0][0].installation).toEqual({
+      positionNote: 'wall opposite the window',
+      distanceWindowM: 2.5,
+      distanceDoorM: null,
+      distanceSourceM: null,
+      measurementFrequencySeconds: null,
+      installedOn: '2026-01-15',
+      lastCalibratedOn: null,
+    });
+  });
+
   it('navigates to the sensor detail only after the operator acknowledges the key', async () => {
     mutateAsync.mockResolvedValue({ id: 'sns-1', apiKey: 'amq_sk_secret' });
     renderPage();
