@@ -43,6 +43,7 @@ export const cs: Resources = {
       privacy: 'Zásady ochrany osobních údajů',
       github: 'GitHub',
       contact: 'Kontakt',
+      apiDocs: 'Dokumentace API',
       dataLicense: 'Otevřená data pod licencí {{license}}.',
     },
   },
@@ -381,7 +382,7 @@ export const cs: Resources = {
       ingestionIdHint:
         'Tento identifikátor použijte při odesílání měření do ingestního API.',
       chartsTitle: 'Poslední měření',
-      chartsSubtitle: 'Posledních 24 hodin, jeden graf na měřenou veličinu.',
+      chartsSubtitle: 'Jeden graf na měřenou veličinu za zvolené období.',
       chartError: 'Měření se nepodařilo načíst.',
       chartNoData: 'Za posledních 24 hodin nejsou žádná měření.',
       registered: 'Senzor byl zaregistrován.',

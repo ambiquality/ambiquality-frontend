@@ -40,6 +40,7 @@ export const en = {
       privacy: 'Privacy Policy',
       github: 'GitHub',
       contact: 'Contact',
+      apiDocs: 'API documentation',
       dataLicense: 'Open data licensed under {{license}}.',
     },
   },
@@ -387,7 +388,7 @@ export const en = {
       ingestionIdHint:
         'Use this identifier when sending measurements to the ingestion API.',
       chartsTitle: 'Recent measurements',
-      chartsSubtitle: 'Last 24 hours, one chart per measured quantity.',
+      chartsSubtitle: 'One chart per measured quantity over the selected look-back window.',
       chartError: 'Measurements could not be loaded.',
       chartNoData: 'No measurements in the last 24 hours.',
       registered: 'The sensor has been registered.',
