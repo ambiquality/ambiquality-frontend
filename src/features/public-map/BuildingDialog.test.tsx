@@ -67,6 +67,7 @@ describe('BuildingDialog', () => {
       { name: /view building detail/i },
       { timeout: 5000 },
     );
-    expect(link).toHaveAttribute('href', '/buildings/bld-rajska-budova');
+    // Detail routes resolve by the persistent GUID (the id the Public.Api catalog serves).
+    expect(link).toHaveAttribute('href', '/buildings/11111111-1111-1111-1111-111111111111');
   });
 });

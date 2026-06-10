@@ -2,7 +2,7 @@ import { SegmentGroup } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import type { TimeRange } from '@/api/public/map-types';
 
-export const TIME_RANGES: TimeRange[] = ['day', 'week', 'month', 'year'];
+const TIME_RANGES: TimeRange[] = ['day', 'week', 'month', 'year'];
 
 /**
  * Shared look-back range selector (ROZ-03): the same four-window control everywhere a

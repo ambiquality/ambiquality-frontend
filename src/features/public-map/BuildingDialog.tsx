@@ -167,7 +167,7 @@ function DialogBody({
 
       <Dialog.Footer>
         <ChakraLink asChild color="brand.fg">
-          <RouterLink to={`/buildings/${selection.slug}`}>{t('dialog.viewDetail')}</RouterLink>
+          <RouterLink to={`/buildings/${selection.buildingId}`}>{t('dialog.viewDetail')}</RouterLink>
         </ChakraLink>
       </Dialog.Footer>
     </>
