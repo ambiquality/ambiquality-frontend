@@ -1,0 +1,74 @@
+name: Release frontend image to GHCR
+
+# Tag-release-only, mirroring the backend repo: pushing a semver tag (v1.2.0)
+# builds the SPA with the PRODUCTION api origins baked in and pushes a single
+# image to ghcr.io/ambiquality/frontend. Ordinary pushes to main publish nothing.
+#
+# The VITE_* values below are inlined into the static bundle at build time, so a
+# config change (e.g. a new domain) requires a fresh tag. They are non-secret
+# (they ship to every browser), so they live here in plain sight rather than in
+# repository secrets.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+  packages: write          # required to push the image to GHCR
+
+env:
+  VITE_AUTH_API_BASE: https://api.ambiquality.org/auth
+  VITE_EVIDENCE_API_BASE: https://api.ambiquality.org/evidence
+  VITE_PUBLIC_API_BASE: https://api.ambiquality.org/public
+  VITE_ENABLE_API_MOCKS: '0'
+  VITE_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/positron
+  VITE_MAP_ATTRIBUTION: >-
+    <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>
+    <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a>
+    Data from <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Derive image tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/frontend
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+          flavor: latest=auto
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_AUTH_API_BASE=${{ env.VITE_AUTH_API_BASE }}
+            VITE_EVIDENCE_API_BASE=${{ env.VITE_EVIDENCE_API_BASE }}
+            VITE_PUBLIC_API_BASE=${{ env.VITE_PUBLIC_API_BASE }}
+            VITE_ENABLE_API_MOCKS=${{ env.VITE_ENABLE_API_MOCKS }}
+            VITE_MAP_STYLE_URL=${{ env.VITE_MAP_STYLE_URL }}
+            VITE_MAP_ATTRIBUTION=${{ env.VITE_MAP_ATTRIBUTION }}
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
