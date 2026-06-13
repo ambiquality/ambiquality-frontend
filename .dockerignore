@@ -1,0 +1,22 @@
+# Keep the build context small and deterministic. Crucially, exclude all .env
+# files so the host's dev .env (mocks on, localhost URLs) never leaks into the
+# image — the release workflow's build args are the only source of prod config.
+node_modules
+dist
+dist-ssr
+.vite
+.env
+.env.*
+coverage
+.vitest
+test-results
+playwright-report
+playwright/.cache
+e2e
+.git
+.github
+.claude
+.tldr
+.agents
+thoughts
+*.log

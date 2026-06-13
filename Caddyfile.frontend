@@ -1,0 +1,18 @@
+# Internal static server for the SPA bundle. The ingress Caddy (backend repo)
+# terminates TLS for ambiquality.org / www.ambiquality.org and reverse-proxies
+# here on the container's :80 — this server never faces the internet directly.
+:80 {
+	root * /usr/share/caddy
+	encode gzip zstd
+
+	# Long-cache the fingerprinted asset bundle; never cache the HTML shell so a
+	# new deploy is picked up immediately.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	header /index.html Cache-Control "no-cache"
+
+	# SPA history fallback: unknown paths return index.html so client-side routing
+	# (and deep links / refreshes) work.
+	try_files {path} /index.html
+	file_server
+}
