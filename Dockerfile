@@ -1,3 +1,8 @@
+# check=skip=SecretsUsedInArgOrEnv
+# ^ The VITE_* build args are public config (they ship to every browser), not
+#   secrets. BuildKit's lint only flags VITE_AUTH_API_BASE because the name
+#   contains "AUTH"; skipping the check silences that false positive.
+#
 # Frontend image: build the Vite SPA, then serve the static bundle with Caddy
 # (file_server + SPA history fallback). Published to GHCR as
 # ghcr.io/ambiquality/frontend:<tag> by .github/workflows/release.yml.
