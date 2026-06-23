@@ -46,6 +46,7 @@ export const cs: Resources = {
       github: 'GitHub',
       contact: 'Kontakt',
       apiDocs: 'Dokumentace API',
+      dataModelSpec: 'Specifikace datového modelu',
       dataLicense: 'Otevřená data pod licencí {{license}}.',
       copyright: '© {{year}} {{holder}}. Zdrojový kód pod licencí {{license}}.',
     },

@@ -57,6 +57,15 @@ export function Footer() {
           >
             {t('footer.apiDocs')}
           </ChakraLink>
+          {/* OFN-conformant formal specification of the open-data conceptual model (ReSpec). */}
+          <ChakraLink
+            colorPalette="brand"
+            href={`${env.publicApiBase}/docs/`}
+            target="_blank"
+            rel="noopener"
+          >
+            {t('footer.dataModelSpec')}
+          </ChakraLink>
         </Flex>
 
         <Text mt="2" fontSize="sm">
