@@ -43,6 +43,7 @@ export const en = {
       github: 'GitHub',
       contact: 'Contact',
       apiDocs: 'API documentation',
+      dataModelSpec: 'Data model specification',
       dataLicense: 'Open data licensed under {{license}}.',
       copyright: '© {{year}} {{holder}}. Source code licensed under {{license}}.',
     },
