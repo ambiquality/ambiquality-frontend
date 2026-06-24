@@ -28,7 +28,10 @@ vi.mock('./ruian/useAddressLookup', () => ({
 vi.mock('@/api/public/hooks', () => ({
   useCodelistScheme: () => ({
     data: {
-      office: { code: 'office', prefLabel: { en: 'Office building', cs: 'Administrativní budova' } },
+      office: {
+        code: 'office',
+        prefLabel: { en: 'Office building', cs: 'Administrativní budova' },
+      },
       residential: { code: 'residential', prefLabel: { en: 'Residential', cs: 'Bytový dům' } },
     },
     isLoading: false,
@@ -73,25 +76,25 @@ beforeEach(() => {
 });
 
 const RESOLVED: ResolvedAddress = {
-  addressPointCode: 6265154,
-  streetName: 'Revoluční',
-  houseNumber: 93,
+  addressPointCode: 21794547,
+  streetName: 'nám. W. Churchilla',
+  houseNumber: 1938,
   houseNumberType: 'č.p.',
-  orientationNumber: null,
+  orientationNumber: 4,
   orientationNumberLetter: null,
-  municipalityName: 'Dobrovíz',
-  municipalityPartName: null,
-  psc: '25261',
-  districtName: 'Praha-západ',
-  regionName: 'Středočeský kraj',
-  streetCode: 428582,
-  municipalityCode: 539171,
-  municipalityPartCode: null,
-  districtCode: 3210,
-  regionCode: 27,
-  latitude: 50.1166,
-  longitude: 14.2181,
-  text: 'Revoluční 93, 252 61 Dobrovíz',
+  municipalityName: 'Praha',
+  municipalityPartName: 'Žižkov',
+  psc: '13067',
+  districtName: 'Hlavní město Praha',
+  regionName: 'Hlavní město Praha',
+  streetCode: 727059,
+  municipalityCode: 554782,
+  municipalityPartCode: 490067,
+  districtCode: 3100,
+  regionCode: 19,
+  latitude: 50.0837,
+  longitude: 14.4407,
+  text: 'nám. W. Churchilla 1938/4, 130 67 Praha 3 - Žižkov',
 };
 
 describe('BuildingNewPage (F05 register)', () => {
@@ -124,22 +127,42 @@ describe('BuildingNewPage (F05 register)', () => {
   });
 
   it('fills the address fields from a RÚIAN autocomplete pick', async () => {
-    ruianSuggest.data = [{ text: 'Revoluční 93, 25261 Dobrovíz', key: '1_555742' }];
+    ruianSuggest.data = [
+      { text: 'nám. W. Churchilla 1938/4, 13067 Praha 3 - Žižkov', key: '1_21794547' },
+    ];
     resolveFn.mockResolvedValue(RESOLVED);
     const user = userEvent.setup();
     renderPage();
 
     await user.click(screen.getByRole('combobox', { name: /Find address in RÚIAN/i }));
-    await user.click(await screen.findByRole('option', { name: /Revoluční 93/i }));
+    await user.click(await screen.findByRole('option', { name: /Churchilla/i }));
 
     // The resolved RÚIAN address populates the required + optional fields (still editable).
     await waitFor(() =>
-      expect(screen.getByLabelText(/^Address point code/)).toHaveValue('6265154'),
+      expect(screen.getByLabelText(/^Address point code/)).toHaveValue('21794547'),
     );
-    expect(screen.getByLabelText(/^Municipality(?![ -](part|code))/)).toHaveValue('Dobrovíz');
-    expect(screen.getByLabelText(/^Postal code/)).toHaveValue('25261');
-    expect(screen.getByLabelText('Street name')).toHaveValue('Revoluční');
-    expect(screen.getByLabelText('Region')).toHaveValue('Středočeský kraj');
+    expect(screen.getByLabelText(/^Municipality(?![ -](part|code))/)).toHaveValue('Praha');
+    expect(screen.getByLabelText(/^Postal code/)).toHaveValue('13067');
+    expect(screen.getByLabelText('Street name')).toHaveValue('nám. W. Churchilla');
+    expect(screen.getByLabelText('Region')).toHaveValue('Hlavní město Praha');
+  });
+
+  it('hard-blocks registration when a non-Czech country is selected', async () => {
+    renderPage();
+
+    // Defaults to Czechia, so the form (and its submit) is present.
+    expect(screen.getByRole('button', { name: 'Register building' })).toBeInTheDocument();
+
+    setField(/^Country/, 'US');
+
+    // The address form and submit are gone; an explanatory message takes their place.
+    expect(screen.queryByRole('button', { name: 'Register building' })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^Address point code/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Only Czechia is supported/i)).toBeInTheDocument();
+
+    // Switching back to Czechia restores the form.
+    setField(/^Country/, 'CZ');
+    expect(screen.getByRole('button', { name: 'Register building' })).toBeInTheDocument();
   });
 
   it('coerces filled optional numeric fields to numbers', async () => {

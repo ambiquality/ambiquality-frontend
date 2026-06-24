@@ -47,6 +47,7 @@ export const cs: Resources = {
       contact: 'Kontakt',
       apiDocs: 'Dokumentace API',
       dataLicense: 'Otevřená data pod licencí {{license}}.',
+      copyright: '© {{year}} {{holder}}. Zdrojový kód pod licencí {{license}}.',
     },
   },
   map: {
@@ -276,7 +277,7 @@ export const cs: Resources = {
     // formuláři budovy — registrátor adresu vybere místo opisování ~18 polí z registru.
     addressLookup: {
       label: 'Najít adresu v RÚIAN',
-      placeholder: 'Začněte psát adresu, např. „Revoluční 93, Dobrovíz“…',
+      placeholder: 'Začněte psát adresu, např. „nám. W. Churchilla 1938/4, Praha“…',
       hint: 'Vyberte adresu z registru RÚIAN a pole níže se vyplní automaticky. Údaje můžete poté upravit.',
       searching: 'Vyhledávání…',
       noResults: 'Žádná adresa neodpovídá.',
@@ -338,6 +339,8 @@ export const cs: Resources = {
       installedOnHint: 'Datum instalace zařízení na tuto pozici.',
       lastCalibratedOnHint: 'Datum poslední kalibrace; nesmí předcházet datu instalace. Stáří kalibrace ovlivňuje důvěryhodnost měření.',
       name: 'Název',
+      country: 'Země',
+      countryHint: 'Země, ve které budova stojí. Platforma zatím podporuje pouze Českou republiku — adresa se eviduje podle českého standardu OFN Adresy (RÚIAN).',
       addressPointCode: 'Kód adresního místa (RÚIAN)',
       addressPointCodeHint:
         'Identifikátor adresního místa z registru RÚIAN (kód adresního místa). Backend adresu ' +
@@ -397,6 +400,8 @@ export const cs: Resources = {
       yearsTitle: 'Roky výstavby',
       locationTitle: 'Poloha',
       registered: 'Budova byla zaregistrována.',
+      unsupportedCountryTitle: 'Podporována je zatím jen Česká republika',
+      unsupportedCountry: 'Registrace budov mimo Českou republiku zatím není podporována. Adresa se eviduje podle českého standardu OFN Adresy (RÚIAN). Chcete-li pokračovat, zvolte jako zemi Česko.',
     },
     room: {
       listTitle: 'Místnosti',
@@ -571,6 +576,9 @@ export const cs: Resources = {
         'Datová sada pozorování je plochá řada validovaných měření ze senzorů. Jeden záznam ' +
         'představuje jednu veličinu změřenou jedním senzorem v jednom okamžiku; kontext entit ' +
         '(budova, místnost, umístění senzoru) publikují katalogové endpointy a každý záznam na ně odkazuje.',
+      specHeading: 'Úplná specifikace',
+      specBody: 'Úplný datový model — entity, číselníky a JSON schémata — najdete ve',
+      specLinkText: 'specifikaci datového modelu',
       fieldsHeading: 'Struktura záznamu (pozorování)',
       fields: {
         id: { name: 'id', meaning: 'Stabilní jednoznačný identifikátor pozorování (UUID). Nikdy se nepřiděluje znovu.' },

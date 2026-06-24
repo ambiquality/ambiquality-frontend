@@ -14,3 +14,12 @@ export const DATA_LICENSE = {
   name: 'CC BY 4.0',
   url: 'https://creativecommons.org/licenses/by/4.0/',
 } as const;
+
+/** Licence under which the platform's source code is released. */
+export const SOURCE_LICENSE = {
+  name: 'MIT License',
+  url: 'https://opensource.org/license/mit',
+} as const;
+
+/** Author / copyright holder shown in the footer notice. */
+export const COPYRIGHT_HOLDER = 'ambiquality';

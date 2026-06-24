@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useCatalog } from '@/api/public/catalog-hooks';
 import type { LiveDistribution, ParsedCatalog } from '@/api/public/catalog-types';
 import { DATA_LICENSE } from '@/lib/constants';
+import { env } from '@/lib/env';
 
 /**
  * F16 — the human-readable rendering of the open-data DCAT-AP catalogue metadata. It reads the
@@ -360,6 +361,25 @@ function DataDocumentationSection() {
         {t('docs.heading')}
       </Heading>
       <Text color="fg.muted">{t('docs.intro')}</Text>
+
+      <Heading size="md" as="h3">
+        {t('docs.specHeading')}
+      </Heading>
+      <Text color="fg.muted">
+        {/* The full ReSpec data-model specification (conceptual model, code lists, JSON schemas)
+            is served statically by Public.Api at `${publicApiBase}/docs/` — the same base the
+            Scalar API reference uses. */}
+        {t('docs.specBody')}{' '}
+        <ChakraLink
+          colorPalette="brand"
+          href={`${env.publicApiBase}/docs/`}
+          target="_blank"
+          rel="noopener"
+        >
+          {t('docs.specLinkText')}
+        </ChakraLink>
+        .
+      </Text>
 
       <Heading size="md" as="h3">
         {t('docs.fieldsHeading')}
