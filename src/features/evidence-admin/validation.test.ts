@@ -3,6 +3,7 @@ import {
   requiredValidator,
   optionalIntInRange,
   optionalNumber,
+  optionalPositiveNumber,
   requiredNumber,
   datetimeLocalToIso,
   isoToDatetimeLocal,
@@ -32,6 +33,15 @@ describe('evidence-admin validation', () => {
     expect(v('12.5')).toBeNull();
     expect(v('-3')).toBeNull();
     expect(v('nope')).toBe('inv');
+  });
+
+  it('optionalPositiveNumber allows blank and positives, rejects zero/negatives/NaN', () => {
+    const v = optionalPositiveNumber('pos');
+    expect(v('')).toBeNull();
+    expect(v('12.5')).toBeNull();
+    expect(v('0')).toBe('pos');
+    expect(v('-3')).toBe('pos');
+    expect(v('nope')).toBe('pos');
   });
 
   it('requiredNumber rejects blank and NaN', () => {

@@ -25,6 +25,7 @@ import { AttributeEditForm, SelectField } from './components';
 import { useCodelistOptions } from './codelists';
 import { useHouseNumberTypeOptions } from './house-number-type';
 import {
+  optionalIntInRange,
   optionalNumberInRange,
   requiredPositiveInt,
   optionalPositiveInt,
@@ -235,7 +236,7 @@ function BuildingAttributeForms({
             </FormField>
             <FormField label={t('fields.orientationNumberLetter')}>
               <Input
-                maxLength={1}
+                maxLength={2}
                 value={orientationNumberLetter}
                 onChange={(e) => setOrientationNumberLetter(e.target.value)}
               />
@@ -384,10 +385,22 @@ function BuildingAttributeForms({
           mutateAsync={changeYears.mutateAsync}
         >
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.yearBuilt')}>
+            <FormField
+              label={t('fields.yearBuilt')}
+              validate={optionalIntInRange(1000, 2200, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '1000', max: '2200' }),
+              })}
+            >
               <Input value={yearBuilt} onChange={(e) => setYearBuilt(e.target.value)} />
             </FormField>
-            <FormField label={t('fields.yearRenovated')}>
+            <FormField
+              label={t('fields.yearRenovated')}
+              validate={optionalIntInRange(1000, 2200, {
+                invalid: tf('validation.invalid'),
+                range: tf('validation.range', { min: '1000', max: '2200' }),
+              })}
+            >
               <Input value={yearRenovated} onChange={(e) => setYearRenovated(e.target.value)} />
             </FormField>
           </SimpleGrid>

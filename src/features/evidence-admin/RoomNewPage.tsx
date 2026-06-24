@@ -7,7 +7,7 @@ import { ProblemError as ProblemErrorObject } from '@/api/middleware/problem-det
 import { useRegisterRoom } from './queries';
 import { SelectField } from './components';
 import { useCodelistOptions } from './codelists';
-import { requiredValidator, optionalIntInRange, optionalNumber } from './validation';
+import { requiredValidator, optionalIntInRange, optionalPositiveNumber } from './validation';
 
 /**
  * F06 register a room under a building (`POST /v1/buildings/{buildingId}/rooms`). Optional
@@ -78,9 +78,9 @@ export function RoomNewPage() {
           <FormField
             label={t('fields.floor')} labelHint={t('fields.floorHint')}
             required
-            validate={optionalIntInRange(0, 255, {
+            validate={optionalIntInRange(0, 100, {
               invalid: tf('validation.invalid'),
-              range: tf('validation.invalid'),
+              range: tf('validation.range', { min: '0', max: '100' }),
             })}
           >
             <Input value={floor} onChange={(e) => setFloor(e.target.value)} />
@@ -105,12 +105,12 @@ export function RoomNewPage() {
                 placeholder={exposureCodes.isLoading ? t('select.loading') : t('select.placeholder')}
               />
             </FormField>
-            <FormField label={t('fields.areaM2')} labelHint={t('fields.areaM2Hint')} validate={optionalNumber(tf('validation.invalid'))}>
+            <FormField label={t('fields.areaM2')} labelHint={t('fields.areaM2Hint')} validate={optionalPositiveNumber(tf('validation.positive'))}>
               <Input value={areaM2} onChange={(e) => setAreaM2(e.target.value)} />
             </FormField>
             <FormField
               label={t('fields.ceilingHeightM')} labelHint={t('fields.ceilingHeightMHint')}
-              validate={optionalNumber(tf('validation.invalid'))}
+              validate={optionalPositiveNumber(tf('validation.positive'))}
             >
               <Input value={ceilingHeightM} onChange={(e) => setCeilingHeightM(e.target.value)} />
             </FormField>

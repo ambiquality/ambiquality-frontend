@@ -254,7 +254,7 @@ export function BuildingNewPage() {
                   labelHint={t('fields.orientationNumberLetterHint')}
                 >
                   <Input
-                    maxLength={1}
+                    maxLength={2}
                     value={orientationNumberLetter}
                     onChange={(e) => setOrientationNumberLetter(e.target.value)}
                   />
