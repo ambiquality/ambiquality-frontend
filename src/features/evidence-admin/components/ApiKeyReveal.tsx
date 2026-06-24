@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Box, Button, Code, HStack, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
+import { SensorDocsLinks } from './SensorDocsLinks';
 
 export interface ApiKeyRevealProps {
   /** The one-time `amq_sk_…` key returned by sensor registration. Shown exactly once. */
@@ -55,6 +56,10 @@ export function ApiKeyReveal({ apiKey, onAcknowledge }: ApiKeyRevealProps) {
               {t('apiKey.copied')}
             </Text>
           )}
+        </Box>
+
+        <Box mt="4">
+          <SensorDocsLinks />
         </Box>
 
         {onAcknowledge && (

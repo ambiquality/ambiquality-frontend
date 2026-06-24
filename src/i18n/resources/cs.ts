@@ -448,6 +448,12 @@ export const cs: Resources = {
       copied: 'Zkopírováno do schránky.',
       label: 'API klíč',
       done: 'Klíč jsem uložil',
+      nextStepsTitle: 'Další krok: zprovoznit odesílání dat ze senzoru',
+    },
+    docs: {
+      intro: 'S klíčem senzoru výše můžete začít odesílat měření:',
+      sendingGuide: 'Jak odesílat měření (návod)',
+      apiReference: 'Referenční dokumentace ingestion API',
     },
     collection: {
       addPlaceholder: 'Zadejte kód',

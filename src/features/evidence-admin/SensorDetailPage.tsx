@@ -7,6 +7,7 @@ import { useSensor, type SensorSnapshot } from './queries';
 import { SummaryCard, CopyField } from './components';
 import { useSensorSummaryRows } from './summaries';
 import { SensorCharts } from './SensorCharts';
+import { SensorDocsLinks } from './components/SensorDocsLinks';
 import { publicEntityUri } from './entity-uri';
 
 /**
@@ -51,6 +52,9 @@ export function SensorDetailPage() {
             snapshot={sensor.data}
             title={title}
           />
+          <Box borderWidth="1px" borderRadius="md" p="4">
+            <SensorDocsLinks />
+          </Box>
           <SensorCharts sensorId={sensor.data.id} snapshot={sensor.data} />
         </Stack>
       )}
