@@ -66,4 +66,22 @@ describe('RoomNewPage (F06 register)', () => {
     expect((screen.getByLabelText(/^Exposure/) as HTMLElement).tagName).toBe('SELECT');
     expect((screen.getByLabelText(/^Ventilation/) as HTMLElement).tagName).toBe('SELECT');
   });
+
+  it('rejects a negative area and an out-of-range floor on blur', async () => {
+    renderPage();
+
+    const area = screen.getByLabelText(/^Area/);
+    fireEvent.change(area, { target: { value: '-5' } });
+    fireEvent.blur(area);
+    await waitFor(() =>
+      expect(screen.getByText('Enter a positive number.')).toBeInTheDocument(),
+    );
+
+    const floor = screen.getByLabelText(/^Floor/);
+    fireEvent.change(floor, { target: { value: '150' } });
+    fireEvent.blur(floor);
+    await waitFor(() =>
+      expect(screen.getByText('Enter a number between 0 and 100.')).toBeInTheDocument(),
+    );
+  });
 });

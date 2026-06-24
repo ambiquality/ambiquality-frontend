@@ -23,6 +23,7 @@ import {
 } from './attribute-mutations';
 import { AttributeEditForm, CollectionEditor, SelectField } from './components';
 import { useCodelistOptions } from './codelists';
+import { optionalIntInRange, optionalPositiveNumber } from './validation';
 
 /**
  * F07 room temporal edits + the pollution-sources collection. Each attribute (name / floor /
@@ -87,6 +88,7 @@ function RoomAttributeForms({
   snapshot: RoomSnapshot;
 }) {
   const { t } = useTranslation('evidence');
+  const { t: tf } = useTranslation('forms');
 
   const functionCodes = useCodelistOptions('room-function');
   const exposureCodes = useCodelistOptions('exposure');
@@ -130,7 +132,14 @@ function RoomAttributeForms({
           buildBody={(validFrom) => ({ floor: Number(floor), validFrom })}
           mutateAsync={changeFloor.mutateAsync}
         >
-          <FormField label={t('fields.floor')} required>
+          <FormField
+            label={t('fields.floor')}
+            required
+            validate={optionalIntInRange(0, 100, {
+              invalid: tf('validation.invalid'),
+              range: tf('validation.range', { min: '0', max: '100' }),
+            })}
+          >
             <Input value={floor} onChange={(e) => setFloor(e.target.value)} />
           </FormField>
         </AttributeEditForm>
@@ -177,10 +186,16 @@ function RoomAttributeForms({
           mutateAsync={changeGeometry.mutateAsync}
         >
           <SimpleGrid columns={{ base: 1, md: 2 }} gap="4">
-            <FormField label={t('fields.areaM2')}>
+            <FormField
+              label={t('fields.areaM2')}
+              validate={optionalPositiveNumber(tf('validation.positive'))}
+            >
               <Input value={areaM2} onChange={(e) => setAreaM2(e.target.value)} />
             </FormField>
-            <FormField label={t('fields.ceilingHeightM')}>
+            <FormField
+              label={t('fields.ceilingHeightM')}
+              validate={optionalPositiveNumber(tf('validation.positive'))}
+            >
               <Input value={ceilingHeightM} onChange={(e) => setCeilingHeightM(e.target.value)} />
             </FormField>
           </SimpleGrid>
