@@ -25,6 +25,12 @@ function optionalBool(name: keyof ImportMetaEnv, fallback: boolean): boolean {
   return value === '1' || value === 'true';
 }
 
+/** Read an optional string var, trimming any trailing slash. Falls back when unset/empty. */
+function optionalUrl(name: keyof ImportMetaEnv, fallback: string): string {
+  const value = import.meta.env[name];
+  return (value == null || value === '' ? fallback : value).replace(/\/+$/, '');
+}
+
 export const env = {
   authApiBase: required('VITE_AUTH_API_BASE'),
   evidenceApiBase: required('VITE_EVIDENCE_API_BASE'),
@@ -38,4 +44,15 @@ export const env = {
    * real Public.Api routes exist. Never enabled in a production build.
    */
   enableApiMocks: optionalBool('VITE_ENABLE_API_MOCKS', import.meta.env.DEV),
+  /**
+   * Ingestion.Api base — used only to link operators to its read-only Scalar API
+   * reference (`{base}/scalar`); the app itself never POSTs measurements. Dev default
+   * routes through Caddy on :8080.
+   */
+  ingestionApiBase: optionalUrl('VITE_INGESTION_API_BASE', 'http://localhost:8080/ingestion'),
+  /**
+   * Base URL of the published operator/developer wiki (mdBook). Used to link the
+   * "how to send measurements" guide. Defaults to the production custom domain.
+   */
+  docsBase: optionalUrl('VITE_DOCS_BASE', 'https://wiki.ambiquality.org'),
 } as const;

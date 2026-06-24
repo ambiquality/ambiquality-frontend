@@ -454,6 +454,12 @@ export const en = {
       copied: 'Copied to clipboard.',
       label: 'API key',
       done: "I've saved it",
+      nextStepsTitle: 'Next: make the sensor send data',
+    },
+    docs: {
+      intro: 'Use the sensor key above to submit measurements:',
+      sendingGuide: 'How to send measurements (guide)',
+      apiReference: 'Ingestion API reference',
     },
     collection: {
       addPlaceholder: 'Enter a code',
