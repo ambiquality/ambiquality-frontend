@@ -283,7 +283,7 @@ export const en = {
     // the registrar picks an address instead of hand-copying the ~18 OFN fields from the registry.
     addressLookup: {
       label: 'Find address in RÚIAN',
-      placeholder: 'Start typing an address, e.g. “Revoluční 93, Dobrovíz”…',
+      placeholder: 'Start typing an address, e.g. “nám. W. Churchilla 1938/4, Praha”…',
       hint: 'Pick an address from the RÚIAN registry and the fields below fill in automatically. You can still edit them.',
       searching: 'Searching…',
       noResults: 'No matching address.',
@@ -345,6 +345,8 @@ export const en = {
       installedOnHint: 'Date the device was installed at this position.',
       lastCalibratedOnHint: 'Date of the last calibration; must not be before the installation date. Calibration age affects measurement trustworthiness.',
       name: 'Name',
+      country: 'Country',
+      countryHint: 'Country the building is located in. The platform currently supports only Czechia — the address is recorded using the Czech OFN Adresy (RÚIAN) standard.',
       addressPointCode: 'Address point code (RÚIAN)',
       addressPointCodeHint:
         'Identifier of the address point in the Czech RÚIAN registry (kód adresního místa). The ' +
@@ -404,6 +406,8 @@ export const en = {
       yearsTitle: 'Construction years',
       locationTitle: 'Location',
       registered: 'The building has been registered.',
+      unsupportedCountryTitle: 'Only Czechia is supported for now',
+      unsupportedCountry: 'Registering buildings outside Czechia is not supported yet. Addresses are recorded using the Czech OFN Adresy (RÚIAN) standard. To continue, select Czechia as the country.',
     },
     room: {
       listTitle: 'Rooms',

@@ -21,25 +21,25 @@ vi.mock('../ruian/useAddressLookup', () => ({
 }));
 
 const RESOLVED: ResolvedAddress = {
-  addressPointCode: 6265154,
-  streetName: 'Revoluční',
-  houseNumber: 93,
+  addressPointCode: 21794547,
+  streetName: 'nám. W. Churchilla',
+  houseNumber: 1938,
   houseNumberType: 'č.p.',
-  orientationNumber: null,
+  orientationNumber: 4,
   orientationNumberLetter: null,
-  municipalityName: 'Dobrovíz',
-  municipalityPartName: null,
-  psc: '25261',
-  districtName: 'Praha-západ',
-  regionName: 'Středočeský kraj',
-  streetCode: 428582,
-  municipalityCode: 539171,
-  municipalityPartCode: null,
-  districtCode: 3210,
-  regionCode: 27,
-  latitude: 50.1166,
-  longitude: 14.2181,
-  text: 'Revoluční 93, 252 61 Dobrovíz',
+  municipalityName: 'Praha',
+  municipalityPartName: 'Žižkov',
+  psc: '13067',
+  districtName: 'Hlavní město Praha',
+  regionName: 'Hlavní město Praha',
+  streetCode: 727059,
+  municipalityCode: 554782,
+  municipalityPartCode: 490067,
+  districtCode: 3100,
+  regionCode: 19,
+  latitude: 50.0837,
+  longitude: 14.4407,
+  text: 'nám. W. Churchilla 1938/4, 130 67 Praha 3 - Žižkov',
 };
 
 beforeEach(() => {
@@ -51,7 +51,9 @@ beforeEach(() => {
 
 describe('AddressAutocomplete', () => {
   it('resolves the picked suggestion and reports the full address', async () => {
-    suggestState.data = [{ text: 'Revoluční 93, 25261 Dobrovíz', key: '1_555742' }];
+    suggestState.data = [
+      { text: 'nám. W. Churchilla 1938/4, 13067 Praha 3 - Žižkov', key: '1_21794547' },
+    ];
     resolveFn.mockResolvedValue(RESOLVED);
     const onResolve = vi.fn();
     const user = userEvent.setup();
@@ -59,10 +61,10 @@ describe('AddressAutocomplete', () => {
     renderWithProviders(<AddressAutocomplete onResolve={onResolve} />);
 
     await user.click(screen.getByRole('combobox', { name: /Find address in RÚIAN/i }));
-    await user.click(await screen.findByRole('option', { name: /Revoluční 93/i }));
+    await user.click(await screen.findByRole('option', { name: /Churchilla/i }));
 
     await waitFor(() => expect(onResolve).toHaveBeenCalledWith(RESOLVED));
-    expect(resolveFn).toHaveBeenCalledWith('1_555742');
+    expect(resolveFn).toHaveBeenCalledWith('1_21794547');
   });
 
   it('shows the manual-entry degradation message when suggest fails', () => {
@@ -73,7 +75,9 @@ describe('AddressAutocomplete', () => {
   });
 
   it('surfaces degradation when resolving a pick fails', async () => {
-    suggestState.data = [{ text: 'Revoluční 93, 25261 Dobrovíz', key: '1_555742' }];
+    suggestState.data = [
+      { text: 'nám. W. Churchilla 1938/4, 13067 Praha 3 - Žižkov', key: '1_21794547' },
+    ];
     resolveFn.mockRejectedValue(new Error('502'));
     const onResolve = vi.fn();
     const user = userEvent.setup();
@@ -81,7 +85,7 @@ describe('AddressAutocomplete', () => {
     renderWithProviders(<AddressAutocomplete onResolve={onResolve} />);
 
     await user.click(screen.getByRole('combobox', { name: /Find address in RÚIAN/i }));
-    await user.click(await screen.findByRole('option', { name: /Revoluční 93/i }));
+    await user.click(await screen.findByRole('option', { name: /Churchilla/i }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/unavailable/i));
     expect(onResolve).not.toHaveBeenCalled();
