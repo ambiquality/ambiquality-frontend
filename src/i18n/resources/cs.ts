@@ -47,6 +47,7 @@ export const cs: Resources = {
       contact: 'Kontakt',
       apiDocs: 'Dokumentace API',
       dataLicense: 'Otevřená data pod licencí {{license}}.',
+      copyright: '© {{year}} {{holder}}. Zdrojový kód pod licencí {{license}}.',
     },
   },
   map: {
@@ -571,6 +572,9 @@ export const cs: Resources = {
         'Datová sada pozorování je plochá řada validovaných měření ze senzorů. Jeden záznam ' +
         'představuje jednu veličinu změřenou jedním senzorem v jednom okamžiku; kontext entit ' +
         '(budova, místnost, umístění senzoru) publikují katalogové endpointy a každý záznam na ně odkazuje.',
+      specHeading: 'Úplná specifikace',
+      specBody: 'Úplný datový model — entity, číselníky a JSON schémata — najdete ve',
+      specLinkText: 'specifikaci datového modelu',
       fieldsHeading: 'Struktura záznamu (pozorování)',
       fields: {
         id: { name: 'id', meaning: 'Stabilní jednoznačný identifikátor pozorování (UUID). Nikdy se nepřiděluje znovu.' },

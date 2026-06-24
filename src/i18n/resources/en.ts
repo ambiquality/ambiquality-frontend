@@ -44,6 +44,7 @@ export const en = {
       contact: 'Contact',
       apiDocs: 'API documentation',
       dataLicense: 'Open data licensed under {{license}}.',
+      copyright: '© {{year}} {{holder}}. Source code licensed under {{license}}.',
     },
   },
   map: {
@@ -585,6 +586,9 @@ export const en = {
         'The observations dataset is a flat series of validated sensor readings. One record ' +
         'represents one quantity measured by one sensor at one moment; entity context (building, ' +
         'room, sensor placement) is published in the catalog endpoints and linked from each record.',
+      specHeading: 'Full specification',
+      specBody: 'For the complete data model — entities, code lists and JSON schemas — see the',
+      specLinkText: 'data-model specification',
       fieldsHeading: 'Record structure (observations)',
       fields: {
         id: { name: 'id', meaning: 'Stable unique identifier of the observation (UUID). Never reassigned.' },

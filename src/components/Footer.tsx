@@ -1,7 +1,14 @@
-import { Box, Container, Flex, Link as ChakraLink, Text } from '@chakra-ui/react';
+import { Box, Container, Flex, Icon, Link as ChakraLink, Text } from '@chakra-ui/react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CONTACT_EMAIL, DATA_LICENSE, GITHUB_ORG_URL } from '@/lib/constants';
+import { FaGithub } from 'react-icons/fa';
+import {
+  CONTACT_EMAIL,
+  COPYRIGHT_HOLDER,
+  DATA_LICENSE,
+  GITHUB_ORG_URL,
+  SOURCE_LICENSE,
+} from '@/lib/constants';
 import { env } from '@/lib/env';
 
 /**
@@ -29,8 +36,14 @@ export function Footer() {
           <ChakraLink asChild colorPalette="brand">
             <RouterLink to="/privacy">{t('footer.privacy')}</RouterLink>
           </ChakraLink>
-          <ChakraLink colorPalette="brand" href={GITHUB_ORG_URL} target="_blank" rel="noopener">
-            {t('footer.github')}
+          <ChakraLink
+            colorPalette="brand"
+            href={GITHUB_ORG_URL}
+            target="_blank"
+            rel="noopener"
+            aria-label={t('footer.github')}
+          >
+            <Icon as={FaGithub} boxSize="5" />
           </ChakraLink>
           <ChakraLink colorPalette="brand" href={`mailto:${CONTACT_EMAIL}`}>
             {t('footer.contact')}
@@ -64,6 +77,33 @@ export function Footer() {
                   rel="noopener"
                 >
                   {DATA_LICENSE.name}
+                </ChakraLink>
+                {after}
+              </>
+            );
+          })()}
+        </Text>
+
+        <Text mt="1" fontSize="sm">
+          {/* Copyright notice: year + author, with the source-code licence rendered as a link.
+              Same sentinel-split trick as the open-data licence line above. */}
+          {(() => {
+            const SENTINEL = '\u0000';
+            const [before, after] = t('footer.copyright', {
+              year: String(new Date().getFullYear()),
+              holder: COPYRIGHT_HOLDER,
+              license: SENTINEL,
+            }).split(SENTINEL);
+            return (
+              <>
+                {before}
+                <ChakraLink
+                  colorPalette="brand"
+                  href={SOURCE_LICENSE.url}
+                  target="_blank"
+                  rel="noopener"
+                >
+                  {SOURCE_LICENSE.name}
                 </ChakraLink>
                 {after}
               </>
