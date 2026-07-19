@@ -24,6 +24,8 @@ env:
   VITE_AUTH_API_BASE: https://api.ambiquality.org/auth
   VITE_EVIDENCE_API_BASE: https://api.ambiquality.org/evidence
   VITE_PUBLIC_API_BASE: https://api.ambiquality.org/public
+  VITE_INGESTION_API_BASE: https://api.ambiquality.org/ingestion
+  VITE_DOCS_BASE: https://wiki.ambiquality.org
   VITE_ENABLE_API_MOCKS: '0'
   VITE_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/positron
   VITE_MAP_ATTRIBUTION: >-
@@ -70,6 +72,8 @@ jobs:
             VITE_AUTH_API_BASE=${{ env.VITE_AUTH_API_BASE }}
             VITE_EVIDENCE_API_BASE=${{ env.VITE_EVIDENCE_API_BASE }}
             VITE_PUBLIC_API_BASE=${{ env.VITE_PUBLIC_API_BASE }}
+            VITE_INGESTION_API_BASE=${{ env.VITE_INGESTION_API_BASE }}
+            VITE_DOCS_BASE=${{ env.VITE_DOCS_BASE }}
             VITE_ENABLE_API_MOCKS=${{ env.VITE_ENABLE_API_MOCKS }}
             VITE_MAP_STYLE_URL=${{ env.VITE_MAP_STYLE_URL }}
             VITE_MAP_ATTRIBUTION=${{ env.VITE_MAP_ATTRIBUTION }}
