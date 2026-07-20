@@ -82,7 +82,7 @@ const FIXTURE: RawCatalog = {
         '@type': 'dcat:Distribution',
         'dcterms:title': 'Measurements 2025-03 (text/csv, zipped)',
         'dcat:downloadURL': { '@id': 'https://storage.example/2025-03.csv.zip' },
-        'dcat:mediaType': 'text/csv',
+        'dcat:mediaType': { '@id': 'http://www.iana.org/assignments/media-types/text/csv' },
         'dcat:compressFormat': 'application/zip',
         'dcat:byteSize': 123456,
         'dcterms:temporal': {
@@ -95,7 +95,7 @@ const FIXTURE: RawCatalog = {
         '@type': 'dcat:Distribution',
         'dcterms:title': 'Measurements 2025-05 (text/csv, zipped)',
         'dcat:downloadURL': { '@id': 'https://storage.example/2025-05.csv.zip' },
-        'dcat:mediaType': 'text/csv',
+        'dcat:mediaType': { '@id': 'http://www.iana.org/assignments/media-types/text/csv' },
         'dcat:compressFormat': 'application/zip',
         // byteSize deliberately absent here.
         'dcterms:temporal': {
@@ -106,6 +106,91 @@ const FIXTURE: RawCatalog = {
       },
     ],
   },
+};
+
+/**
+ * The catalog shape the backend actually emits: `dcat:dataset` is an **array** = the live dataset,
+ * a `dcat:DatasetSeries`, and one member `dcat:Dataset` per archived month. Monthly archives are
+ * separate datasets (not distributions on the live dataset), and their period lives on the dataset's
+ * `dcterms:temporal` — the distributions themselves carry no `dcterms:temporal`. This mirrors
+ * `GET https://data.ambiquality.org/v1/catalog`.
+ */
+const SERIES_FIXTURE: RawCatalog = {
+  '@type': 'dcat:Catalog',
+  'dcterms:title': [{ '@language': 'en', '@value': 'Ambiquality Catalogue' }],
+  'dcat:dataset': [
+    {
+      '@id': 'https://api.example/v1/catalog#dataset',
+      '@type': 'dcat:Dataset',
+      'dcterms:title': [{ '@language': 'en', '@value': 'IEQ Open Data' }],
+      'dcterms:accrualPeriodicity': { '@id': 'http://publications.europa.eu/resource/authority/frequency/CONT' },
+      'dcat:distribution': [
+        {
+          '@type': 'dcat:Distribution',
+          'dcterms:title': 'Observations as CSV',
+          'dcat:accessURL': { '@id': 'https://api.example/v1/observations.csv' },
+          'dcat:mediaType': 'text/csv',
+        },
+      ],
+    },
+    {
+      '@id': 'https://api.example/v1/catalog#series',
+      '@type': 'dcat:DatasetSeries',
+      'dcterms:title': [{ '@language': 'en', '@value': 'Monthly archives' }],
+      'dcterms:temporal': {
+        'dcat:startDate': { '@value': '2026-05-01T00:00:00Z' },
+        'dcat:endDate': { '@value': '2026-07-01T00:00:00Z' },
+      },
+    },
+    {
+      '@id': 'https://api.example/v1/catalog#dataset-2026-06',
+      '@type': 'dcat:Dataset',
+      'dcterms:title': [{ '@language': 'en', '@value': 'Measurements 2026-06' }],
+      'dcat:inSeries': { '@id': 'https://api.example/v1/catalog#series' },
+      'dcterms:temporal': {
+        'dcat:startDate': { '@value': '2026-06-01T00:00:00Z' },
+        'dcat:endDate': { '@value': '2026-07-01T00:00:00Z' },
+      },
+      'dcat:distribution': [
+        {
+          '@type': 'dcat:Distribution',
+          'dcterms:title': 'Measurements 2026-06 (text/csv, gzip)',
+          'dcat:downloadURL': { '@id': 'https://storage.example/exports/2026/06/measurements-2026-06.csv.gz' },
+          'dcat:mediaType': { '@id': 'http://www.iana.org/assignments/media-types/text/csv' },
+          'dcat:compressFormat': 'application/gzip',
+          'dcat:byteSize': 100,
+        },
+        {
+          '@type': 'dcat:Distribution',
+          'dcterms:title': 'Measurements 2026-06 (application/ld+json, gzip)',
+          'dcat:downloadURL': { '@id': 'https://storage.example/exports/2026/06/measurements-2026-06.jsonld.gz' },
+          'dcat:mediaType': 'application/ld+json',
+          'dcat:compressFormat': 'application/gzip',
+          'dcat:byteSize': 137,
+        },
+      ],
+    },
+    {
+      '@id': 'https://api.example/v1/catalog#dataset-2026-05',
+      '@type': 'dcat:Dataset',
+      'dcterms:title': [{ '@language': 'en', '@value': 'Measurements 2026-05' }],
+      'dcat:inSeries': { '@id': 'https://api.example/v1/catalog#series' },
+      'dcterms:temporal': {
+        'dcat:startDate': { '@value': '2026-05-01T00:00:00Z' },
+        'dcat:endDate': { '@value': '2026-06-01T00:00:00Z' },
+      },
+      'dcat:distribution': [
+        {
+          '@type': 'dcat:Distribution',
+          'dcterms:title': 'Measurements 2026-05 (text/csv, zipped)',
+          'dcat:downloadURL': { '@id': 'https://storage.example/exports/2026/05/measurements-2026-05.csv.zip' },
+          'dcat:mediaType': { '@id': 'http://www.iana.org/assignments/media-types/text/csv' },
+          'dcat:compressFormat': 'application/zip',
+          'dcat:byteSize': 212,
+        },
+      ],
+    },
+  ],
 };
 
 describe('pickLiteral', () => {
@@ -236,5 +321,53 @@ describe('parseCatalog', () => {
     expect(empty.liveDistributions).toEqual([]);
     expect(empty.dataset.keywords).toEqual([]);
     expect(empty.catalog.title).toBeUndefined();
+  });
+});
+
+describe('parseCatalog — DatasetSeries / array-of-datasets (real backend shape)', () => {
+  it('collects archives from every member dataset in the dcat:dataset array', () => {
+    const parsed = parseCatalog(SERIES_FIXTURE, 'en');
+    // 2 from 2026-06 (csv + jsonld) + 1 from 2026-05 = 3 archives.
+    expect(parsed.archives).toHaveLength(3);
+    expect(parsed.archives.map((a) => a.downloadUrl)).toEqual(
+      expect.arrayContaining([
+        'https://storage.example/exports/2026/06/measurements-2026-06.csv.gz',
+        'https://storage.example/exports/2026/06/measurements-2026-06.jsonld.gz',
+        'https://storage.example/exports/2026/05/measurements-2026-05.csv.zip',
+      ]),
+    );
+  });
+
+  it('derives each archive period from its parent dataset (distributions have no temporal)', () => {
+    const parsed = parseCatalog(SERIES_FIXTURE, 'en');
+    const june = parsed.archives.find((a) => a.downloadUrl.includes('2026-06.csv'));
+    const may = parsed.archives.find((a) => a.downloadUrl.includes('2026-05'));
+    expect(june?.period).toEqual({ start: '2026-06-01T00:00:00Z', end: '2026-07-01T00:00:00Z' });
+    expect(may?.period).toEqual({ start: '2026-05-01T00:00:00Z', end: '2026-06-01T00:00:00Z' });
+  });
+
+  it('sorts archives newest-first across datasets (June before May)', () => {
+    const parsed = parseCatalog(SERIES_FIXTURE, 'en');
+    const starts = parsed.archives.map((a) => a.period?.start);
+    // The two June archives precede the single May one.
+    expect(starts[2]).toBe('2026-05-01T00:00:00Z');
+    expect(starts.slice(0, 2)).toEqual(['2026-06-01T00:00:00Z', '2026-06-01T00:00:00Z']);
+  });
+
+  it('uses the live (non-series, not inSeries) dataset for the metadata block and its live access points', () => {
+    const parsed = parseCatalog(SERIES_FIXTURE, 'en');
+    expect(parsed.dataset.title).toBe('IEQ Open Data');
+    expect(parsed.dataset.accrualPeriodicityUri).toContain('CONT');
+    expect(parsed.liveDistributions).toHaveLength(1);
+    expect(parsed.liveDistributions[0].url).toBe('https://api.example/v1/observations.csv');
+  });
+
+  it('normalizes an IANA media-type IRI reference to a bare type/subtype string', () => {
+    const parsed = parseCatalog(SERIES_FIXTURE, 'en');
+    const csvArchive = parsed.archives.find((a) => a.downloadUrl.includes('2026-06.csv'));
+    // Backend serializes `dcat:mediaType` as `{ "@id": ".../media-types/text/csv" }`.
+    expect(csvArchive?.mediaType).toBe('text/csv');
+    const jsonldArchive = parsed.archives.find((a) => a.downloadUrl.includes('.jsonld'));
+    expect(jsonldArchive?.mediaType).toBe('application/ld+json');
   });
 });
