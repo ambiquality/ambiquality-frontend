@@ -49,7 +49,11 @@ export interface RawDistribution {
   'dcterms:title'?: RawLangValue;
   'dcat:accessURL'?: RawIdRef;
   'dcat:downloadURL'?: RawIdRef;
-  'dcat:mediaType'?: string;
+  /**
+   * An IANA media-type IRI reference (`{ "@id": "http://www.iana.org/assignments/media-types/text/csv" }`)
+   * in the real backend output; a bare `"text/csv"` string is also tolerated.
+   */
+  'dcat:mediaType'?: RawIdRef | string;
   'dcat:compressFormat'?: string;
   'dcat:byteSize'?: number | string;
   'dcterms:format'?: RawIdRef;
@@ -79,6 +83,8 @@ export interface RawDataset {
   'dcat:theme'?: RawIdRef;
   'dcat:keyword'?: RawLangValue;
   'dcterms:accrualPeriodicity'?: RawIdRef;
+  /** Present on a monthly member dataset, referencing its parent `dcat:DatasetSeries`. */
+  'dcat:inSeries'?: RawIdRef;
   'dcat:contactPoint'?: RawContactPoint;
   'dcterms:issued'?: RawTypedLiteral | string;
   'dcterms:temporal'?: RawPeriodOfTime;
@@ -97,7 +103,12 @@ export interface RawCatalog {
   'dcterms:description'?: RawLangValue;
   'dcterms:publisher'?: RawPublisher;
   'dcterms:license'?: RawIdRef;
-  'dcat:dataset'?: RawDataset;
+  /**
+   * The catalog's datasets. The backend serializes this as an **array**: the live dataset, a
+   * `dcat:DatasetSeries`, and one member `dcat:Dataset` per archived month. JSON-LD may collapse a
+   * single-element array to a bare object, so both shapes are accepted.
+   */
+  'dcat:dataset'?: RawDataset | RawDataset[];
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -245,6 +256,21 @@ function parsePeriod(raw: RawPeriodOfTime | undefined): Period | undefined {
   return { start, end };
 }
 
+/**
+ * Normalize `dcat:mediaType` to a bare `type/subtype` string. The backend serializes it as an IANA
+ * media-type IRI reference (`{ "@id": "http://www.iana.org/assignments/media-types/text/csv" }`) to
+ * satisfy the DCAT-AP validator; a plain `"text/csv"` string is also accepted. An unrecognized IRI
+ * is returned as-is rather than dropped.
+ */
+function parseMediaType(raw: RawDistribution['dcat:mediaType']): string | undefined {
+  if (raw == null) return undefined;
+  if (typeof raw === 'string') return raw || undefined;
+  const id = idOf(raw);
+  if (id == null) return undefined;
+  const match = id.match(/\/media-types\/(.+)$/);
+  return match ? match[1] : id;
+}
+
 /** Strip a leading `mailto:` from a contact email reference. */
 function parseEmail(ref: RawContactPoint['vcard:hasEmail']): string | undefined {
   const raw = idOf(ref);
@@ -276,17 +302,31 @@ export function formatByteSize(bytes: number | undefined): string | undefined {
 // Parser.
 // ---------------------------------------------------------------------------------------------
 
-function parseDistributions(
-  raw: RawDataset['dcat:distribution'],
-  lang: string,
-): { live: LiveDistribution[]; archives: ArchiveDistribution[] } {
-  const live: LiveDistribution[] = [];
-  const archives: ArchiveDistribution[] = [];
+/** True if the dataset node is a `dcat:DatasetSeries` (which carries no `dcat:distribution`). */
+function isDatasetSeries(ds: RawDataset): boolean {
+  const type = ds['@type'] as string | string[] | undefined;
+  return Array.isArray(type) ? type.includes('dcat:DatasetSeries') : type === 'dcat:DatasetSeries';
+}
 
+/**
+ * Collect a single dataset's distributions into the shared `live`/`archives` accumulators.
+ *
+ * A distribution with a `dcat:downloadURL` is a downloadable archive; one with only a
+ * `dcat:accessURL` is a live access point. Archives in the real backend output carry their period
+ * on the **parent dataset** (`dcterms:temporal`), not on the distribution — so `datasetPeriod` is
+ * used as the fallback when the distribution itself has none.
+ */
+function collectDistributions(
+  raw: RawDataset['dcat:distribution'],
+  datasetPeriod: Period | undefined,
+  lang: string,
+  live: LiveDistribution[],
+  archives: ArchiveDistribution[],
+): void {
   for (const dist of asArray(raw)) {
     if (dist == null || typeof dist !== 'object') continue;
     const title = pickLiteral(dist['dcterms:title'], lang) ?? '';
-    const mediaType = dist['dcat:mediaType'];
+    const mediaType = parseMediaType(dist['dcat:mediaType']);
     const downloadUrl = idOf(dist['dcat:downloadURL']);
     const accessUrl = idOf(dist['dcat:accessURL']);
 
@@ -297,7 +337,7 @@ function parseDistributions(
         mediaType,
         compressFormat: dist['dcat:compressFormat'],
         byteSize: toByteSize(dist['dcat:byteSize']),
-        period: parsePeriod(dist['dcterms:temporal']),
+        period: parsePeriod(dist['dcterms:temporal']) ?? datasetPeriod,
       });
     } else if (accessUrl != null) {
       live.push({
@@ -309,18 +349,6 @@ function parseDistributions(
       });
     }
   }
-
-  // Newest-first by period start. Entries without a start sort last (stable for the rest).
-  archives.sort((a, b) => {
-    const sa = a.period?.start;
-    const sb = b.period?.start;
-    if (sa == null && sb == null) return 0;
-    if (sa == null) return 1;
-    if (sb == null) return -1;
-    return sb.localeCompare(sa);
-  });
-
-  return { live, archives };
 }
 
 /**
@@ -334,9 +362,33 @@ export function parseCatalog(
   fallback = 'en',
 ): ParsedCatalog {
   const doc = raw ?? {};
-  const dataset = doc['dcat:dataset'] ?? {};
 
-  const { live, archives } = parseDistributions(dataset['dcat:distribution'], lang);
+  // `dcat:dataset` is an array in the real backend output (live dataset + DatasetSeries + one
+  // dataset per archived month); JSON-LD may also collapse it to a bare object. Normalize, drop the
+  // DatasetSeries (no distributions), and collect distributions from every remaining dataset.
+  const datasets = asArray(doc['dcat:dataset']).filter(
+    (d): d is RawDataset => d != null && typeof d === 'object' && !isDatasetSeries(d),
+  );
+
+  const live: LiveDistribution[] = [];
+  const archives: ArchiveDistribution[] = [];
+  for (const ds of datasets) {
+    collectDistributions(ds['dcat:distribution'], parsePeriod(ds['dcterms:temporal']), lang, live, archives);
+  }
+
+  // Newest-first by period start. Entries without a start sort last (stable for the rest).
+  archives.sort((a, b) => {
+    const sa = a.period?.start;
+    const sb = b.period?.start;
+    if (sa == null && sb == null) return 0;
+    if (sa == null) return 1;
+    if (sb == null) return -1;
+    return sb.localeCompare(sa);
+  });
+
+  // The dataset-level metadata block describes the live dataset: the one that is not a member of a
+  // series (`dcat:inSeries` absent). Fall back to the first dataset, then an empty object.
+  const dataset = datasets.find((d) => d['dcat:inSeries'] == null) ?? datasets[0] ?? {};
 
   return {
     catalog: {
