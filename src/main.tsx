@@ -7,6 +7,7 @@ import { I18nProvider } from './i18n';
 import { AuthProvider } from './auth/AuthProvider';
 import { UnitPreferenceProvider } from './units';
 import { env } from './lib/env';
+import { initVitals } from './lib/vitals';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -25,6 +26,8 @@ async function enableMocks(): Promise<void> {
 }
 
 void enableMocks().then(() => {
+  // Anonymous Core Web Vitals reporting (no-op unless VITE_RUM_ENDPOINT is set).
+  initVitals();
   createRoot(rootElement).render(
     <StrictMode>
       <I18nProvider>

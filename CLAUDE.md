@@ -163,6 +163,16 @@ When implementing later phases, these are the easy things to get wrong:
   `localhost:8080`; prod = real HTTPS origins). Read them via `src/lib/env.ts`, not
   `import.meta.env` directly. Public endpoints are CORS-open.
 
+## Core Web Vitals / RUM
+
+`src/lib/vitals.ts` reports anonymized Core Web Vitals (LCP / INP / TTFB / CLS — note
+web-vitals v6 dropped FID, INP is its successor) and page views to the backend's Public.Api
+`POST /telemetry/vitals` endpoint on `pagehide` via `sendBeacon` with a `text/plain` blob
+(CORS-safelisted, no preflight). It is enabled only when `VITE_RUM_ENDPOINT` is set
+(empty in dev; baked by the release workflow as `…/public/telemetry/vitals`) and feeds the
+backend's Grafana "Overview" bar gauges. Keep `deriveRouteBucket`'s buckets in sync with
+`src/router.tsx` top-level segments and with the backend's `SanitizeRouteBucket`.
+
 ## Conventions
 
 - Idiomatic modern Vite + Chakra v3. No raw hex in feature code — reference theme tokens in

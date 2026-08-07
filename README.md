@@ -69,9 +69,13 @@ Copy `.env.example` to `.env` and adjust. Never commit `.env`.
 | `VITE_PUBLIC_API_BASE`    | Public.Api — open-data read API (`/v1/*`) for the visitor     | `http://localhost:8080/public`        |
 | `VITE_MAP_STYLE_URL`      | MapLibre GL style JSON from a configurable tile provider      | `https://demotiles.maplibre.org/style.json` |
 | `VITE_MAP_ATTRIBUTION`    | Attribution string shown on the map                          | `© MapLibre`                          |
+| `VITE_RUM_ENDPOINT`       | Anonymous Core Web Vitals beacon (Public.Api `/telemetry/vitals`); empty disables RUM | *(empty — disabled)* |
 
 In production, point the API bases at the real HTTPS origins (treat backend URIs as
-permanent) and supply your own map provider/key.
+permanent) and supply your own map provider/key. The release workflow bakes
+`VITE_RUM_ENDPOINT=https://api.ambiquality.org/public/telemetry/vitals`, which feeds the
+backend's Prometheus/Grafana Observability stack (Core Web Vitals bar gauges on the
+Overview dashboard — see backend `docs/monitoring.md`).
 
 ## Scripts
 

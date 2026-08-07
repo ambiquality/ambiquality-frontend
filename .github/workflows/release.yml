@@ -28,6 +28,7 @@ env:
   VITE_DOCS_BASE: https://wiki.ambiquality.org
   VITE_ENABLE_API_MOCKS: '0'
   VITE_MAP_STYLE_URL: https://tiles.openfreemap.org/styles/positron
+  VITE_RUM_ENDPOINT: https://api.ambiquality.org/public/telemetry/vitals
   VITE_MAP_ATTRIBUTION: >-
     <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>
     <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a>
@@ -76,6 +77,7 @@ jobs:
             VITE_DOCS_BASE=${{ env.VITE_DOCS_BASE }}
             VITE_ENABLE_API_MOCKS=${{ env.VITE_ENABLE_API_MOCKS }}
             VITE_MAP_STYLE_URL=${{ env.VITE_MAP_STYLE_URL }}
+            VITE_RUM_ENDPOINT=${{ env.VITE_RUM_ENDPOINT }}
             VITE_MAP_ATTRIBUTION=${{ env.VITE_MAP_ATTRIBUTION }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
