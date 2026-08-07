@@ -2,7 +2,7 @@
 
 Web client (single-page application) for **Ambiquality**, an IEQ (Indoor Environmental
 Quality) monitoring platform built as a bachelor thesis at VŠE Prague (author: Vilém
-Charwot, submission May 2026). The platform collects sensor measurements of indoor
+Charwot, submitted May 2026). The platform collects sensor measurements of indoor
 environmental parameters (CO₂, temperature, humidity, particulate matter, VOCs,
 acoustics, light) and publishes them as open data.
 
@@ -31,11 +31,11 @@ The SPA exposes two distinct interfaces:
 - **React + Vite + TypeScript**, **React Router** (data router)
 - **Chakra UI v3** — the single design system (no other UI kit)
 - **MapLibre GL JS** for the tile map (configurable style/tile URL) + **d3** for value
-  indicators and time-series charts _(added in a later phase)_
+  indicators and time-series charts
 - **openapi-typescript** + **openapi-fetch** — typed clients generated per service from
-  the backend OpenAPI specs _(Phase 2)_
-- **TanStack Query** for server state / caching / pagination _(Phase 2)_
-- **react-i18next** for **cs + en**, preference persisted in `localStorage` _(Phase 3)_
+  the vendored backend OpenAPI specs
+- **TanStack Query** for server state / caching / pagination
+- **react-i18next** for **cs + en**, preference persisted in `localStorage`
 - **Vitest** + **React Testing Library** (unit/component); **Playwright** for E2E
   (incl. axe-core accessibility checks)
 
@@ -67,8 +67,12 @@ Copy `.env.example` to `.env` and adjust. Never commit `.env`.
 | `VITE_AUTH_API_BASE`      | Auth.Api — register / login / refresh / account              | `http://localhost:8080/auth`          |
 | `VITE_EVIDENCE_API_BASE`  | Evidence.Api — operator catalog, temporal edits, `asOf`      | `http://localhost:8080/evidence`      |
 | `VITE_PUBLIC_API_BASE`    | Public.Api — open-data read API (`/v1/*`) for the visitor     | `http://localhost:8080/public`        |
-| `VITE_MAP_STYLE_URL`      | MapLibre GL style JSON from a configurable tile provider      | `https://demotiles.maplibre.org/style.json` |
-| `VITE_MAP_ATTRIBUTION`    | Attribution string shown on the map                          | `© MapLibre`                          |
+| `VITE_INGESTION_API_BASE` | Ingestion.Api — links to its read-only Scalar reference      | `http://localhost:8080/ingestion`     |
+| `VITE_DOCS_BASE`          | Published mdBook wiki (how-to-send-data guide links)         | `https://wiki.ambiquality.org`        |
+| `VITE_RUM_ENDPOINT`       | Anonymous Core Web Vitals beacon (Public.Api `/telemetry/vitals`); empty disables RUM | *(empty — disabled)* |
+| `VITE_ENABLE_API_MOCKS`   | Serve the map's read endpoints from MSW mocks (`1`/`0`)      | `1` (dev only)                        |
+| `VITE_MAP_STYLE_URL`      | MapLibre GL style JSON from a configurable tile provider      | `https://tiles.openfreemap.org/styles/positron` |
+| `VITE_MAP_ATTRIBUTION`    | Attribution string shown on the map                          | OpenFreeMap / OpenMapTiles / OSM      |
 | `VITE_RUM_ENDPOINT`       | Anonymous Core Web Vitals beacon (Public.Api `/telemetry/vitals`); empty disables RUM | *(empty — disabled)* |
 
 In production, point the API bases at the real HTTPS origins (treat backend URIs as
@@ -88,19 +92,27 @@ Overview dashboard — see backend `docs/monitoring.md`).
 | `npm run lint`      | ESLint over the project                                       |
 | `npm run format`    | Format with Prettier                                          |
 | `npm run test`      | Run the Vitest suite                                          |
-| `npm run gen:api`   | Generate typed API clients from the OpenAPI specs (Phase 2 — currently a no-op stub) |
+| `npm run gen:api`   | Generate typed API clients from the vendored OpenAPI specs    |
+| `npm run gen:api:fetch` | Re-pull the backend specs, then regenerate the clients     |
 
-### OpenAPI codegen (Phase 2)
+### OpenAPI codegen
 
-Typed clients are generated per service from the backend's `/openapi/v1.json` specs into
-`src/api/`:
+Typed clients are generated per service from the vendored specs in `openapi/` into
+`src/api/<service>/schema.d.ts` (fully offline — the build never depends on a running
+backend):
 
 ```bash
 npm run gen:api
 ```
 
-This is currently a placeholder (`scripts/gen-api.mjs`); the real codegen — vendoring the
-three specs into `openapi/` and running `openapi-typescript` — lands in Phase 2.
+After a backend contract change, refresh the vendored specs from a live backend (base URLs
+from the env / `.env`) and regenerate:
+
+```bash
+npm run gen:api:fetch
+```
+
+The generated `schema.d.ts` modules and the thin `client.ts` wrappers are committed.
 
 ## Relationship to the backend
 

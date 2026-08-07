@@ -30,10 +30,10 @@ import { MapPage } from '@/features/public-map/MapPage';
 /**
  * React Router v7 data router.
  *
- * Public detail routes use the backend-issued GUID — the persistent identifier the
- * Public.Api catalog and its linked-data IRIs resolve — so visitor detail URLs are
- * stable and shareable. Operator routes live under `/operator/*` behind
- * `ProtectedRoute` — Phase 4 wires the real auth boundary and the account screens.
+ * Public detail routes use the backend-issued slug or GUID (`bld-…` / `rm-…` / `sns-…`) —
+ * the persistent identifier the Public.Api catalog and its linked-data IRIs resolve — so
+ * visitor detail URLs are stable and shareable. Operator routes live under `/operator/*`
+ * behind `ProtectedRoute` (real auth boundary + account screens).
  */
 export const router = createBrowserRouter([
   {

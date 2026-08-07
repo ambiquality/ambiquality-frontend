@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { publicClient } from './client';
 import {
   parseCatalog,
-  type ArchiveDistribution,
   type ParsedCatalog,
   type RawCatalog,
 } from './catalog-types';
@@ -57,18 +56,5 @@ export function useCatalog(): UseQueryResult<ParsedCatalog> {
     staleTime: CATALOG_STALE_MS,
     queryFn: fetchCatalog,
     select: (raw) => parseCatalog(raw, lang),
-  });
-}
-
-/** Thin selector over {@link useCatalog} for callers that only need the downloadable archives. */
-export function useArchives(): UseQueryResult<ArchiveDistribution[]> {
-  const { i18n } = useTranslation();
-  const lang = i18n.resolvedLanguage ?? i18n.language;
-
-  return useQuery({
-    queryKey: catalogQueryKeys.catalog(),
-    staleTime: CATALOG_STALE_MS,
-    queryFn: fetchCatalog,
-    select: (raw) => parseCatalog(raw, lang).archives,
   });
 }

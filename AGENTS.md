@@ -1,11 +1,12 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code when working with code in this repository.
+Agent guide for this repository (read by opencode and Claude Code). The human-facing docs —
+setup, scripts, env — live in [`README.md`](README.md).
 
 ## About
 
 Frontend for **Ambiquality** — an IEQ (Indoor Environmental Quality) monitoring platform
-built as a bachelor thesis at VŠE Prague (author: Vilém Charwot, submission May 2026). This
+built as a bachelor thesis at VŠE Prague (author: Vilém Charwot, submitted May 2026). This
 is the platform's **"Webová aplikace"**: a single-page application that lets the public
 explore indoor environmental measurements and lets operators register and maintain the
 catalog of monitored buildings, rooms and sensors.
@@ -13,9 +14,6 @@ catalog of monitored buildings, rooms and sensors.
 The backend (`../ambiquality-backend`) is **fully built** — independently deployable .NET
 services for auth, the evidence catalog, ingestion, and a public open-data API. This repo
 consumes those services; it owns no database.
-
-The root `README.md` is the human-facing doc (setup, scripts, env); this file is the agent
-guide.
 
 ## Two interfaces, two read sources
 
@@ -29,9 +27,8 @@ deliberate architectural decision — do not blur them:
 
 > **Two read sources rule.** Catalog reads exist on **both** Evidence.Api (owner-scoped,
 > `asOf`) and Public.Api (paginated, SSN/SOSA open-data shape). The operator path reads/writes
-> via Evidence.Api; the visitor path reads via Public.Api. Coordinates are now **precise on
-> both** (anonymization was dropped backend-side, 2026-06-08); keep their auth / `asOf`
-> semantics distinct.
+> via Evidence.Api; the visitor path reads via Public.Api. Coordinates are precise on **both**
+> (anonymization was dropped backend-side); keep their auth / `asOf` semantics distinct.
 
 ## Functional scope (from thesis)
 
@@ -45,18 +42,18 @@ deliberate architectural decision — do not blur them:
 
 F18 is the headline deliverable.
 
-## Tech stack (decided)
+## Tech stack
 
 - **React + Vite + TypeScript**, **React Router** (data router; `createBrowserRouter`)
 - **Chakra UI v3** — the single design system (the VZH requirement: one kit, no mixing)
-- **MapLibre GL JS** for the slippy/tile map (style URL is env-configurable — EXT) +
-  **d3** for value indicators and time-series charts _(added in Phases 6–7)_
+- **MapLibre GL JS** for the slippy/tile map (style URL is env-configurable) +
+  **d3** for value indicators and time-series charts
 - **openapi-typescript** (types) + **openapi-fetch** (runtime) — one typed client per
-  service, generated from each backend's `/openapi/v1.json` _(Phase 2)_
+  service, generated from the vendored backend specs via `npm run gen:api`
 - **TanStack Query** — server state, caching, the heterogeneous pagination, retries, the
-  UC18 "API unavailable" degradation path _(Phase 2)_
-- **react-i18next** — cs + en, preference persisted in `localStorage` _(Phase 3)_
-- **Vitest** + **React Testing Library**; **Playwright** for E2E (incl. axe-core) _(Phase 8)_
+  UC18 "API unavailable" degradation path
+- **react-i18next** — cs + en, preference persisted in `localStorage`
+- **Vitest** + **React Testing Library**; **Playwright** for E2E (incl. axe-core)
 
 ## Directory map
 
@@ -64,67 +61,73 @@ F18 is the headline deliverable.
 ambiquality-frontend/
   index.html, vite.config.ts, tsconfig*.json, eslint.config.js
   .env.example              VITE_AUTH_API_BASE / VITE_EVIDENCE_API_BASE /
-                            VITE_PUBLIC_API_BASE / VITE_MAP_STYLE_URL / VITE_MAP_ATTRIBUTION
-  scripts/gen-api.mjs       OpenAPI codegen entry (no-op stub until Phase 2)
-  openapi/                  vendored backend specs (Phase 2)
+                            VITE_PUBLIC_API_BASE / VITE_INGESTION_API_BASE /
+                            VITE_DOCS_BASE / VITE_RUM_ENDPOINT / VITE_ENABLE_API_MOCKS /
+                            VITE_MAP_STYLE_URL / VITE_MAP_ATTRIBUTION
+  scripts/gen-api.mjs       OpenAPI codegen: generates src/api/<svc>/schema.d.ts from the
+                            vendored openapi/*.json; `--fetch` re-pulls the specs from a live backend
+  openapi/                  vendored backend specs (auth, evidence, public)
   src/
-    main.tsx, App.tsx       app entry + RouterProvider
-    router.tsx              data router: public routes by slug; /admin behind ProtectedRoute
-    api/                    [Phase 2] generated clients (auth/, evidence/, public/) + fetch middleware
-    auth/                   AuthProvider, token store, useAuth, ProtectedRoute, silent refresh
-                            (Phase 1 = stub: useAuth always "not authenticated")
-    i18n/                   [Phase 3] react-i18next cs/en, glossary-driven
+    main.tsx, App.tsx       app entry + RouterProvider (optional MSW mock worker gate)
+    router.tsx              data router: visitor + informational + account routes; /operator behind ProtectedRoute
+    api/                    generated clients (auth/, evidence/, public/) + fetch middleware +
+                            pagination helpers + public feature hooks (hooks, map-hooks, catalog-hooks, entity-hooks)
+    auth/                   AuthProvider, token store (memory access + localStorage refresh),
+                            useAuth, ProtectedRoute, silent single-flight refresh
+    i18n/                   react-i18next cs/en, glossary-driven codelist labels, resources/
     theme/                  Chakra v3 system + a11y tokens + color-mode + UiProvider
-    components/             shared UI (RootLayout, ErrorPage; later Breadcrumb, FormField,
-                            ProblemError, UnitValue, LanguageSwitch)
+    components/             shared UI (RootLayout, Footer, ErrorPage, Breadcrumb, FormField,
+                            FormActions, InfoTip, LanguageSwitch, ProblemError, UnitValue)
     features/
-      public-map/           F18: MapLibre + d3 overlay, parameter filter, degradation banner
-      entity-detail/        building/room/sensor detail, breadcrumb, d3 time-series chart
-      catalog-browse/       F11–F14 list/search/filter/paginate
+      public-map/           F18: MapLibre + d3 overlay, parameter filter, degradation banner,
+                            marker-table fallback, charts/ (TimeSeriesChart, BoxPlot)
+      entity-detail/        visitor building/room/sensor detail (Public.Api slugs)
+      catalogue/            F11–F14 open-data catalog frontend (`/catalog`)
+      catalog-browse/       evidence browsing list/search/filter/paginate (`/browse`)
       archive/              F17 DCAT distributions + download links
       account/              F01–F04 register/login/logout/credentials
-      evidence-admin/       F05–F09 forms + temporal-change + lifecycle + one-time API key
-    units/                  [Phase 8] QUDT display-unit preference + conversion (display-only)
-    lib/                    env access, query client, problem-details parsing, formatting
+      evidence-admin/       F05–F09 forms + temporal-change + lifecycle + one-time API key;
+                            components/ (AsOfViewer, AttributeEditForm, CollectionEditor, …),
+                            ruian/ (RÚIAN address autocomplete)
+      about/, legal/        informational pages
+    units/                  QUDT display-unit preference + conversion (display-only)
+    lib/                    env access, query client, vitals (RUM), constants
+    mocks/                  MSW handlers/data for the map endpoints (dev only)
     test/                   Vitest setup + render helpers
-  e2e/                      [Phase 8] Playwright + axe-core
+  e2e/                      Playwright + axe-core
 ```
 
 The `@/*` import alias maps to `src/*` (see `tsconfig.app.json` + `vite.config.ts`).
 
-## Implementation phases
+## Project status
 
-1. Scaffold & repo setup (Vite+React+TS, Chakra v3 provider/theme, router shell,
-   ESLint/Prettier, `.env.example`, README/CLAUDE) — **done**
-2. API integration layer (vendor specs, codegen, fetch middleware, TanStack Query)
-3. Cross-cutting UI (i18n, language switch, a11y tokens, Breadcrumb/FormField/ProblemError/UnitValue)
-4. Auth & account (F01–F04)
-5. Evidence admin (F05–F09)
-6. Public catalog & archive (F11–F17)
-7. Public map (F18 / UC18)
-8. PER (display units), WCAG AA pass, responsive 360 px→desktop, E2E
+All implementation phases are **complete** (scaffold → API layer → UI → auth → evidence
+admin → catalog/archive → map → PER/WCAG/E2E). Treat the app as finished: changes should
+extend or fix, not scaffold.
 
 ## Key gotchas
 
-When implementing later phases, these are the easy things to get wrong:
+These are the easy things to get wrong:
 
 - **Per-attribute temporal `PUT` with `validFrom`.** Evidence edits are **not** a single
   "save object" form. Each building/room/sensor attribute is changed via its own `PUT`
   carrying a `validFrom`; the server closes the open history row and opens a new one
-  (`204`). Reads accept `asOf` to project past state. Build an attribute-by-attribute edit
-  model + an `asOf` history viewer. Respect `409 overlapping-validity-range` and surface it
-  clearly. Collections (pollution sources, measured parameters) change via `POST`/`DELETE`.
+  (`204`). Reads accept `asOf` to project past state. Respect `409 overlapping-validity-range`
+  and surface it clearly. Collections (pollution sources, measured parameters) change via
+  `POST`/`DELETE`.
 - **Keyset vs offset pagination (heterogeneous).** `/v1/observations` uses **keyset/cursor**
   pagination (follow the opaque `next` link/cursor); catalog lists (`/v1/buildings`, etc.)
   use **offset** `page`/`pageSize`. The query layer must support both patterns; don't assume
   one. Default page 50, max 200.
 - **Two read sources.** (See the table above.) Never read operator data from Public.Api or
-  visitor data from Evidence.Api.
+  visitor data from Evidence.Api. The one exception: shared controlled vocabularies
+  (codelists) come from Public.Api's `/v1/codelists` even on the operator side.
 - **RFC 9457 ProblemDetails everywhere.** All three services return ProblemDetails with
   stable `type` URNs (e.g. `urn:ambiquality:auth:*`, evidence's `unknown-codelist-code` /
-  `domain-rule-violation`). One shared parser maps `type` → localized, field-aware messages.
-  Auth uses **generic** error codes on purpose (anti-enumeration) — don't leak specifics.
-  `/login` is rate-limited: handle **429 + Retry-After**.
+  `domain-rule-violation`). The middleware throws `ProblemError` on non-2xx; one component
+  maps `type` → localized, field-aware messages. Auth uses **generic** error codes on
+  purpose (anti-enumeration) — don't leak specifics. `/login` is rate-limited: handle
+  **429 + Retry-After**.
 - **Token model: in-memory access token + localStorage refresh, single-flight refresh.**
   Access token (15 min) lives in **memory** (React context); refresh token (30 days) in
   `localStorage`. On 401/expiry, refresh silently. Multiple concurrent 401s must trigger
@@ -132,26 +135,30 @@ When implementing later phases, these are the easy things to get wrong:
   logout. Because the refresh token is in `localStorage`, keep the app XSS-clean — rely on
   React/Chakra escaping, never use `dangerouslySetInnerHTML`.
 - **Coordinates are precise everywhere.** Anonymization/coordinate masking was removed
-  backend-side (2026-06-08); Public.Api returns exact lat/lon to everyone. Render coordinates
-  as-is — there is no longer a coordinate-precision (`anonymizationLevel`) field on buildings.
+  backend-side; Public.Api returns exact lat/lon to everyone. Render coordinates as-is —
+  there is no coordinate-precision (`anonymizationLevel`) field on buildings.
 - **Czech OFN Adresy address model (RÚIAN-anchored).** A building address is NOT flat
   street/city/postcode/country. It is the structured Czech OFN model: `addressPointCode` (RÚIAN
   kód adresního místa, required > 0), `streetName?`, `houseNumber` + `houseNumberType`
   (`č.p.`/`č.ev.`), `orientationNumber?` (+ `orientationNumberLetter?`), `municipalityName`,
-  `municipalityPartName?`, `psc` (5 digits), `districtName?`, `regionName?` (Country dropped —
-  platform is CZ-only). Each territorial element (ulice, obec, část obce, okres, kraj/VÚSC) also
-  has an **optional RÚIAN `*Code`** (`streetCode?`, `municipalityCode?`, `municipalityPartCode?`,
-  `districtCode?`, `regionCode?`, all positive-when-present) that backs a dereferenceable
-  `linked.cuzk.cz` IRI in the JSON-LD — the forms collect these alongside their name fields.
-  There is **no live RÚIAN lookup** — the registration/edit forms collect the fields directly
-  (CUZK autocomplete is a future enhancement). Evidence.Api returns the fields flat; compose
-  display text in the frontend (`evidence-admin/address.ts`).
+  `municipalityPartName?`, `psc` (5 digits), `districtName?`, `regionName?`. Country is a
+  **scope gate, not a stored field** — the platform is CZ-only and the registration form's
+  country picker hard-blocks anything but CZ. Each territorial element has an optional RÚIAN
+  `*Code` (`streetCode?`, `municipalityCode?`, `municipalityPartCode?`, `districtCode?`,
+  `regionCode?`, all positive-when-present) that backs a dereferenceable `linked.cuzk.cz`
+  IRI in the JSON-LD. Evidence.Api returns the fields flat; compose display text in the
+  frontend (`evidence-admin/address.ts`).
+- **RÚIAN autocomplete is live.** `evidence-admin/ruian/useAddressLookup.ts` calls
+  Evidence.Api's operator-only `address-lookup` endpoints (suggest ≥ 2 chars, resolve on
+  pick) which proxy ČÚZK's RÚIAN geocoder; `AddressAutocomplete` fills the ~18 OFN fields.
+  The backend stays authoritative and re-validates on submit. Backend geocoder outages
+  surface as a degradation path, not a form blocker.
 - **API key shown once (F08).** Sensor-registration returns `apiKey` (`amq_sk_…`) once and it
   is unrecoverable. Present it prominently with copy + "store it now" warning; never refetch
   or display it afterward.
 - **UC18 degradation.** When Public.Api is down/errors, render the map **without** indicators
-  plus an informative banner — bake this into the map feature's loading/error states. Provide
-  an accessible list/table fallback for the map (WCAG keyboard operability).
+  plus an informative banner — baked into the map feature's loading/error states. An
+  accessible list/table fallback covers the map (WCAG keyboard operability).
 - **i18n + canonical terminology (KON).** Use the thesis glossary's single canonical term per
   concept (budova/building, místnost/room, senzor/sensor, pozorování/observation, subjekt
   zájmu/feature of interest, veličina/quantity, jednotka/unit) — no synonyms. Codelist labels
@@ -161,16 +168,17 @@ When implementing later phases, these are the easy things to get wrong:
   canonical values; the API and archives stay canonical.
 - **Env-driven base URLs / HTTPS.** API bases come from `VITE_*` env (dev = Caddy on
   `localhost:8080`; prod = real HTTPS origins). Read them via `src/lib/env.ts`, not
-  `import.meta.env` directly. Public endpoints are CORS-open.
+  `import.meta.env` directly. Public endpoints are CORS-open. MSW mocks gate on
+  `VITE_ENABLE_API_MOCKS` (dev-only).
 
 ## Core Web Vitals / RUM
 
-`src/lib/vitals.ts` reports anonymized Core Web Vitals (LCP / INP / TTFB / CLS — note
-web-vitals v6 dropped FID, INP is its successor) and page views to the backend's Public.Api
-`POST /telemetry/vitals` endpoint on `pagehide` via `sendBeacon` with a `text/plain` blob
-(CORS-safelisted, no preflight). It is enabled only when `VITE_RUM_ENDPOINT` is set
-(empty in dev; baked by the release workflow as `…/public/telemetry/vitals`) and feeds the
-backend's Grafana "Overview" bar gauges. Keep `deriveRouteBucket`'s buckets in sync with
+`src/lib/vitals.ts` reports anonymized Core Web Vitals (LCP / INP / TTFB / CLS — web-vitals
+v6 dropped FID, INP is its successor) and page views to the backend's Public.Api
+`POST /telemetry/vitals` on `pagehide` via `sendBeacon` with a `text/plain` blob
+(CORS-safelisted, no preflight). It is enabled only when `VITE_RUM_ENDPOINT` is set (empty
+in dev; baked by the release workflow as `…/public/telemetry/vitals`) and feeds the backend's
+Grafana "Overview" bar gauges. Keep `deriveRouteBucket`'s buckets in sync with
 `src/router.tsx` top-level segments and with the backend's `SanitizeRouteBucket`.
 
 ## Conventions
@@ -180,9 +188,23 @@ backend's Grafana "Overview" bar gauges. Keep `deriveRouteBucket`'s buckets in s
   `<ChakraProvider value={system}>` (see `src/theme/`). Color mode is delegated to
   `next-themes`.
 - Public detail routes use backend-issued **slugs** (`bld-…` / `rm-…` / `sns-…`) so URLs are
-  stable/shareable.
-- Verification gates: `npm run typecheck`, `npm run lint`, `npm run test`, `npm run build`
-  must all pass before considering work done.
+  stable/shareable. Operator routes use server UUIDs under `/operator/*`.
+- Generated clients in `src/api/*/client.ts` are committed; regenerate with `npm run gen:api`
+  after a backend contract change (use `gen:api:fetch` to refresh the vendored specs first).
+
+## Verification gates
+
+```bash
+npm run typecheck   # tsc -b
+npm run lint        # ESLint (no errors)
+npm run test        # Vitest suite
+npm run build       # tsc -b && vite build
+npm run e2e         # Playwright (incl. axe-core)
+```
+
+All four main gates must pass before considering work done. Note: the Vitest suite is
+**flakey under full parallel runs** (page tests using MSW can exceed the 5 s default
+timeout); re-run failed files individually — they pass in isolation.
 
 ## Git rules
 
