@@ -52,3 +52,5 @@ coverage
 .tldrignore
 skills-lock.json
 thoughts/
+# Added by code-review-graph
+.code-review-graph/
