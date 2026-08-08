@@ -73,7 +73,6 @@ Copy `.env.example` to `.env` and adjust. Never commit `.env`.
 | `VITE_ENABLE_API_MOCKS`   | Serve the map's read endpoints from MSW mocks (`1`/`0`)      | `1` (dev only)                        |
 | `VITE_MAP_STYLE_URL`      | MapLibre GL style JSON from a configurable tile provider      | `https://tiles.openfreemap.org/styles/positron` |
 | `VITE_MAP_ATTRIBUTION`    | Attribution string shown on the map                          | OpenFreeMap / OpenMapTiles / OSM      |
-| `VITE_RUM_ENDPOINT`       | Anonymous Core Web Vitals beacon (Public.Api `/telemetry/vitals`); empty disables RUM | *(empty — disabled)* |
 
 In production, point the API bases at the real HTTPS origins (treat backend URIs as
 permanent) and supply your own map provider/key. The release workflow bakes

@@ -82,5 +82,5 @@ ensure both patterns are expressible now.
 The shared client + provider live in `@/lib/query-client.ts` and `@/lib/query-provider.tsx`
 (mounted in `main.tsx` alongside Chakra's `UiProvider`). Defaults: `staleTime` 30s, no
 `refetchOnWindowFocus`, retry up to 2× with backoff but **never retry 4xx** `ProblemError`s.
-Devtools are dev-only and tree-shaken from production. Example hooks: `usePublicBuildings`,
-`usePublicProperties` in `public/hooks.ts`.
+Devtools are dev-only and tree-shaken from production. Example hook: `usePublicProperties`
+in `public/hooks.ts`.

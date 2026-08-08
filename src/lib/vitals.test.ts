@@ -24,6 +24,7 @@ describe('deriveRouteBucket', () => {
     expect(deriveRouteBucket('/login')).toBe('account');
     expect(deriveRouteBucket('/register')).toBe('account');
     expect(deriveRouteBucket('/confirm-email')).toBe('account');
+    expect(deriveRouteBucket('/confirm-email-change')).toBe('account');
     expect(deriveRouteBucket('/operator')).toBe('admin');
     expect(deriveRouteBucket('/operator/buildings/abc123/edit')).toBe('admin');
   });

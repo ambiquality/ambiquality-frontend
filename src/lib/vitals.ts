@@ -40,6 +40,7 @@ export function deriveRouteBucket(pathname: string): RouteBucket {
     case 'login':
     case 'register':
     case 'confirm-email':
+    case 'confirm-email-change':
       return 'account';
     case 'operator':
       return 'admin';
@@ -52,8 +53,8 @@ export function initVitals(): void {
   const endpoint = env.rumEndpoint;
   if (!endpoint) return;
 
-  const bucket = deriveRouteBucket(window.location.pathname);
   const report: Record<string, number> = {};
+  let sent = false;
 
   const clampMs = (value: number) => Math.min(Math.max(0, value), 300_000);
 
@@ -67,10 +68,19 @@ export function initVitals(): void {
     report.ttfb = clampMs(metric.value);
   });
   onCLS((metric) => {
+    // Raw CLS, clamped below at 0 only. The backend is authoritative and drops values > 1.0
+    // (see RumVitalsEndpoint.MaxCls) — the asymmetry is intentional.
     report.cls = metric.value < 0 ? 0 : metric.value;
   });
 
   const flush = () => {
+    // visibilitychange(hidden) and pagehide both fire on tab close / bfcache navigation;
+    // only the first flush may send, otherwise the same payload is double-counted.
+    if (sent) return;
+    sent = true;
+    // Recompute at flush time: in this SPA the user may have navigated client-side since
+    // load, so report the route they ended on rather than the landing route.
+    const bucket = deriveRouteBucket(window.location.pathname);
     const payload = JSON.stringify({ routeBucket: bucket, ...report });
     if (typeof navigator.sendBeacon === 'function' && navigator.sendBeacon(endpoint, new Blob([payload], { type: 'text/plain' }))) {
       return;
