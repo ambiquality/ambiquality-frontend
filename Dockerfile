@@ -26,6 +26,9 @@ ARG VITE_DOCS_BASE=https://wiki.ambiquality.org
 ARG VITE_ENABLE_API_MOCKS=0
 ARG VITE_MAP_STYLE_URL=https://tiles.openfreemap.org/styles/positron
 ARG VITE_MAP_ATTRIBUTION
+# Anonymous Core Web Vitals beacon endpoint (Public.Api /telemetry/vitals). Empty =
+# RUM disabled in the bundle.
+ARG VITE_RUM_ENDPOINT=
 
 # Vite loads .env.production in `vite build` (production mode) and it wins over any
 # baked-in defaults. Writing the args here is more reliable than relying on
@@ -39,6 +42,7 @@ RUN printf '%s\n' \
       "VITE_ENABLE_API_MOCKS=${VITE_ENABLE_API_MOCKS}" \
       "VITE_MAP_STYLE_URL=${VITE_MAP_STYLE_URL}" \
       "VITE_MAP_ATTRIBUTION=${VITE_MAP_ATTRIBUTION}" \
+      "VITE_RUM_ENDPOINT=${VITE_RUM_ENDPOINT}" \
       > .env.production \
  && npm run build
 

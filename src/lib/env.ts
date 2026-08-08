@@ -55,4 +55,10 @@ export const env = {
    * "how to send measurements" guide. Defaults to the production custom domain.
    */
   docsBase: optionalUrl('VITE_DOCS_BASE', 'https://wiki.ambiquality.org'),
+  /**
+   * Anonymous Core Web Vitals beacon endpoint (Public.Api's POST /telemetry/vitals,
+   * e.g. https://api.ambiquality.org/public/telemetry/vitals). When empty the RUM
+   * reporter is disabled entirely (dev/mocks).
+   */
+  rumEndpoint: optionalUrl('VITE_RUM_ENDPOINT', ''),
 } as const;
