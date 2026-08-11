@@ -30,8 +30,10 @@ test.describe('scroll restoration', () => {
   });
 
   test('the skip-to-content link still jumps to the main content', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.getByRole('table')).toBeVisible();
+    // Use the static /about page: the skip-link behaviour is route-independent, and /about needs
+    // no backend/mock data, so this test never couples to the map mock snapshot (issue #30).
+    await page.goto('/about');
+    await expect(page.getByRole('heading', { name: /about ambiquality/i })).toBeVisible();
 
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', { name: /skip/i })).toBeFocused();
