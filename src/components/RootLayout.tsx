@@ -8,7 +8,12 @@ import {
   Link as ChakraLink,
   Spacer,
 } from '@chakra-ui/react';
-import { Link as RouterLink, Outlet, useNavigate } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  Outlet,
+  ScrollRestoration,
+  useNavigate,
+} from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { Footer } from '@/components/Footer';
@@ -25,6 +30,10 @@ export function RootLayout() {
   const { t } = useTranslation('common');
   return (
     <Flex direction="column" minH="100dvh">
+      {/* React Router scroll restoration: scrolls to top on route change (PUSH/REPLACE) and
+          restores the previous position on back/forward (POP). In-page anchors (#...) and the
+          skip-to-content link are unaffected — the browser handles same-page fragment jumps. */}
+      <ScrollRestoration />
       <ChakraLink
         href="#main-content"
         position="absolute"
