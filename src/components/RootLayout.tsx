@@ -1,3 +1,4 @@
+import { type ReactNode } from 'react';
 import {
   Box,
   Button,
@@ -10,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import {
   Link as RouterLink,
+  NavLink,
   Outlet,
   ScrollRestoration,
   useNavigate,
@@ -69,24 +71,14 @@ export function RootLayout() {
                 wrap="wrap"
                 aria-label={t('nav.primary')}
               >
-                <ChakraLink asChild>
-                  <RouterLink to="/">{t('nav.map')}</RouterLink>
-                </ChakraLink>
-                <ChakraLink asChild>
-                  <RouterLink to="/browse">{t('nav.browse')}</RouterLink>
-                </ChakraLink>
-                <ChakraLink asChild>
-                  <RouterLink to="/catalog">{t('nav.catalog')}</RouterLink>
-                </ChakraLink>
-                <ChakraLink asChild>
-                  <RouterLink to="/archive">{t('nav.archive')}</RouterLink>
-                </ChakraLink>
-                <ChakraLink asChild>
-                  <RouterLink to="/operator">{t('nav.operator')}</RouterLink>
-                </ChakraLink>
-                <ChakraLink asChild>
-                  <RouterLink to="/about">{t('nav.about')}</RouterLink>
-                </ChakraLink>
+                <PrimaryNavLink to="/" end>
+                  {t('nav.map')}
+                </PrimaryNavLink>
+                <PrimaryNavLink to="/browse">{t('nav.browse')}</PrimaryNavLink>
+                <PrimaryNavLink to="/catalog">{t('nav.catalog')}</PrimaryNavLink>
+                <PrimaryNavLink to="/archive">{t('nav.archive')}</PrimaryNavLink>
+                <PrimaryNavLink to="/operator">{t('nav.operator')}</PrimaryNavLink>
+                <PrimaryNavLink to="/about">{t('nav.about')}</PrimaryNavLink>
               </HStack>
             </HStack>
             <Spacer />
@@ -106,6 +98,32 @@ export function RootLayout() {
 
       <Footer />
     </Flex>
+  );
+}
+
+/**
+ * Primary-nav link with an active/current-page state (issue #27). Wraps React Router's
+ * `NavLink`, which sets `aria-current="page"` on the active item; Chakra's `_currentPage`
+ * pseudo-style (compiled to `&[aria-current="page"]`) supplies the visual emphasis. The brand
+ * underline uses an always-present transparent border that fills on the active item, so the
+ * text baseline never shifts between active/inactive.
+ */
+function PrimaryNavLink({ to, end, children }: { to: string; end?: boolean; children: ReactNode }) {
+  return (
+    <ChakraLink
+      asChild
+      borderBottom="2px solid"
+      borderColor="transparent"
+      _currentPage={{
+        color: 'brand.fg',
+        fontWeight: 'semibold',
+        borderColor: 'brand.fg',
+      }}
+    >
+      <NavLink to={to} end={end}>
+        {children}
+      </NavLink>
+    </ChakraLink>
   );
 }
 
