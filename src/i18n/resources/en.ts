@@ -169,7 +169,7 @@ export const en = {
       invalid: 'This value is not valid.',
       range: 'Enter a number between {{min}} and {{max}}.',
       email: 'Enter a valid email address.',
-      passwordTooShort: 'Use at least 8 characters.',
+      passwordTooShort: 'Use at least 12 characters.',
       positive: 'Enter a positive number.',
     },
   },
@@ -486,6 +486,8 @@ export const en = {
     fieldErrorsLabel: 'Please correct the following:',
     'urn:ambiquality:auth:invalid-credentials': 'Email or password is incorrect.',
     'urn:ambiquality:auth:invalid-email': 'Please enter a valid email address.',
+    'urn:ambiquality:auth:weak-password':
+      'Password is too short. Use at least 12 characters.',
     'urn:ambiquality:auth:email-already-registered':
       'If this email can be registered, a confirmation link has been sent.',
     'urn:ambiquality:auth:email-not-confirmed': 'Please confirm your email address first.',
