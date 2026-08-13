@@ -51,9 +51,10 @@ cacheable). Do not blur their auth/coords/`asOf` semantics.
   and are replayed with the new token. On refresh failure → `TokenStore.onAuthFailure()`
   (hard logout). A retry marker header prevents refresh loops.
 - **Token-store seam** (`middleware/token-store.ts`) — the `TokenStore` interface
-  (`getAccessToken` / `getRefreshToken` / `refresh` / `onAuthFailure`) is the **Phase 4** plug
+  (`getAccessToken` / `refresh` / `onAuthFailure`) is the **Phase 4** plug
   point. A default `InMemoryTokenStore` is active until the AuthProvider installs a real one via
-  `setTokenStore()`. Access token lives in memory; refresh token in localStorage (XSS-safe model).
+  `setTokenStore()`. Access token lives in memory; the refresh token is an HttpOnly cookie set by
+  the Auth API (never readable by page JavaScript — WSTG-SESS-04).
 - **RFC 9457 ProblemDetails** (`middleware/problem-details.ts`, pitfall #9) — one shared parser
   maps the stable `urn:ambiquality:*` `type`, `status`/`title`/`detail`, and validation `errors`
   into a typed `ProblemError` (with `Retry-After` for 429s). `problemDetailsMiddleware` throws it

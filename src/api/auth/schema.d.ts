@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Register a new user account
-         * @description Creates a new user with the provided email and password. A confirmation email is sent; the account cannot be used until the email is confirmed via GET /confirm-email.
+         * @description Creates a new user with the provided email and password. A confirmation email is sent; the account cannot be used until the email is confirmed via GET /confirm-email. Returns 201 uniformly - registering an already-existing address is a silent no-op (no second email) so the endpoint cannot be used to enumerate accounts.
          */
         post: operations["RegisterUser"];
         delete?: never;
@@ -35,7 +35,7 @@ export interface paths {
         put?: never;
         /**
          * Log in and obtain JWT tokens
-         * @description Validates the credentials and returns a short-lived access token plus a long-lived refresh token. The account email must be confirmed before login succeeds.
+         * @description Validates the credentials and returns a short-lived access token. The long-lived refresh token is set as an HttpOnly cookie. The account email must be confirmed before login succeeds.
          */
         post: operations["Login"];
         delete?: never;
@@ -54,8 +54,8 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Exchange a refresh token for a new token pair
-         * @description Issues a new access token and refresh token in exchange for a valid, non-expired refresh token. The old refresh token is invalidated on success.
+         * Exchange the refresh-token cookie for a new token pair
+         * @description Issues a new access token and refresh token in exchange for the HttpOnly refresh cookie. The old refresh token is invalidated on success (rotation).
          */
         post: operations["RefreshToken"];
         delete?: never;
@@ -135,7 +135,7 @@ export interface paths {
         put?: never;
         /**
          * Change the authenticated user's password
-         * @description Verifies the current password then replaces it with the new password. All existing refresh tokens remain valid after the change.
+         * @description Verifies the current password then replaces it with the new password. All existing refresh tokens are revoked, so other sessions must re-authenticate; the current access token stays valid until it expires.
          */
         post: operations["ChangePassword"];
         delete?: never;
@@ -232,9 +232,6 @@ export interface components {
             accessToken: string;
             /** Format: date-time */
             accessTokenExpiresAt: string;
-            refreshToken: string;
-            /** Format: date-time */
-            refreshTokenExpiresAt: string;
         };
         ChangeEmailRequest: {
             currentPassword: string;
@@ -264,9 +261,6 @@ export interface components {
             status?: null | number | string;
             detail?: null | string;
             instance?: null | string;
-        };
-        RefreshRequest: {
-            refreshToken: string;
         };
         RegisterRequest: {
             email: string;
@@ -313,8 +307,8 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Conflict */
-            409: {
+            /** @description Too Many Requests */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -373,11 +367,7 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description OK */
             200: {
@@ -450,6 +440,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
         };
     };
