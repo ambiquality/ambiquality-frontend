@@ -70,6 +70,15 @@ export function RegisterPage() {
       setRegistered(true);
       return;
     }
+    if (outcome.reason === 'rate-limited') {
+      // Email-triggering rate limit on /register — tell the user when to retry.
+      setGenericError(
+        outcome.retryAfterSeconds != null
+          ? t('register.rateLimited', { seconds: String(outcome.retryAfterSeconds) })
+          : t('register.rateLimitedNoTime'),
+      );
+      return;
+    }
     if (outcome.reason === 'conflict') {
       // Generic, anti-enumeration: do not reveal that the email already exists.
       setGenericError(t('register.conflict'));

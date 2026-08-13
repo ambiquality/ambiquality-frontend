@@ -205,6 +205,8 @@ export const en = {
       loginLink: 'Sign in',
       passwordMismatch: 'The passwords do not match.',
       conflict: 'If this email can be registered, a confirmation link has been sent.',
+      rateLimited: 'Too many requests. Please try again in {{seconds}} s.',
+      rateLimitedNoTime: 'Too many requests. Please try again shortly.',
       successTitle: 'Check your email',
       successBody:
         'We sent a confirmation link to {{email}}. Open it to activate your account, then sign in.',

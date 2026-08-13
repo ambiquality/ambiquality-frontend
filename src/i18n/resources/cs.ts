@@ -203,6 +203,8 @@ export const cs: Resources = {
       loginLink: 'Přihlásit se',
       passwordMismatch: 'Hesla se neshodují.',
       conflict: 'Pokud lze tento e-mail registrovat, byl odeslán potvrzovací odkaz.',
+      rateLimited: 'Příliš mnoho požadavků. Zkuste to prosím za {{seconds}} s.',
+      rateLimitedNoTime: 'Příliš mnoho požadavků. Zkuste to prosím za chvíli.',
       successTitle: 'Zkontrolujte e-mail',
       successBody:
         'Na adresu {{email}} jsme odeslali potvrzovací odkaz. Otevřete jej pro aktivaci účtu a poté se přihlaste.',
