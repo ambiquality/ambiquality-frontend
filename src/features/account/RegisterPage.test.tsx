@@ -95,4 +95,15 @@ describe('RegisterPage', () => {
     // Anti-enumeration: the message must NOT state the email is already registered/in use.
     expect(screen.queryByText(/already registered|already in use|email exists/i)).toBeNull();
   });
+
+  it('shows the rate-limit message on a 429 (email-triggering rate limit)', async () => {
+    const user = userEvent.setup();
+    register.mockResolvedValue({ ok: false, reason: 'rate-limited', retryAfterSeconds: 42 });
+    renderWithProviders(<RegisterPage />, { withRouter: true });
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: 'Create account' }));
+
+    expect(await screen.findByText(/try again in 42 s/i)).toBeInTheDocument();
+  });
 });

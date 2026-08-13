@@ -25,6 +25,8 @@ export type RegisterOutcome =
   | { ok: true }
   | { ok: false; reason: 'conflict'; error: unknown }
   | { ok: false; reason: 'validation'; error: unknown }
+  /** Rate-limited (`429`, e.g. email-triggering endpoints); `retryAfterSeconds` when present. */
+  | { ok: false; reason: 'rate-limited'; retryAfterSeconds: number | null }
   | { ok: false; reason: 'error'; error: unknown };
 
 export interface AuthContextValue {

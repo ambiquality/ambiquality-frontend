@@ -212,6 +212,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
         return { ok: true };
       } catch (error) {
         if (error instanceof ProblemError) {
+          // 429 email-triggering rate limit: surface Retry-After so the screen can explain.
+          if (error.httpStatus === 429) {
+            return {
+              ok: false,
+              reason: 'rate-limited',
+              retryAfterSeconds: error.retryAfterSeconds,
+            };
+          }
           // 409 email-exists is reported generically by the screen (anti-enumeration).
           if (error.httpStatus === 409) return { ok: false, reason: 'conflict', error };
           if (error.httpStatus === 400) return { ok: false, reason: 'validation', error };
