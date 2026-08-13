@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { authHeaderMiddleware, refreshMiddleware, __resetRefreshStateForTests } from './auth';
 import { setTokenStore, InMemoryTokenStore, type TokenStore } from './token-store';
+import { ProblemError } from './problem-details';
 
 // openapi-fetch middleware callbacks receive more context than we use; build the minimal
 // slice the middleware actually reads. `options`/`schemaPath`/`params`/`id` are required by
@@ -65,7 +66,6 @@ describe('refreshMiddleware single-flight (pitfall #8)', () => {
     let refreshCalls = 0;
     const store: TokenStore = {
       getAccessToken: () => 'stale',
-      getRefreshToken: () => 'refresh-token',
       refresh: vi.fn(async () => {
         refreshCalls += 1;
         // simulate latency so all three 401s overlap on the same in-flight promise
@@ -111,7 +111,6 @@ describe('refreshMiddleware single-flight (pitfall #8)', () => {
     const onAuthFailure = vi.fn();
     const store: TokenStore = {
       getAccessToken: () => 'stale',
-      getRefreshToken: () => 'refresh-token',
       refresh: vi.fn(async () => {
         throw new Error('refresh token expired');
       }),
@@ -127,21 +126,33 @@ describe('refreshMiddleware single-flight (pitfall #8)', () => {
     expect(out).toBe(original);
   });
 
-  it('hard-logs-out immediately when there is no refresh token', async () => {
+  it('attempts refresh even though no token is readable (HttpOnly refresh cookie)', async () => {
+    // JS cannot inspect the HttpOnly cookie, so a 401 always triggers a refresh attempt;
+    // if there is no cookie the refresh itself 401s and we hard-logout.
+    const refresh = vi.fn(async () => {
+      throw new ProblemError(
+        {
+          type: 'urn:ambiquality:auth:invalid-refresh-token',
+          title: null,
+          status: 401,
+          detail: null,
+          instance: null,
+          errors: {},
+          extensions: {},
+        },
+        401,
+        null,
+      );
+    });
     const onAuthFailure = vi.fn();
-    const store: TokenStore = {
-      getAccessToken: () => null,
-      getRefreshToken: () => null,
-      refresh: vi.fn(),
-      onAuthFailure,
-    };
+    const store: TokenStore = { getAccessToken: () => null, refresh, onAuthFailure };
     setTokenStore(store);
 
     const original = new Response('{}', { status: 401 });
     const out = await refreshMiddleware.onResponse!(
       onResponseCtx(new Request('https://api.test/v1/x'), original),
     );
-    expect(store.refresh).not.toHaveBeenCalled();
+    expect(refresh).toHaveBeenCalledOnce();
     expect(onAuthFailure).toHaveBeenCalledOnce();
     expect(out).toBe(original);
   });
@@ -149,7 +160,6 @@ describe('refreshMiddleware single-flight (pitfall #8)', () => {
   it('does not refresh again for an already-retried request (no loop)', async () => {
     const store: TokenStore = {
       getAccessToken: () => 'x',
-      getRefreshToken: () => 'r',
       refresh: vi.fn(),
       onAuthFailure: vi.fn(),
     };

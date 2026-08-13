@@ -3,7 +3,6 @@ import { screen, waitFor, act } from '@testing-library/react';
 import { renderWithProviders } from '@/test/render';
 import { ProblemError } from '@/api/middleware/problem-details';
 import { getTokenStore, InMemoryTokenStore, setTokenStore } from '@/api/middleware/token-store';
-import { REFRESH_TOKEN_STORAGE_KEY } from './storage';
 import { useAuth } from './useAuth';
 
 // --- Mock the typed auth client so no real network happens. ---
@@ -18,11 +17,10 @@ vi.mock('@/api/auth/client', () => ({
   },
 }));
 
+// The refresh token is an HttpOnly cookie; the body only ever carries the access token.
 const AUTH_RESPONSE = {
   accessToken: 'access-1',
   accessTokenExpiresAt: new Date(Date.now() + 15 * 60_000).toISOString(),
-  refreshToken: 'refresh-1',
-  refreshTokenExpiresAt: new Date(Date.now() + 30 * 86_400_000).toISOString(),
 };
 const ME = { id: 'user-1', email: 'a@b.cz', emailConfirmed: true };
 
@@ -61,16 +59,18 @@ afterEach(() => {
 });
 
 describe('AuthProvider', () => {
-  it('logs in, becomes authenticated, then logs out and clears storage', async () => {
+  it('logs in, becomes authenticated, then logs out and never persists the refresh token', async () => {
     post.mockImplementation((path: string) => {
       if (path === '/v1/login') return Promise.resolve({ data: AUTH_RESPONSE });
       if (path === '/v1/account/logout') return Promise.resolve({ data: undefined });
+      // Boot-time silent refresh with no cookie → anonymous.
       return Promise.resolve({ data: undefined });
     });
     get.mockResolvedValue({ data: ME });
 
     renderWithProviders(<Probe />, { withAuth: true });
 
+    await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
     expect(screen.getByTestId('auth').textContent).toBe('false');
 
     await act(async () => {
@@ -79,8 +79,8 @@ describe('AuthProvider', () => {
 
     await waitFor(() => expect(screen.getByTestId('auth').textContent).toBe('true'));
     expect(screen.getByTestId('email').textContent).toBe('a@b.cz');
-    // Refresh token persisted to localStorage; access token is NOT.
-    expect(localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY)).toContain('refresh-1');
+    // The refresh token is an HttpOnly cookie — nothing sensitive lands in localStorage.
+    expect(localStorage.getItem('amq.auth.refresh')).toBeNull();
     // The installed TokenStore exposes the in-memory access token to the middleware.
     expect(getTokenStore().getAccessToken()).toBe('access-1');
 
@@ -89,7 +89,6 @@ describe('AuthProvider', () => {
     });
 
     await waitFor(() => expect(screen.getByTestId('auth').textContent).toBe('false'));
-    expect(localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY)).toBeNull();
     expect(getTokenStore().getAccessToken()).toBeNull();
   });
 
@@ -139,14 +138,7 @@ describe('AuthProvider', () => {
     );
   });
 
-  it('restores the session on boot via a silent refresh when a refresh token is present', async () => {
-    localStorage.setItem(
-      REFRESH_TOKEN_STORAGE_KEY,
-      JSON.stringify({
-        refreshToken: 'refresh-boot',
-        expiresAt: AUTH_RESPONSE.refreshTokenExpiresAt,
-      }),
-    );
+  it('restores the session on boot via a silent cookie-based refresh', async () => {
     post.mockImplementation((path: string) => {
       if (path === '/v1/refresh') return Promise.resolve({ data: AUTH_RESPONSE });
       return Promise.resolve({ data: undefined });
@@ -155,26 +147,20 @@ describe('AuthProvider', () => {
 
     renderWithProviders(<Probe />, { withAuth: true });
 
-    // Boot starts loading because a refresh token exists.
+    // Boot always starts loading while it probes for a (possibly present) HttpOnly cookie.
     expect(screen.getByTestId('loading').textContent).toBe('true');
     await waitFor(() => expect(screen.getByTestId('auth').textContent).toBe('true'));
     expect(screen.getByTestId('email').textContent).toBe('a@b.cz');
-    expect(post).toHaveBeenCalledWith('/v1/refresh', {
-      body: { refreshToken: 'refresh-boot' },
-    });
+    // The refresh endpoint is called with NO body — the cookie is sent by the browser.
+    expect(post).toHaveBeenCalledWith('/v1/refresh');
   });
 
-  it('clears state on boot when the silent refresh fails', async () => {
-    localStorage.setItem(
-      REFRESH_TOKEN_STORAGE_KEY,
-      JSON.stringify({ refreshToken: 'expired', expiresAt: AUTH_RESPONSE.refreshTokenExpiresAt }),
-    );
+  it('treats the user as anonymous on boot when the silent refresh fails', async () => {
     post.mockRejectedValue(problem(401, 'urn:ambiquality:auth:invalid-refresh-token'));
 
     renderWithProviders(<Probe />, { withAuth: true });
 
     await waitFor(() => expect(screen.getByTestId('loading').textContent).toBe('false'));
     expect(screen.getByTestId('auth').textContent).toBe('false');
-    expect(localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY)).toBeNull();
   });
 });

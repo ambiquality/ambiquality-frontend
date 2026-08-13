@@ -2,26 +2,27 @@
  * The real AuthProvider (Phase 4) — owns the session and plugs the live {@link TokenStore} into
  * the Phase-2 API middleware.
  *
- * ## Token model (pitfall #8 / the plan)
+ * ## Token model (pitfall #8 / the plan, hardened for WSTG-SESS-04)
  * - **Access token + its expiry + the `MeResponse` user** live in memory (React state, mirrored
  *   into a ref so the synchronous `TokenStore.getAccessToken()` always reads the latest value).
- * - **Refresh token + its expiry** live in `localStorage` (see `storage.ts`) so the session
- *   survives reloads; never the access token.
+ * - **Refresh token** is held by the server as an **HttpOnly cookie** (set by `/login` and
+ *   `/refresh`); page JavaScript never sees it. There is therefore nothing to persist in
+ *   localStorage — the SPA simply sends `credentials: 'include'` on auth requests and the
+ *   cookie travels automatically.
  *
  * ## Middleware seam
  * On mount we `setTokenStore(...)` with an implementation that closes over the live refs:
  *   - `getAccessToken()`   → in-memory access token,
- *   - `getRefreshToken()`  → persisted refresh token,
  *   - `refresh()`          → `authClient POST /v1/refresh` **directly** (not through
  *                            `refreshMiddleware`), so a refresh can never recurse into another
- *                            refresh; on success it updates memory + storage,
- *   - `onAuthFailure()`    → clear memory + storage (→ `isAuthenticated` false → `ProtectedRoute`
+ *                            refresh; the HttpOnly cookie is sent by the client automatically,
+ *   - `onAuthFailure()`    → clear memory (→ `isAuthenticated` false → `ProtectedRoute`
  *                            redirects to `/login`).
  *
  * ## Session restore on boot
- * If a non-expired refresh token is in `localStorage` at start, we attempt one silent refresh and
- * then `GET /v1/account/me`; `isLoading` is true until that resolves. On any failure we clear and
- * treat the user as anonymous.
+ * Whether a refresh cookie exists is unknowable from JS, so on boot we always attempt one
+ * silent refresh and then `GET /v1/account/me`; `isLoading` is true until that resolves. On
+ * any failure we treat the user as anonymous.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
@@ -35,12 +36,6 @@ import {
   type LoginOutcome,
   type RegisterOutcome,
 } from './auth-context';
-import {
-  clearRefreshToken,
-  loadRefreshToken,
-  saveRefreshToken,
-  type StoredRefreshToken,
-} from './storage';
 
 /** The in-memory access token + its expiry. */
 interface AccessSession {
@@ -50,8 +45,9 @@ interface AccessSession {
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  // Boot starts in a loading state ONLY if there is a refresh token to try; resolved in the effect.
-  const [isLoading, setIsLoading] = useState<boolean>(() => loadRefreshToken() !== null);
+  // Boot starts loading because a refresh may exist as an HttpOnly cookie we cannot
+  // inspect; the boot effect attempts one silent refresh to find out.
+  const [isLoading, setIsLoading] = useState(true);
   // Render-safe mirror of "is an access token held": the ref is the synchronous source of truth
   // for the middleware, while this state drives `isAuthenticated` without reading the ref in render.
   const [hasAccess, setHasAccess] = useState(false);
@@ -66,28 +62,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setHasAccess(session !== null);
   }, []);
 
-  /** Apply a full auth response: access in memory, refresh in storage. */
+  /** Apply a full auth response: access token in memory; the refresh cookie is server-side. */
   const applyAuthResponse = useCallback(
-    (res: {
-      accessToken: string;
-      accessTokenExpiresAt: string;
-      refreshToken: string;
-      refreshTokenExpiresAt: string;
-    }) => {
+    (res: { accessToken: string; accessTokenExpiresAt: string }) => {
       setAccess({ accessToken: res.accessToken, accessTokenExpiresAt: res.accessTokenExpiresAt });
-      const stored: StoredRefreshToken = {
-        refreshToken: res.refreshToken,
-        expiresAt: res.refreshTokenExpiresAt,
-      };
-      saveRefreshToken(stored);
     },
     [setAccess],
   );
 
-  /** Clear ALL session state (memory + storage). Drives `isAuthenticated` → false. */
+  /** Clear ALL session state (memory). Drives `isAuthenticated` → false. */
   const clearSession = useCallback(() => {
     setAccess(null);
-    clearRefreshToken();
     setUser(null);
   }, [setAccess]);
 
@@ -105,20 +90,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   /**
-   * Exchange the persisted refresh token for a new token pair — calling the auth client's
+   * Exchange the HttpOnly refresh cookie for a new token pair — calling the auth client's
    * `POST /v1/refresh` **directly**. The refresh middleware only triggers on 401 of a *secured*
-   * request; `/v1/refresh` is anonymous and carries the refresh token in its body, so it never
-   * loops back through the refresh latch.
+   * request; `/v1/refresh` is anonymous and reads the refresh cookie (sent via
+   * `credentials: 'include'`), so it never loops back through the refresh latch.
    */
   const doRefresh = useCallback(async (): Promise<RefreshResult> => {
-    const stored = loadRefreshToken();
-    if (!stored) throw new Error('No refresh token to exchange.');
-
-    // `problemDetailsMiddleware` throws on a non-ok refresh (e.g. 401 expired/revoked), which
-    // propagates to the caller / the middleware's single-flight latch as a hard failure.
-    const { data } = await authClient.POST('/v1/refresh', {
-      body: { refreshToken: stored.refreshToken },
-    });
+    // `problemDetailsMiddleware` throws on a non-ok refresh (e.g. 401 no/expired/revoked
+    // cookie), which propagates to the caller / the middleware's single-flight latch as a
+    // hard failure.
+    const { data } = await authClient.POST('/v1/refresh');
     if (!data) throw new Error('Refresh failed.');
     applyAuthResponse(data);
     return { accessToken: data.accessToken };
@@ -137,7 +118,6 @@ export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     const store: TokenStore = {
       getAccessToken: () => accessRef.current?.accessToken ?? null,
-      getRefreshToken: () => loadRefreshToken()?.refreshToken ?? null,
       refresh: () => doRefreshRef.current(),
       onAuthFailure: () => clearSessionRef.current(),
     };
@@ -145,13 +125,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   // --- Session restore on boot. ---
+  // Whether a refresh cookie exists is unknowable from JS, so always attempt one silent
+  // refresh; a missing/expired cookie just 401s and we fall back to anonymous.
   useEffect(() => {
     let cancelled = false;
-    const stored = loadRefreshToken();
-    if (!stored) {
-      // Nothing to restore; effect's initial isLoading was already false.
-      return;
-    }
     (async () => {
       try {
         await doRefresh();

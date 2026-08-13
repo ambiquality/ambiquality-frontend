@@ -62,12 +62,8 @@ export const refreshMiddleware: Middleware = {
     if (request.headers.get(RETRY_HEADER)) return response;
 
     const store = getTokenStore();
-    // Nothing to refresh with → straight to hard logout.
-    if (!store.getRefreshToken()) {
-      store.onAuthFailure();
-      return response;
-    }
-
+    // Whether a refresh cookie exists is unknowable from JS (HttpOnly); just attempt
+    // the refresh — if there is no cookie it 401s and we hard-logout below.
     let newAccessToken: string;
     try {
       newAccessToken = await runSingleFlightRefresh();
@@ -80,7 +76,7 @@ export const refreshMiddleware: Middleware = {
     const retried = request.clone();
     retried.headers.set('Authorization', `Bearer ${newAccessToken}`);
     retried.headers.set(RETRY_HEADER, '1');
-    return fetch(retried);
+    return fetch(retried, { credentials: 'include' });
   },
 };
 

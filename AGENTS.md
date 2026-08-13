@@ -72,7 +72,7 @@ ambiquality-frontend/
     router.tsx              data router: visitor + informational + account routes; /operator behind ProtectedRoute
     api/                    generated clients (auth/, evidence/, public/) + fetch middleware +
                             pagination helpers + public feature hooks (hooks, map-hooks, catalog-hooks, entity-hooks)
-    auth/                   AuthProvider, token store (memory access + localStorage refresh),
+    auth/                   AuthProvider, token store (memory access + HttpOnly-cookie refresh),
                             useAuth, ProtectedRoute, silent single-flight refresh
     i18n/                   react-i18next cs/en, glossary-driven codelist labels, resources/
     theme/                  Chakra v3 system + a11y tokens + color-mode + UiProvider
@@ -128,12 +128,15 @@ These are the easy things to get wrong:
   maps `type` → localized, field-aware messages. Auth uses **generic** error codes on
   purpose (anti-enumeration) — don't leak specifics. `/login` is rate-limited: handle
   **429 + Retry-After**.
-- **Token model: in-memory access token + localStorage refresh, single-flight refresh.**
-  Access token (15 min) lives in **memory** (React context); refresh token (30 days) in
-  `localStorage`. On 401/expiry, refresh silently. Multiple concurrent 401s must trigger
+- **Token model: in-memory access token + HttpOnly-cookie refresh, single-flight refresh.**
+  Access token (15 min) lives in **memory** (React context); the refresh token (30 days) is an
+  **HttpOnly + SameSite=Strict cookie** set by Auth.Api — page JS never reads it, so there is
+  nothing to store in `localStorage`. On 401/expiry, refresh silently (the cookie travels via
+  `credentials: 'include'`). Multiple concurrent 401s must trigger
   **one** refresh (single-flight), then replay the queued requests; on refresh failure, hard
-  logout. Because the refresh token is in `localStorage`, keep the app XSS-clean — rely on
-  React/Chakra escaping, never use `dangerouslySetInnerHTML`.
+  logout. Because the refresh token is unreadable, a DOM-XSS can no longer mint a session, but
+  keep the app XSS-clean anyway (React/Chakra escaping, never `dangerouslySetInnerHTML`) to
+  protect the short-lived access token.
 - **Coordinates are precise everywhere.** Anonymization/coordinate masking was removed
   backend-side; Public.Api returns exact lat/lon to everyone. Render coordinates as-is —
   there is no coordinate-precision (`anonymizationLevel`) field on buildings.
