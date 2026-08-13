@@ -168,7 +168,7 @@ export const cs: Resources = {
       invalid: 'Tato hodnota není platná.',
       range: 'Zadejte číslo mezi {{min}} a {{max}}.',
       email: 'Zadejte platnou e-mailovou adresu.',
-      passwordTooShort: 'Použijte alespoň 8 znaků.',
+      passwordTooShort: 'Použijte alespoň 12 znaků.',
       positive: 'Zadejte kladné číslo.',
     },
   },
@@ -476,6 +476,7 @@ export const cs: Resources = {
     fieldErrorsLabel: 'Opravte prosím následující:',
     'urn:ambiquality:auth:invalid-credentials': 'E-mail nebo heslo je nesprávné.',
     'urn:ambiquality:auth:invalid-email': 'Zadejte prosím platnou e-mailovou adresu.',
+    'urn:ambiquality:auth:weak-password': 'Heslo je příliš krátké. Použijte alespoň 12 znaků.',
     'urn:ambiquality:auth:email-already-registered':
       'Pokud lze tento e-mail registrovat, byl odeslán potvrzovací odkaz.',
     'urn:ambiquality:auth:email-not-confirmed': 'Nejprve prosím potvrďte svou e-mailovou adresu.',

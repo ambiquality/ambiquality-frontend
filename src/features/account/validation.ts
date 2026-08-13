@@ -23,14 +23,17 @@ export function emailValidator(messages: { required: string; invalid: string }):
   };
 }
 
-/** Required + a minimum length (8, a sane lower bound; the backend owns the real policy). */
+/** Backend password minimum — must stay in sync with Auth.Api `Auth:PasswordMinLength`. */
+export const PASSWORD_MIN_LENGTH = 12;
+
+/** Required + a minimum length (12, matching the backend policy; the backend owns enforcement). */
 export function passwordValidator(messages: {
   required: string;
   tooShort: string;
 }): FieldValidator {
   return (value) => {
     if (value === '') return messages.required;
-    if (value.length < 8) return messages.tooShort;
+    if (value.length < PASSWORD_MIN_LENGTH) return messages.tooShort;
     return null;
   };
 }
@@ -39,3 +42,4 @@ export function passwordValidator(messages: {
 export function requiredValidator(message: string): FieldValidator {
   return (value) => (value.trim() === '' ? message : null);
 }
+

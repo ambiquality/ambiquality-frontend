@@ -4,7 +4,7 @@ import { Link as RouterLink, Navigate, useLocation, useNavigate } from 'react-ro
 import { useTranslation } from 'react-i18next';
 import { FormField, FormActions } from '@/components';
 import { useAuth } from '@/auth/useAuth';
-import { emailValidator, passwordValidator } from './validation';
+import { emailValidator, requiredValidator } from './validation';
 
 interface FromState {
   from?: { pathname?: string };
@@ -99,10 +99,9 @@ export function LoginPage() {
           <FormField
             label={t('fields.password')}
             required
-            validate={passwordValidator({
-              required: tf('validation.required'),
-              tooShort: tf('validation.passwordTooShort'),
-            })}
+            // Required-only: the password policy applies to choosing a NEW password
+            // (register / change-password), not to logging in with an existing one.
+            validate={requiredValidator(tf('validation.required'))}
           >
             <Input
               type="password"
