@@ -5,8 +5,9 @@ import { CONTACT_EMAIL } from '@/lib/constants';
 /**
  * Public Privacy Policy page (GDPR/EU framing). A full data-protection notice rendered from i18n
  * keys (cs+en) with semantic headings (`h1` title, `h2` sections) — no raw HTML and no
- * `dangerouslySetInnerHTML` (the refresh token lives in `localStorage`, so the app stays
- * XSS-clean). The contact address comes from `@/lib/constants`.
+ * `dangerouslySetInnerHTML` (the refresh token is an HttpOnly cookie — never readable by page
+ * JS — and the access token lives in memory only, so the app stays XSS-clean). The contact
+ * address comes from `@/lib/constants`.
  *
  * The notice is provisional: Ambiquality is a student bachelor-thesis project at VŠE Praha and
  * the text awaits the author's legal review (see the closing "status" section).
